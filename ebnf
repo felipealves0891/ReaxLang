@@ -1,0 +1,69 @@
+program         = { statement } ;
+
+statement       = variableDeclaration
+                | reactiveBlock
+                | ifStatement
+                | whileLoop
+                | forLoop
+                | foreachLoop
+                | expressionStatement ;
+
+variableDeclaration = "let" identifier "=" expression ";" ;
+
+reactiveBlock   = "on" identifier [ "when" identifier "=>" expression ] block ;
+
+ifStatement     = "if" "(" expression ")" block [ "else" block ] ;
+
+whileLoop       = "while" "(" expression ")" block ;
+
+forLoop         = "for" "(" [ variableDeclaration | expressionStatement ] expression ";" [ expression ] ")" block ;
+
+foreachLoop     = "foreach" "(" identifier "in" expression ")" block ;
+
+expressionStatement = expression ";" ;
+
+block           = "{" { statement } "}" ;
+
+expression      = assignment ;
+
+assignment      = logicalOr ;
+
+logicalOr       = logicalAnd { "||" logicalAnd } ;
+
+logicalAnd      = equality { "&&" equality } ;
+
+equality        = comparison { ( "==" | "!=" ) comparison } ; 
+
+comparison      = term { ( "<" | "<=" | ">" | ">=" ) term } ;
+
+term            = factor { ( "+" | "-" ) factor } ;
+
+factor          = unary { ( "*" | "/" ) unary } ;
+
+unary           = ( "!" | "-" ) unary
+                | primary ;
+
+primary         = literal
+                | identifier
+                | functionCall
+                | "(" expression ")" ;
+
+functionCall    = identifier "(" [ arguments ] ")" ;
+
+arguments       = expression { "," expression } ;
+
+literal         = number | string | boolean ;
+
+identifier      = letter { letter | digit | "_" } ;
+
+number          = digit { digit } ;
+
+string          = "'" { character } "'" ;
+
+boolean         = "true" | "false" ;
+
+letter          = "a".."z" | "A".."Z" ;
+
+digit           = "0".."9" ;
+
+character       = ? any character except ' ? ;

@@ -1,0 +1,15 @@
+let contador = 0;
+
+on contador {
+    writer('O contador alterou!');
+}
+
+on contador when contador => contador > 5 {
+    writer('O contador passou de 5!');
+} 
+
+while contador < 10 {
+    contador = contador + 1;
+}
+
+writer('Fim!');

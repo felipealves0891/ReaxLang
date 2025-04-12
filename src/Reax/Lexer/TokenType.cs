@@ -1,0 +1,23 @@
+namespace Reax.Lexer;
+
+public enum TokenType 
+{
+    EOF = -1,
+    UNKNOW,
+    END_STATEMENT,
+    IDENTIFIER,
+    ASSIGNMENT,
+    START_PARAMETER,
+    END_PARAMETER,
+    STRING,
+    NUMBER,
+    LET,
+    COMPARISON,
+    EQUALITY,
+    IF,
+    START_BLOCK,
+    END_BLOCK,
+    TERM,
+    FACTOR,
+    UNARY
+} 
