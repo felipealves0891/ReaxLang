@@ -33,12 +33,14 @@ public class ReaxParser
             return null;
 
         var nextToken = _tokens[_position];
-        if(nextToken.Type == TokenType.EOF) return null;
-        else if(nextToken.Type == TokenType.LET) return DeclarationParse();
-        else if(nextToken.Type == TokenType.IDENTIFIER 
-            && _tokens[_position+1].Type == TokenType.START_PARAMETER) return FunctionCallParse();
-        else if(nextToken.Type == TokenType.IDENTIFIER 
-            && _tokens[_position+1].Type == TokenType.ASSIGNMENT) return AssignmentParse();
+        if(nextToken.Type == TokenType.EOF) 
+            return null;
+        else if(nextToken.Type == TokenType.LET) 
+            return DeclarationParse();
+        else if(IsFunctionCall()) 
+            return FunctionCallParse();
+        else if(IsAssignment()) 
+            return AssignmentParse();
 
         throw new Exception();
     }
@@ -66,6 +68,12 @@ public class ReaxParser
             return new DeclarationNode(identifier.Source, null);
     }
 
+    private bool IsFunctionCall() 
+    {
+        return _tokens[_position].Type == TokenType.IDENTIFIER 
+            && _tokens[_position+1].Type == TokenType.START_PARAMETER;
+    }
+
     private ReaxNode FunctionCallParse() 
     {
         var statements = NextStatement();
@@ -88,6 +96,12 @@ public class ReaxParser
             throw new Exception();
         
         return new FunctionCallNode(identifier.Source, parameter.ToReaxValue());
+    }
+
+    private bool IsAssignment() 
+    {
+        return _tokens[_position].Type == TokenType.IDENTIFIER 
+            && _tokens[_position+1].Type == TokenType.ASSIGNMENT;
     }
 
     private ReaxNode AssignmentParse() 
