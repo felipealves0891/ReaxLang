@@ -23,5 +23,6 @@ public enum TokenType
     UNARY,
     ON,
     TRUE,
-    FALSE
+    FALSE,
+    ARROW
 } 

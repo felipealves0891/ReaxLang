@@ -80,10 +80,7 @@ public class ReaxInterpreter
 
         if(_observables.TryGetValue(assignment.Identifier, out var interpreters))
         {
-            foreach (var interpreter in interpreters)
-            {
-                interpreter.Interpret();
-            }
+            Parallel.ForEach(interpreters, interpreter => interpreter.Interpret());
         }
     }
 

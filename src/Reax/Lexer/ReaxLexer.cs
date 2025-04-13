@@ -54,6 +54,8 @@ public class ReaxLexer
             return AdvanceAndReturn(new Token(TokenType.EQUALITY, "==", _position));   
         if(CurrentChar == '!' && NextChar == '=') 
             return AdvanceAndReturn(new Token(TokenType.EQUALITY, "!=", _position));   
+        if(CurrentChar == '-' && NextChar == '>')
+            return GetArrow();
         if(CurrentChar == '<' || CurrentChar == '>') 
             return GetComparison();
         if(CurrentChar == '+' || CurrentChar == '-') 
@@ -129,6 +131,14 @@ public class ReaxLexer
         var end = _position;
         Advance();
         return new Token(TokenType.COMPARISON, _source[start..end], _position);
+    }
+
+    private Token GetArrow() 
+    {
+        var start = _position;
+        Advance();
+        Advance();
+        return new Token(TokenType.ARROW, "->", start);
     }
 
     private void Advance() 

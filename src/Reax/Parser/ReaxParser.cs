@@ -51,11 +51,10 @@ public class ReaxParser
 
     private ReaxNode DeclarationParse() 
     {
-        var statements = NextStatement();
         Token? identifier = null;
         Token? value = null;
 
-        foreach (var statement in statements)
+        foreach (var statement in NextStatement())
         {
             if(statement.Type == TokenType.IDENTIFIER)
                 identifier = statement;
@@ -80,13 +79,12 @@ public class ReaxParser
 
     private ReaxNode FunctionCallParse() 
     {
-        var statements = NextStatement();
         bool startParameter = false;
 
         Token? identifier = null;
         Token? parameter = null;
         
-        foreach (var statement in statements)
+        foreach (var statement in NextStatement())
         {
             if(!startParameter && statement.Type == TokenType.IDENTIFIER)
                 identifier = statement;
@@ -154,8 +152,19 @@ public class ReaxParser
     {
         _position++;
         var variable = new VarNode(_tokens[_position++].Source);
-        var block = NextBlock();
-        return new ObservableNode(variable, block);
+
+        if(_tokens[_position].Type == TokenType.START_BLOCK)
+            return new ObservableNode(variable, NextBlock());
+        else if(_tokens[_position].Type == TokenType.ARROW)
+            return  new ObservableNode(variable, new ContextNode([ArrowParse()]));
+        else
+            throw new InvalidOperationException($"Token invalido '{_tokens[_position].Type}' na posição: {_position}");
+    }
+
+    private ReaxNode ArrowParse() 
+    {
+        _position++;
+        return NextNode() ?? throw new InvalidOperationException();
     }
 
     private IEnumerable<Token> NextStatement() 

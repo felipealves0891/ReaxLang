@@ -1,24 +1,25 @@
 using System;
+using System.Collections.Concurrent;
 using Reax.Parser.Node;
 
 namespace Reax.Runtime;
 
 public class ReaxExecutionContext
 {
-    private readonly Dictionary<string, Guid> _keys;
-    private readonly Dictionary<Guid, ReaxNode> _context;
+    private readonly IDictionary<string, Guid> _keys;
+    private readonly IDictionary<Guid, ReaxNode> _context;
     private readonly ReaxExecutionContext? _parentContext;
 
     public ReaxExecutionContext()
     {
-        _keys = new Dictionary<string, Guid>();
-        _context = new Dictionary<Guid, ReaxNode>();
+        _keys = new ConcurrentDictionary<string, Guid>();
+        _context = new ConcurrentDictionary<Guid, ReaxNode>();
     }
 
     public ReaxExecutionContext(ReaxExecutionContext parentContext)
     {
-        _keys = new Dictionary<string, Guid>();
-        _context = new Dictionary<Guid, ReaxNode>();
+        _keys = new ConcurrentDictionary<string, Guid>();
+        _context = new ConcurrentDictionary<Guid, ReaxNode>();
         _parentContext = parentContext;
     }
 

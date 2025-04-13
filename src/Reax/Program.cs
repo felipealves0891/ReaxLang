@@ -7,6 +7,10 @@ let minha_variavel = 'Meu Texto';
 on minha_variavel {
     writer('Minha variavel foi alterada!');
 }
+on minha_variavel {
+    writer('Minha variavel foi alterada2!');
+}
+on minha_variavel -> writer('Minha variavel foi alterada3!');
 let meuNumero = 5;
 if meuNumero != 10 {
     writer('Meu numero é igual a 5');    
