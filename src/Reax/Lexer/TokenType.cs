@@ -20,5 +20,8 @@ public enum TokenType
     END_BLOCK,
     TERM,
     FACTOR,
-    UNARY
+    UNARY,
+    ON,
+    TRUE,
+    FALSE
 } 

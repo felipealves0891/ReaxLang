@@ -43,6 +43,8 @@ public class ReaxParser
             return AssignmentParse();
         else if(nextToken.Type == TokenType.IF)
             return IfParse();
+        else if(nextToken.Type == TokenType.ON)
+            return ObservableParse();
 
         throw new Exception();
     }
@@ -147,8 +149,14 @@ public class ReaxParser
 
         return new IfNode(condition, @true, @else);
     }
-
-
+    
+    private ReaxNode ObservableParse() 
+    {
+        _position++;
+        var variable = new VarNode(_tokens[_position++].Source);
+        var block = NextBlock();
+        return new ObservableNode(variable, block);
+    }
 
     private IEnumerable<Token> NextStatement() 
     {

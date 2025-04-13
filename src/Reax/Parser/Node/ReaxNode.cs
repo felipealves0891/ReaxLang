@@ -138,4 +138,19 @@ public record CalculateNode(ReaxNode Left, ReaxNode Operator, ReaxNode Right) : 
 
 public record ContextNode(ReaxNode[] Block) : ReaxNode;
 
-public record IfNode(BinaryNode Condition, ReaxNode True, ReaxNode? False) : ReaxNode;
+public record IfNode(BinaryNode Condition, ReaxNode True, ReaxNode? False) : ReaxNode
+{
+    public override string ToString()
+    {
+        var elseText = False is null ? "" : "else {}";
+        return $"if {Condition} {{}} {elseText}";
+    }
+}
+
+public record ObservableNode(ReaxNode Var, ReaxNode Block) : ReaxNode
+{
+    public override string ToString()
+    {
+        return $"Observer {Var} {{}}";
+    }
+}

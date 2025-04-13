@@ -99,6 +99,9 @@ public class ReaxLexer
             "let" => new Token(TokenType.LET, identifier, start),
             "if" =>  new Token(TokenType.IF, identifier, start),
             "else" => new Token(TokenType.ELSE, identifier, start),
+            "on" =>  new Token(TokenType.ON, identifier, start),
+            "true" =>  new Token(TokenType.TRUE, identifier, start),
+            "false" =>  new Token(TokenType.FALSE, identifier, start),
             _ => new Token(TokenType.IDENTIFIER, identifier, start)
         };
     }

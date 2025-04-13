@@ -8,12 +8,14 @@ public class ReaxInterpreter
 {
     private readonly ReaxNode[] _nodes;
     private readonly Dictionary<string, Action<ReaxNode>> _functionBuiltIn;
+    private readonly Dictionary<string, IList<ReaxInterpreter>> _observables;
     private ReaxExecutionContext _context;
 
     public ReaxInterpreter(ReaxNode[] nodes)
     {
         _nodes = nodes;
         _context = new ReaxExecutionContext();
+        _observables = new Dictionary<string, IList<ReaxInterpreter>>();
         _functionBuiltIn = new Dictionary<string, Action<ReaxNode>> 
         {
             {"writer", x => Console.WriteLine(x)}
@@ -24,6 +26,7 @@ public class ReaxInterpreter
     {
         _nodes = nodes;
         _context = new ReaxExecutionContext(context);
+        _observables = new Dictionary<string, IList<ReaxInterpreter>>();
         _functionBuiltIn = new Dictionary<string, Action<ReaxNode>> 
         {
             {"writer", x => Console.WriteLine(x)}
@@ -39,9 +42,11 @@ public class ReaxInterpreter
             else if (node is DeclarationNode declaration)
                 ExecuteDeclaration(declaration);
             else if (node is AssignmentNode assignment)
-                _context.SetValue(assignment.Identifier, assignment.Assignment);
+                ExecuteAssignment(assignment);
             else if (node is IfNode @if)
                 ExecuteIf(@if);
+            else if (node is ObservableNode observable)
+                ExecuteOn(observable);
         }
     }
 
@@ -66,7 +71,20 @@ public class ReaxInterpreter
     {
         _context.Declare(declaration.Identifier);
         if(declaration.Assignment is not null)
-            _context.SetValue(declaration.Identifier, declaration.Assignment);
+            ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment));
+    }
+
+    public void ExecuteAssignment(AssignmentNode assignment)
+    {
+        _context.SetValue(assignment.Identifier, assignment.Assignment);
+
+        if(_observables.TryGetValue(assignment.Identifier, out var interpreters))
+        {
+            foreach (var interpreter in interpreters)
+            {
+                interpreter.Interpret();
+            }
+        }
     }
 
     private void ExecuteIf(IfNode node) 
@@ -86,6 +104,22 @@ public class ReaxInterpreter
             var contextNode = (ContextNode)node.False;
             var interpreter = new ReaxInterpreter(contextNode.Block, _context);
             interpreter.Interpret();
+        }
+    }
+
+    private void ExecuteOn(ObservableNode node) 
+    {
+        var identifier = node.Var.ToString();
+        var contextNode = (ContextNode)node.Block;
+        var interpreter = new ReaxInterpreter(contextNode.Block, _context);
+        if (_observables.TryGetValue(identifier, out var interpreters))
+        {
+            interpreters.Add(interpreter);
+        }
+        else
+        {
+            interpreters = new List<ReaxInterpreter>([interpreter]);
+            _observables[identifier] = interpreters;
         }
     }
 
