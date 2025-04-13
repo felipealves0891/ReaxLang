@@ -97,8 +97,8 @@ public class ReaxInterpreter
     public ReaxNode Calculate(CalculateNode node)
     {
         var op = (IArithmeticOperator)node.Operator;
-        var left = GetValue(node.Left) as NumberNode;
-        var right = GetValue(node.Right) as NumberNode;
+        var left = GetValue(CalculateChild(node.Left)) as NumberNode;
+        var right = GetValue(CalculateChild(node.Right)) as NumberNode;
 
         if(left is null)
             throw new InvalidOperationException($"Valor invalido para calculo '{left}'");
@@ -107,6 +107,16 @@ public class ReaxInterpreter
             throw new InvalidOperationException($"Valor invalido para calculo '{right}'");
 
         return op.Calculate(left, right);
+    }
+
+    private ReaxNode CalculateChild(ReaxNode node) 
+    {
+        if(node is CalculateNode calculate)
+            return Calculate(calculate);
+        else if (node is IReaxValue value)
+            return node;
+        else 
+            throw new InvalidOperationException("Não é possivel tratar o nó da operação!");
     }
 
     private void ExecuteIf(IfNode node) 

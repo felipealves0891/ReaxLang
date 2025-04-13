@@ -1,5 +1,5 @@
-using System;
 using Reax.Lexer;
+using Reax.Parser.Helpers;
 using Reax.Parser.Node;
 
 namespace Reax.Parser;
@@ -140,8 +140,6 @@ public class ReaxParser
             value = new ContextNode(expressionNodes.ToArray());
         }
 
-        
-
         if(identifier is null || expression is null)
             throw new Exception();
         
@@ -191,24 +189,14 @@ public class ReaxParser
 
     private ReaxNode ArithmeticOperationParse() 
     {
-        ReaxNode? left = null;
-        ReaxNode? op = null;
-        ReaxNode? right = null;
+        var statement = NextStatement();
+        var helper = new CalculationHelper(statement);
+        var node = helper.ParseExpression();
         
-        foreach (var item in NextStatement())
-        {
-            if(left is null)
-                left = item.ToReaxValue();
-            else if (op is null)
-                op = item.ToArithmeticOperator();
-            else
-                right = item.ToReaxValue();
-        }
-
-        if(left is null || op is null || right is null)
+        if(node is null)
             throw new InvalidOperationException("Valores faltando para a operação");
 
-        return new CalculateNode(left, op, right);
+        return node;
     }
 
     private ReaxNode ArrowParse() 
