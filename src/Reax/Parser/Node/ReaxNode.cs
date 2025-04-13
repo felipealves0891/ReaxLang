@@ -4,7 +4,10 @@ namespace Reax.Parser.Node;
 
 public interface IReaxValue;
 public interface IOperator;
-public interface IArithmeticOperator : IOperator;
+public interface IArithmeticOperator : IOperator
+{
+    NumberNode Calculate(NumberNode x, NumberNode y);
+};
 public interface ILogicOperator : IOperator
 {
     bool Compare(ReaxNode x, ReaxNode y);
@@ -106,6 +109,16 @@ public record EqualityNode(string Operator) : ReaxNode, ILogicOperator
 
 public record TermNode(string Operator) : ReaxNode, IArithmeticOperator
 {
+    public NumberNode Calculate(NumberNode x, NumberNode y)
+    {
+        return Operator switch 
+        {
+            "+" => new NumberNode((x.ValueConverted + y.ValueConverted).ToString()),
+            "-" => new NumberNode((x.ValueConverted - y.ValueConverted).ToString()),
+            _ => throw new InvalidOperationException("Operador invalido!")
+        };
+    }
+
     public override string ToString()
     {
         return Operator.ToString();
@@ -114,6 +127,16 @@ public record TermNode(string Operator) : ReaxNode, IArithmeticOperator
 
 public record FactorNode(string Operator) : ReaxNode, IArithmeticOperator
 {
+    public NumberNode Calculate(NumberNode x, NumberNode y)
+    {
+        return Operator switch 
+        {
+            "*" => new NumberNode((x.ValueConverted * y.ValueConverted).ToString()),
+            "/" => new NumberNode((x.ValueConverted / y.ValueConverted).ToString()),
+            _ => throw new InvalidOperationException("Operador invalido!")
+        };
+    }
+
     public override string ToString()
     {
         return Operator.ToString();

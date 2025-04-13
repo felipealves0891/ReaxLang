@@ -9,7 +9,7 @@ public class ReaxInterpreter
     private readonly ReaxNode[] _nodes;
     private readonly Dictionary<string, Action<ReaxNode>> _functionBuiltIn;
     private readonly Dictionary<string, IList<ReaxInterpreter>> _observables;
-    private ReaxExecutionContext _context;
+    private readonly ReaxExecutionContext _context;
 
     public ReaxInterpreter(ReaxNode[] nodes)
     {
@@ -22,6 +22,9 @@ public class ReaxInterpreter
         };
     }
     
+    public bool IsOutput => Output is not null;
+    public ReaxNode? Output { get; private set; }
+
     public ReaxInterpreter(ReaxNode[] nodes, ReaxExecutionContext context)
     {
         _nodes = nodes;
@@ -47,6 +50,8 @@ public class ReaxInterpreter
                 ExecuteIf(@if);
             else if (node is ObservableNode observable)
                 ExecuteOn(observable);
+            else if(node is CalculateNode calculate)
+                Output = Calculate(calculate);
         }
     }
 
@@ -76,12 +81,32 @@ public class ReaxInterpreter
 
     public void ExecuteAssignment(AssignmentNode assignment)
     {
-        _context.SetValue(assignment.Identifier, assignment.Assignment);
+        if(assignment.Assignment is ContextNode node)
+            _context.SetValue(assignment.Identifier, ExecuteContextAndReturnValue(node));
+        else if (assignment.Assignment is VarNode variable)
+            _context.SetValue(assignment.Identifier, _context.GetValue(variable.Identifier));
+        else
+            _context.SetValue(assignment.Identifier, assignment.Assignment);
 
         if(_observables.TryGetValue(assignment.Identifier, out var interpreters))
         {
             Parallel.ForEach(interpreters, interpreter => interpreter.Interpret());
         }
+    }
+
+    public ReaxNode Calculate(CalculateNode node)
+    {
+        var op = (IArithmeticOperator)node.Operator;
+        var left = GetValue(node.Left) as NumberNode;
+        var right = GetValue(node.Right) as NumberNode;
+
+        if(left is null)
+            throw new InvalidOperationException($"Valor invalido para calculo '{left}'");
+        
+        if(right is null)
+            throw new InvalidOperationException($"Valor invalido para calculo '{right}'");
+
+        return op.Calculate(left, right);
     }
 
     private void ExecuteIf(IfNode node) 
@@ -118,6 +143,17 @@ public class ReaxInterpreter
             interpreters = new List<ReaxInterpreter>([interpreter]);
             _observables[identifier] = interpreters;
         }
+    }
+
+    private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 
+    {
+        var interpreter = new ReaxInterpreter(node.Block, _context);
+            interpreter.Interpret();
+
+        if(interpreter.Output is null)
+            throw new InvalidOperationException("Era esperado que a função retornace um valor!");
+
+        return interpreter.Output;
     }
 
     private ReaxNode GetValue(ReaxNode node) 

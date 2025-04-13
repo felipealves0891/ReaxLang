@@ -2,25 +2,7 @@
 using Reax.Lexer;
 using Reax.Parser;
 
-var code = @"
-let minha_variavel = 'Meu Texto';
-on minha_variavel {
-    writer('Minha variavel foi alterada!');
-}
-on minha_variavel {
-    writer('Minha variavel foi alterada2!');
-}
-on minha_variavel -> writer('Minha variavel foi alterada3!');
-let meuNumero = 5;
-if meuNumero != 10 {
-    writer('Meu numero é igual a 5');    
-} else {
-    writer('Meu numero é menor que 10');    
-}
-writer(minha_variavel);
-minha_variavel = 'Meu texto alterado ';
-writer(meuNumero);
-";
+var code = File.ReadAllText(@"D:\Source\simple.reax");
 
 var lexer = new ReaxLexer(code);
 var tokens = lexer.Tokenize();

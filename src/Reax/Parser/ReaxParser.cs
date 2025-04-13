@@ -15,6 +15,11 @@ public class ReaxParser
         _position = 0;
     }
 
+    public bool EndOfTokens => _position >= _tokens.Length;
+    public Token BeforeToken => _tokens[_position-1];
+    public Token CurrentToken => _tokens[_position];
+    public Token NextToken => _tokens[_position+1];
+
     public IEnumerable<ReaxNode> Parse() 
     {
         ReaxNode? node = null;
@@ -45,6 +50,8 @@ public class ReaxParser
             return IfParse();
         else if(nextToken.Type == TokenType.ON)
             return ObservableParse();
+        else if(IsArithmeticOperation())
+            return ArithmeticOperationParse();
 
         throw new Exception();
     }
@@ -109,20 +116,36 @@ public class ReaxParser
     private ReaxNode AssignmentParse() 
     {
         Token? identifier = null;
-        Token? value = null;
-        
+        bool isExpression = false;
+        List<Token> expression = new List<Token>();
+        ReaxNode? value = null;
         foreach (var statement in NextStatement())
         {
-            if(identifier is null && statement.Type == TokenType.IDENTIFIER)
+            if(!isExpression && statement.Type == TokenType.IDENTIFIER)
                 identifier = statement;
-            else if (identifier is not null && statement.IsReaxValue())
-                value = statement;
+            else if (!isExpression && statement.Type == TokenType.ASSIGNMENT)
+                isExpression = true;
+            else if (isExpression)
+                expression.Add(statement);
         }
 
-        if(identifier is null || value is null)
+        if(expression.Count() == 1)
+        {
+            value = expression[0].ToReaxValue();
+        }
+        else 
+        {
+            var parser = new ReaxParser(expression);
+            var expressionNodes = parser.Parse();
+            value = new ContextNode(expressionNodes.ToArray());
+        }
+
+        
+
+        if(identifier is null || expression is null)
             throw new Exception();
         
-        return new AssignmentNode(identifier.Source, value.ToReaxValue());
+        return new AssignmentNode(identifier.Source, value);
     }
 
     private ReaxNode IfParse()
@@ -161,6 +184,33 @@ public class ReaxParser
             throw new InvalidOperationException($"Token invalido '{_tokens[_position].Type}' na posição: {_position}");
     }
 
+    private bool IsArithmeticOperation() 
+    {
+        return CurrentToken.CanCalculated() && NextToken.IsArithmeticOperator();
+    }
+
+    private ReaxNode ArithmeticOperationParse() 
+    {
+        ReaxNode? left = null;
+        ReaxNode? op = null;
+        ReaxNode? right = null;
+        
+        foreach (var item in NextStatement())
+        {
+            if(left is null)
+                left = item.ToReaxValue();
+            else if (op is null)
+                op = item.ToArithmeticOperator();
+            else
+                right = item.ToReaxValue();
+        }
+
+        if(left is null || op is null || right is null)
+            throw new InvalidOperationException("Valores faltando para a operação");
+
+        return new CalculateNode(left, op, right);
+    }
+
     private ReaxNode ArrowParse() 
     {
         _position++;
@@ -171,6 +221,9 @@ public class ReaxParser
     {
         while(true)
         {
+            if(EndOfTokens)
+                break;
+
             if(_tokens[_position].Type == TokenType.END_STATEMENT)
             {
                 _position++;

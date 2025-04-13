@@ -23,6 +23,36 @@ public static class TokenExtensions
         };
     }
 
+    public static bool CanCalculated(this Token token)
+    {
+        return token.Type switch 
+        {
+            TokenType.IDENTIFIER => true,
+            TokenType.NUMBER => true,
+            _ => false
+        };
+    }
+
+    public static bool IsArithmeticOperator(this Token token)
+    {
+        return token.Type switch 
+        {
+            TokenType.TERM => true,
+            TokenType.FACTOR => true,
+            _ => false
+        };
+    }
+
+    public static ReaxNode ToArithmeticOperator(this Token token) 
+    {
+        return token.Type switch 
+        {
+            TokenType.TERM => new TermNode(token.Source),
+            TokenType.FACTOR => new FactorNode(token.Source),
+            _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em operador aritimetico!")
+        };
+    }
+
     public static ReaxNode ToReaxValue(this Token token) 
     {
         return token.Type switch 
@@ -36,9 +66,6 @@ public static class TokenExtensions
 
     public static ReaxNode ToLogicOperator(this Token token) 
     {
-        if(token.Type != TokenType.COMPARISON && token.Type != TokenType.EQUALITY)
-            throw new InvalidOperationException($"Não é possivel converter {token.Type} em um operador logico!");
-
         return token.Type switch 
         {
             TokenType.COMPARISON => new ComparisonNode(token.Source),
