@@ -4,9 +4,10 @@ using Reax.Parser;
 
 var code = @"
 let minha_variavel = 'Meu Texto';
+
 let meuNumero = 5;
-if meuNumero < 0 {
-    writer('Meu numero é maior que 0');    
+if meuNumero != 10 {
+    writer('Meu numero é igual a 5');    
 } else {
     writer('Meu numero é menor que 10');    
 }
@@ -23,5 +24,3 @@ var ast = parser.Parse().ToArray();
 
 var interpreter = new ReaxInterpreter(ast);
 interpreter.Interpret();
-
-Console.Read();

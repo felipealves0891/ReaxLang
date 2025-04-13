@@ -14,6 +14,7 @@ public class ReaxLexer
     }
 
     public bool EndOfFile => _position >= _source.Length;
+    public char BeforeChar => _source[_position-1];
     public char CurrentChar => _source[_position];
     public char NextChar => _source[_position+1];
 
@@ -47,9 +48,9 @@ public class ReaxLexer
             return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ")", _position));       
         if(CurrentChar == ';') 
             return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, ";", _position));   
-        if(CurrentChar == '=' && NextChar != '=') 
+        if(IsLetterOrIsDigitOrWhiteSpace(BeforeChar) && CurrentChar == '=' && IsLetterOrIsDigitOrWhiteSpace(NextChar)) 
             return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, "=", _position));   
-        if(CurrentChar == '=' && NextChar == '=') 
+        if(BeforeChar == '=' && CurrentChar == '=') 
             return AdvanceAndReturn(new Token(TokenType.EQUALITY, "==", _position));   
         if(CurrentChar == '!' && NextChar == '=') 
             return AdvanceAndReturn(new Token(TokenType.EQUALITY, "!=", _position));   
@@ -136,5 +137,9 @@ public class ReaxLexer
 
     public bool IsIdentifier(char c) 
         => char.IsLetter(c) || char.IsDigit(c) || c == '_';
-    
+
+    private bool IsLetterOrIsDigitOrWhiteSpace(char c) 
+    {
+        return char.IsLetter(c) || char.IsDigit(c) || char.IsWhiteSpace(c);
+    }   
 }
