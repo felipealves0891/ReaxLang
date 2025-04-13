@@ -15,6 +15,7 @@ public enum TokenType
     COMPARISON,
     EQUALITY,
     IF,
+    ELSE,
     START_BLOCK,
     END_BLOCK,
     TERM,

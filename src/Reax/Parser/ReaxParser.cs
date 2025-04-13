@@ -41,6 +41,8 @@ public class ReaxParser
             return FunctionCallParse();
         else if(IsAssignment()) 
             return AssignmentParse();
+        else if(nextToken.Type == TokenType.IF)
+            return IfParse();
 
         throw new Exception();
     }
@@ -122,7 +124,32 @@ public class ReaxParser
         
         return new AssignmentNode(identifier.Source, value.ToReaxValue());
     }
-    
+
+    private ReaxNode IfParse()
+    {
+        _position++;
+        var left = _tokens[_position++];
+        var @perator = _tokens[_position++];
+        var right = _tokens[_position++];
+        var @true = NextBlock();
+        ReaxNode? @else = null;
+
+        if(_tokens[_position].Type == TokenType.ELSE)
+        {
+            _position++;
+            @else = NextBlock();
+        }
+
+        var condition = new BinaryNode(
+            left.ToReaxValue(), 
+            @perator.ToLogicOperator(), 
+            right.ToReaxValue());
+
+        return new IfNode(condition, @true, @else);
+    }
+
+
+
     private IEnumerable<Token> NextStatement() 
     {
         while(true)
@@ -136,5 +163,28 @@ public class ReaxParser
             yield return _tokens[_position];
             _position++;
         }
+    }
+
+    private ReaxNode NextBlock()
+    {
+        var block = new List<ReaxNode>();
+        if(_tokens[_position].Type != TokenType.START_BLOCK)
+            return new ContextNode(block.ToArray());
+
+        _position++;
+        while(true)
+        {
+            if(_tokens[_position].Type == TokenType.END_BLOCK)
+                break;
+
+            var node = NextNode();
+            if(node is null)
+                throw new InvalidOperationException("Era esperado o fim do bloco!");
+
+            block.Add(node);
+        }
+
+        _position++;
+        return new ContextNode(block.ToArray());
     }
 }

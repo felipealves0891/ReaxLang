@@ -60,7 +60,11 @@ public class ReaxLexer
         if(CurrentChar == '*' || CurrentChar == '/')
             return AdvanceAndReturn(new Token(TokenType.FACTOR, CurrentChar.ToString(), _position));   
         if(CurrentChar == '!')
-            return AdvanceAndReturn(new Token(TokenType.UNARY, CurrentChar.ToString(), _position));   
+            return AdvanceAndReturn(new Token(TokenType.UNARY, CurrentChar.ToString(), _position)); 
+        if(CurrentChar == '{')
+            return AdvanceAndReturn(new Token(TokenType.START_BLOCK, CurrentChar.ToString(), _position)); 
+        if(CurrentChar == '}')
+            return AdvanceAndReturn(new Token(TokenType.END_BLOCK, CurrentChar.ToString(), _position));
         
         Advance();
         return NextToken();
@@ -93,6 +97,7 @@ public class ReaxLexer
         {
             "let" => new Token(TokenType.LET, identifier, start),
             "if" =>  new Token(TokenType.IF, identifier, start),
+            "else" => new Token(TokenType.ELSE, identifier, start),
             _ => new Token(TokenType.IDENTIFIER, identifier, start)
         };
     }

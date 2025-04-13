@@ -33,4 +33,17 @@ public static class TokenExtensions
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }
+
+    public static ReaxNode ToLogicOperator(this Token token) 
+    {
+        if(token.Type != TokenType.COMPARISON && token.Type != TokenType.EQUALITY)
+            throw new InvalidOperationException($"Não é possivel converter {token.Type} em um operador logico!");
+
+        return token.Type switch 
+        {
+            TokenType.COMPARISON => new ComparisonNode(token.Source),
+            TokenType.EQUALITY => new EqualityNode(token.Source),
+            _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
+        };
+    }
 }

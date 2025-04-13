@@ -22,6 +22,14 @@ public class ReaxExecutionContext
         _parentContext = parentContext;
     }
 
+    public ReaxExecutionContext GetParent() 
+    {
+        if(_parentContext is not null)
+            return _parentContext;
+        else 
+            throw new InvalidOperationException("Não é possivel obter o contexto pai no contexto inicial");
+    }
+
     public void Declare(string identifier)
     {
         _keys[identifier] = Guid.NewGuid();
