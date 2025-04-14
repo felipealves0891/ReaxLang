@@ -40,11 +40,11 @@ public record VarNode(string Identifier) : ReaxNode, IReaxValue
     }
 }
 
-public record FunctionCallNode(string Identifier, ReaxNode Parameter) : ReaxNode
+public record FunctionCallNode(string Identifier, ReaxNode[] Parameter) : ReaxNode
 {
     public override string ToString()
     {
-        return $"{Identifier}({Parameter});";
+        return $"{Identifier}({string.Join(',', Parameter.Select(x => x.ToString()))});";
     }
 }
 
@@ -175,5 +175,22 @@ public record ObservableNode(ReaxNode Var, ReaxNode Block) : ReaxNode
     public override string ToString()
     {
         return $"Observer {Var} {{}}";
+    }
+}
+
+public record FunctionNode(ReaxNode Identifier, ReaxNode Block, ReaxNode[] Parameters) : ReaxNode
+{
+    public override string ToString()
+    {
+        var param = string.Join(',', Parameters.Select(x => x.ToString()));
+        return $"fun {Identifier} ({param}) {{...}}";
+    }
+}
+
+public record ReturnNode(ReaxNode Expression) : ReaxNode
+{
+    public override string ToString()
+    {
+        return $"return {Expression}";
     }
 }

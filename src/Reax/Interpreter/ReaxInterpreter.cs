@@ -1,39 +1,69 @@
 using System;
 using Reax.Parser.Node;
 using Reax.Runtime;
+using Reax.Runtime.Functions;
 
 namespace Reax.Interpreter;
 
 public class ReaxInterpreter
 {
     private readonly ReaxNode[] _nodes;
-    private readonly Dictionary<string, Action<ReaxNode>> _functionBuiltIn;
     private readonly Dictionary<string, IList<ReaxInterpreter>> _observables;
     private readonly ReaxExecutionContext _context;
+    private readonly Dictionary<int, ReaxNode> _parameters;
+    
+    private ReaxInterpreter(ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
+        : this(nodes, context)
+    {
+        for (int i = 0; i < parameters.Length; i++)
+            _parameters[i] = parameters[i];
+    }
 
-    public ReaxInterpreter(ReaxNode[] nodes)
+    private ReaxInterpreter(ReaxNode[] nodes, ReaxExecutionContext context)
+        : this(nodes)
+    {
+        _context = new ReaxExecutionContext(context);
+    }
+
+    private ReaxInterpreter(ReaxNode[] nodes)
     {
         _nodes = nodes;
         _context = new ReaxExecutionContext();
         _observables = new Dictionary<string, IList<ReaxInterpreter>>();
-        _functionBuiltIn = new Dictionary<string, Action<ReaxNode>> 
-        {
-            {"writer", x => Console.WriteLine(x)}
-        };
+        _parameters = new Dictionary<int, ReaxNode>();
     }
     
+    public static ReaxInterpreter CreateMain(ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
+    {
+        var interpreter = new ReaxInterpreter(nodes);
+
+        foreach (var fun in functions)
+        {
+            interpreter._context.DeclareFunction(fun.Identifier);
+            interpreter._context.SetFunction(fun.Identifier, fun.Function);
+        }
+
+        return interpreter;
+    }
+
     public bool IsOutput => Output is not null;
     public ReaxNode? Output { get; private set; }
 
-    public ReaxInterpreter(ReaxNode[] nodes, ReaxExecutionContext context)
+    public void Interpret(string identifier, params ReaxNode[] values) 
     {
-        _nodes = nodes;
-        _context = new ReaxExecutionContext(context);
-        _observables = new Dictionary<string, IList<ReaxInterpreter>>();
-        _functionBuiltIn = new Dictionary<string, Action<ReaxNode>> 
+        var parametersLength = _parameters.Keys.Count();
+        if(values.Length != parametersLength)
+            throw new InvalidOperationException($"A função {identifier} espera {parametersLength} parametro(s), mas recebeu {values.Length}!");
+
+        for (int i = 0; i < values.Length; i++)
         {
-            {"writer", x => Console.WriteLine(x)}
-        };
+            var variable = _parameters[i].ToString();
+            var value = values[i];
+            _context.DeclareVariable(variable);
+            _context.SetVariable(variable, value);
+        }
+
+        Interpret();
     }
 
     public void Interpret() 
@@ -41,7 +71,7 @@ public class ReaxInterpreter
         foreach (var node in _nodes)
         {
             if(node is FunctionCallNode functionCall)
-                ExecuteFunctionCall(functionCall);
+                Output = ExecuteFunctionCall(functionCall);
             else if (node is DeclarationNode declaration)
                 ExecuteDeclaration(declaration);
             else if (node is AssignmentNode assignment)
@@ -52,29 +82,25 @@ public class ReaxInterpreter
                 ExecuteOn(observable);
             else if(node is CalculateNode calculate)
                 Output = Calculate(calculate);
+            else if(node is FunctionNode function)
+                ExecuteDeclarationFunction(function);
+            else if(node is ReturnNode returnNode)
+                Output = ExecuteReturn(returnNode);
+            else if(node is ContextNode contextNode)
+                Output = ExecuteContextAndReturnValue(contextNode);
         }
     }
 
-    private void ExecuteFunctionCall(FunctionCallNode functionCall) 
+    private ReaxNode? ExecuteFunctionCall(FunctionCallNode functionCall) 
     {
-        if(_functionBuiltIn.ContainsKey(functionCall.Identifier))
-        {
-            if(functionCall.Parameter is StringNode)
-            {
-                _functionBuiltIn[functionCall.Identifier](functionCall.Parameter);
-            }
-            else if(functionCall.Parameter is VarNode)
-            {
-                var identifier = functionCall.Parameter.ToString();
-                var value = _context.GetValue(identifier);
-                _functionBuiltIn[functionCall.Identifier](value);
-            }
-        }
+        var function = _context.GetFunction(functionCall.Identifier);
+        var parameters = functionCall.Parameter.Select(x => GetValue(x)).ToArray();
+        return function.Invoke(parameters);
     }
 
     private void ExecuteDeclaration(DeclarationNode declaration) 
     {
-        _context.Declare(declaration.Identifier);
+        _context.DeclareVariable(declaration.Identifier);
         if(declaration.Assignment is not null)
             ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment));
     }
@@ -82,11 +108,11 @@ public class ReaxInterpreter
     public void ExecuteAssignment(AssignmentNode assignment)
     {
         if(assignment.Assignment is ContextNode node)
-            _context.SetValue(assignment.Identifier, ExecuteContextAndReturnValue(node));
+            _context.SetVariable(assignment.Identifier, ExecuteContextAndReturnValue(node));
         else if (assignment.Assignment is VarNode variable)
-            _context.SetValue(assignment.Identifier, _context.GetValue(variable.Identifier));
+            _context.SetVariable(assignment.Identifier, _context.GetVariable(variable.Identifier));
         else
-            _context.SetValue(assignment.Identifier, assignment.Assignment);
+            _context.SetVariable(assignment.Identifier, assignment.Assignment);
 
         if(_observables.TryGetValue(assignment.Identifier, out var interpreters))
         {
@@ -158,12 +184,33 @@ public class ReaxInterpreter
     private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 
     {
         var interpreter = new ReaxInterpreter(node.Block, _context);
-            interpreter.Interpret();
+        interpreter.Interpret();
 
         if(interpreter.Output is null)
             throw new InvalidOperationException("Era esperado que a função retornace um valor!");
 
         return interpreter.Output;
+    }
+
+    private ReaxNode ExecuteReturn(ReturnNode returnNode) 
+    {
+        if(returnNode.Expression is IReaxValue)
+            return GetValue(returnNode.Expression);
+        
+        var block = (ContextNode)returnNode.Expression;
+        var interpreter = new ReaxInterpreter(block.Block, _context);
+        interpreter.Interpret();
+
+        return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
+    }
+
+    public void ExecuteDeclarationFunction(FunctionNode node) 
+    {
+        var block = (ContextNode)node.Block;
+        var identifier = node.Identifier.ToString();
+        var interpreter = new ReaxInterpreter(block.Block, _context, node.Parameters);
+        _context.DeclareFunction(identifier);
+        _context.SetFunction(identifier, interpreter);
     }
 
     private ReaxNode GetValue(ReaxNode node) 
@@ -173,7 +220,7 @@ public class ReaxInterpreter
         else if(node is StringNode text)
             return text;
         else if(node is VarNode variable)
-            return _context.GetValue(variable.Identifier);
+            return _context.GetVariable(variable.Identifier);
         else
             throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
             

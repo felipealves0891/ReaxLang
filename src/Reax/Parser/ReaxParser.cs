@@ -50,9 +50,13 @@ public class ReaxParser
             return IfParse();
         else if(nextToken.Type == TokenType.ON)
             return ObservableParse();
+        else if(nextToken.Type == TokenType.FUNCTION)
+            return FunctionDeclarationParse();
         else if(IsArithmeticOperation())
             return ArithmeticOperationParse();
-
+        else if(nextToken.Type == TokenType.RETURN)
+            return ReturnParse();
+        
         throw new Exception();
     }
 
@@ -89,22 +93,23 @@ public class ReaxParser
         bool startParameter = false;
 
         Token? identifier = null;
-        Token? parameter = null;
+        List<Token> parameter = new List<Token>();
         
         foreach (var statement in NextStatement())
         {
             if(!startParameter && statement.Type == TokenType.IDENTIFIER)
                 identifier = statement;
             else if (startParameter && statement.IsReaxValue())
-                parameter = statement;
+                parameter.Add(statement);
             else if (statement.Type == TokenType.START_PARAMETER)
                 startParameter = true;
         }
 
-        if(identifier is null || parameter is null)
+        if(identifier is null)
             throw new Exception();
-        
-        return new FunctionCallNode(identifier.Source, parameter.ToReaxValue());
+            
+        var values = parameter.Select(x => x.ToReaxValue()).ToArray();
+        return new FunctionCallNode(identifier.Source, values);
     }
 
     private bool IsAssignment() 
@@ -205,6 +210,46 @@ public class ReaxParser
         return NextNode() ?? throw new InvalidOperationException();
     }
 
+    private ReaxNode FunctionDeclarationParse() 
+    {
+        _position++;
+        var identifier = CurrentToken.ToReaxValue();
+        _position++;
+        var parameters = GetParameters().ToArray();
+        var block = NextBlock();
+        return new FunctionNode(identifier, block, parameters);
+    }
+
+    private IEnumerable<ReaxNode> GetParameters() 
+    {
+        var parameters = new List<ReaxNode>();
+        if(CurrentToken.Type != TokenType.START_PARAMETER)
+            return parameters;
+
+        _position++;
+        while(CurrentToken.Type != TokenType.END_PARAMETER) 
+        {
+            if(CurrentToken.Type == TokenType.IDENTIFIER)
+                parameters.Add(CurrentToken.ToReaxValue());
+
+            _position++;
+        }
+        _position++;
+        return parameters;
+    }
+
+    private ReaxNode ReturnParse() 
+    {
+        _position++;
+        var statement = NextStatement().ToArray();
+        if(statement.Length == 1)
+            return statement[0].ToReaxValue();
+        
+        var parser = new ReaxParser(statement);
+        var context = parser.Parse();
+        return new ContextNode(context.ToArray());
+    }
+
     private IEnumerable<Token> NextStatement() 
     {
         while(true)
@@ -230,11 +275,8 @@ public class ReaxParser
             return new ContextNode(block.ToArray());
 
         _position++;
-        while(true)
+        while(_tokens[_position].Type != TokenType.END_BLOCK)
         {
-            if(_tokens[_position].Type == TokenType.END_BLOCK)
-                break;
-
             var node = NextNode();
             if(node is null)
                 throw new InvalidOperationException("Era esperado o fim do bloco!");

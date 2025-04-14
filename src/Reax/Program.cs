@@ -9,6 +9,9 @@ var tokens = lexer.Tokenize();
 
 var parser = new ReaxParser(tokens);
 var ast = parser.Parse().ToArray();
-
-var interpreter = new ReaxInterpreter(ast);
+ 
+var interpreter = new ReaxInterpreterBuilder()
+                        .AddFunctionsBuiltIn()
+                        .Build(ast);
+                        
 interpreter.Interpret();

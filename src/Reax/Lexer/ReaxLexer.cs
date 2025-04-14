@@ -44,6 +44,8 @@ public class ReaxLexer
             return GetString();
         if(CurrentChar == '(') 
             return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, "(", _position));   
+        if(CurrentChar == ',') 
+            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, ",", _position));   
         if(CurrentChar == ')') 
             return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ")", _position));       
         if(CurrentChar == ';') 
@@ -103,7 +105,9 @@ public class ReaxLexer
             "else" => new Token(TokenType.ELSE, identifier, start),
             "on" =>  new Token(TokenType.ON, identifier, start),
             "true" =>  new Token(TokenType.TRUE, identifier, start),
-            "false" =>  new Token(TokenType.FALSE, identifier, start),
+            "false" => new Token(TokenType.FALSE, identifier, start),
+            "fun" => new Token(TokenType.FUNCTION, identifier, start),
+            "return" => new Token(TokenType.RETURN, identifier, start),
             _ => new Token(TokenType.IDENTIFIER, identifier, start)
         };
     }

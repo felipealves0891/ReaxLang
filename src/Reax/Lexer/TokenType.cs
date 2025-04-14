@@ -8,6 +8,7 @@ public enum TokenType
     IDENTIFIER,
     ASSIGNMENT,
     START_PARAMETER,
+    PARAMETER_SEPARATOR,
     END_PARAMETER,
     STRING,
     NUMBER,
@@ -24,5 +25,7 @@ public enum TokenType
     ON,
     TRUE,
     FALSE,
-    ARROW
+    ARROW,
+    FUNCTION,
+    RETURN
 } 
