@@ -86,6 +86,8 @@ public class ReaxInterpreter
                 Output = ExecuteReturn(returnNode);
             else if(node is ContextNode contextNode)
                 Output = ExecuteContextAndReturnValue(contextNode);
+            else if(node is ForNode @for)
+                ExecuteFor(@for);
         }
     }
 
@@ -189,13 +191,43 @@ public class ReaxInterpreter
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
     }
 
-    public void ExecuteDeclarationFunction(FunctionNode node) 
+    private void ExecuteDeclarationFunction(FunctionNode node) 
     {
         var block = (ContextNode)node.Block;
         var identifier = node.Identifier.ToString();
         var interpreter = new ReaxInterpreter(block.Block, _context, node.Parameters);
         _context.DeclareFunction(identifier);
         _context.SetFunction(identifier, interpreter);
+    }
+
+    private void ExecuteFor(ForNode node) 
+    {
+        var declaration = (DeclarationNode)node.declaration;
+        var condition = (BinaryNode)node.condition;
+        var block = (ContextNode)node.Block;
+
+        ExecuteDeclaration(declaration);
+        while(ExecuteBinary(condition))
+        {
+            var interpreter = new ReaxInterpreter(block.Block, _context);
+            interpreter.Interpret();
+
+            var value = _context.GetVariable(declaration.Identifier) as NumberNode;
+            if(value is null)
+                throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
+
+            var newValue = new NumberNode((value.ValueConverted + 1).ToString());
+            _context.SetVariable(declaration.Identifier, newValue);
+        }
+    }
+
+    private bool ExecuteBinary(BinaryNode condition) 
+    {
+        var left = GetValue(condition.Left);
+        var right = GetValue(condition.Right);
+        var logical = (ILogicOperator)condition.Operator;
+        return logical.Compare(left, right);
+
     }
 
     private ReaxNode GetValue(ReaxNode node) 

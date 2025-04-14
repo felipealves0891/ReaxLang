@@ -54,8 +54,17 @@ public class ReaxExecutionContext
     public void SetVariable(string identifier, ReaxNode value)
     {
         if(!_variableKeys.TryGetValue(identifier, out var key))
+        {
+            if(_parentContext is not null && _parentContext._variableKeys.TryGetValue(identifier, out var parentKey))
+            {
+                _parentContext._variableContext[parentKey] = value;
+                _parentContext.OnChange(parentKey);
+                return;
+            }
+
             throw new InvalidOperationException($"Variavel '{identifier}' não declarada!");
-        
+        }
+
         _variableContext[key] = value;
         OnChange(key);
     }
@@ -137,8 +146,8 @@ public class ReaxExecutionContext
             if(valueContext is not null)
                 return valueContext;
 
-            throw new InvalidOperationException($"Variavel '{identifier}' não declarada!");
-        }
+            throw new InvalidOperationException($"Função '{identifier}' não declarada!");
+        }   
         
         if(!_functionContext.TryGetValue(key, out var value) || value is null)    
             throw new InvalidOperationException($"Função '{identifier}' não foi atribuida!");
@@ -148,30 +157,26 @@ public class ReaxExecutionContext
 
     private ReaxNode? GetParentVariable(string identifier) 
     {
-        if(_parentContext is null)
+        try
+        {
+            return _parentContext?.GetVariable(identifier);
+        }
+        catch (System.Exception)
+        {
             return null;
-            
-        if(!_parentContext._variableKeys.TryGetValue(identifier, out var key))
-            return null;
-
-        if(!_parentContext._variableContext.TryGetValue(key, out var value) || value is null)
-            return null;
-
-        return value;
+        }
     }
     
     private Function? GetParentFunction(string identifier) 
     {
-        if(_parentContext is null)
+        try
+        {
+            return _parentContext?.GetFunction(identifier);
+        }
+        catch (System.Exception)
+        {
             return null;
-            
-        if(!_parentContext._functionKeys.TryGetValue(identifier, out var key))
-            return null;
-
-        if(!_parentContext._functionContext.TryGetValue(key, out var value) || value is null)
-            return null;
-
-        return value;
+        }
     }
 
 }

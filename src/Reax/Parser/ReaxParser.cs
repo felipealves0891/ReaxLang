@@ -56,6 +56,8 @@ public class ReaxParser
             return ArithmeticOperationParse();
         else if(nextToken.Type == TokenType.RETURN)
             return ReturnParse();
+        else if(nextToken.Type == TokenType.FOR)
+            return ForParse();
         
         throw new Exception();
     }
@@ -264,6 +266,33 @@ public class ReaxParser
         return new ContextNode(context.ToArray());
     }
 
+    private ReaxNode ForParse() 
+    {
+        Advance();
+        var identifierControl = CurrentToken;
+        Advance();
+        if(CurrentToken.Type != TokenType.ASSIGNMENT)
+            throw new InvalidOperationException("Era esperado uma atribuição!");
+        Advance();
+        var initialValue = CurrentToken;
+        Advance();
+        var declaration = new DeclarationNode(identifierControl.Source, initialValue.ToReaxValue());
+        if(CurrentToken.Type != TokenType.TO)
+            throw new InvalidOperationException("Era esperado uma expresão 'TO'!");
+        Advance();
+
+        var limitValue = CurrentToken;
+        var condition = new BinaryNode(
+            identifierControl.ToReaxValue(), 
+            new ComparisonNode("<"), 
+            limitValue.ToReaxValue());
+        
+        Advance();
+
+        var block = NextBlock();
+        return new ForNode(declaration, condition, block);
+    }
+
     private IEnumerable<Token> NextStatement() 
     {
         while(true)
@@ -300,5 +329,13 @@ public class ReaxParser
 
         _position++;
         return new ContextNode(block.ToArray());
+    }
+
+    private void Advance() 
+    {
+        if(_position + 1 >= _tokens.Length)
+            throw new InvalidOperationException("Não é possivel avançar após o fim dos tokens");
+
+        _position++;
     }
 }

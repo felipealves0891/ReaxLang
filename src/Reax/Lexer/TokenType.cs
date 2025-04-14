@@ -28,5 +28,8 @@ public enum TokenType
     ARROW,
     FUNCTION,
     RETURN,
-    WHEN
+    WHEN,
+    FOR,
+    TO,
+    WHILE
 } 

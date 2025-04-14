@@ -209,3 +209,5 @@ public record ReturnNode(ReaxNode Expression) : ReaxNode
         return $"return {Expression}";
     }
 }
+
+public record ForNode(ReaxNode declaration, ReaxNode condition, ReaxNode Block) : ReaxNode;
