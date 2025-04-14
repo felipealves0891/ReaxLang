@@ -27,5 +27,6 @@ public enum TokenType
     FALSE,
     ARROW,
     FUNCTION,
-    RETURN
+    RETURN,
+    WHEN
 } 

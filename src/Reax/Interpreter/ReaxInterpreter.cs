@@ -8,7 +8,6 @@ namespace Reax.Interpreter;
 public class ReaxInterpreter
 {
     private readonly ReaxNode[] _nodes;
-    private readonly Dictionary<string, IList<ReaxInterpreter>> _observables;
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
     
@@ -29,7 +28,6 @@ public class ReaxInterpreter
     {
         _nodes = nodes;
         _context = new ReaxExecutionContext();
-        _observables = new Dictionary<string, IList<ReaxInterpreter>>();
         _parameters = new Dictionary<int, ReaxNode>();
     }
     
@@ -113,11 +111,6 @@ public class ReaxInterpreter
             _context.SetVariable(assignment.Identifier, _context.GetVariable(variable.Identifier));
         else
             _context.SetVariable(assignment.Identifier, assignment.Assignment);
-
-        if(_observables.TryGetValue(assignment.Identifier, out var interpreters))
-        {
-            Parallel.ForEach(interpreters, interpreter => interpreter.Interpret());
-        }
     }
 
     public ReaxNode Calculate(CalculateNode node)
@@ -170,15 +163,7 @@ public class ReaxInterpreter
         var identifier = node.Var.ToString();
         var contextNode = (ContextNode)node.Block;
         var interpreter = new ReaxInterpreter(contextNode.Block, _context);
-        if (_observables.TryGetValue(identifier, out var interpreters))
-        {
-            interpreters.Add(interpreter);
-        }
-        else
-        {
-            interpreters = new List<ReaxInterpreter>([interpreter]);
-            _observables[identifier] = interpreters;
-        }
+        _context.SetObservable(identifier, interpreter, node.Condition);
     }
 
     private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 

@@ -1,4 +1,5 @@
 using System;
+using Reax.Runtime;
 
 namespace Reax.Parser.Node;
 
@@ -12,7 +13,21 @@ public interface ILogicOperator : IOperator
 {
     bool Compare(ReaxNode x, ReaxNode y);
 };
-public record ReaxNode;
+
+public abstract record ReaxNode 
+{
+    public ReaxNode GetValue(ReaxExecutionContext context) 
+    {
+        if(this is NumberNode number)
+            return number;
+        else if(this is StringNode text)
+            return text;
+        else if(this is VarNode variable)
+            return context.GetVariable(variable.Identifier);
+        else
+            throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
+    }
+}
 
 public record StringNode(string Value) : ReaxNode, IReaxValue
 {
@@ -170,7 +185,7 @@ public record IfNode(BinaryNode Condition, ReaxNode True, ReaxNode? False) : Rea
     }
 }
 
-public record ObservableNode(ReaxNode Var, ReaxNode Block) : ReaxNode
+public record ObservableNode(ReaxNode Var, ReaxNode Block, BinaryNode? Condition) : ReaxNode
 {
     public override string ToString()
     {

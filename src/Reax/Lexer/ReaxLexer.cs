@@ -108,6 +108,7 @@ public class ReaxLexer
             "false" => new Token(TokenType.FALSE, identifier, start),
             "fun" => new Token(TokenType.FUNCTION, identifier, start),
             "return" => new Token(TokenType.RETURN, identifier, start),
+            "when" =>  new Token(TokenType.WHEN, identifier, start),
             _ => new Token(TokenType.IDENTIFIER, identifier, start)
         };
     }

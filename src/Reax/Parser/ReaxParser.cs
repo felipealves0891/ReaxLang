@@ -73,7 +73,7 @@ public class ReaxParser
                 value = statement;
         }
 
-        if(identifier is null || value is null)
+        if(identifier is null)
             throw new Exception();
 
         if(value is not null)
@@ -178,11 +178,25 @@ public class ReaxParser
     {
         _position++;
         var variable = new VarNode(_tokens[_position++].Source);
+        BinaryNode? condition = null;
+
+        if(_tokens[_position].Type == TokenType.WHEN)
+        {
+            _position++;    
+            var left = _tokens[_position++];
+            var @perator = _tokens[_position++];
+            var right = _tokens[_position++];
+
+            condition = new BinaryNode(
+                left.ToReaxValue(), 
+                @perator.ToLogicOperator(), 
+                right.ToReaxValue());
+        }
 
         if(_tokens[_position].Type == TokenType.START_BLOCK)
-            return new ObservableNode(variable, NextBlock());
+            return new ObservableNode(variable, NextBlock(), condition);
         else if(_tokens[_position].Type == TokenType.ARROW)
-            return  new ObservableNode(variable, new ContextNode([ArrowParse()]));
+            return  new ObservableNode(variable, new ContextNode([ArrowParse()]), condition);
         else
             throw new InvalidOperationException($"Token invalido '{_tokens[_position].Type}' na posição: {_position}");
     }
@@ -257,7 +271,7 @@ public class ReaxParser
             if(EndOfTokens)
                 break;
 
-            if(_tokens[_position].Type == TokenType.END_STATEMENT)
+            if(_tokens[_position].Type == TokenType.END_STATEMENT) 
             {
                 _position++;
                 break;
