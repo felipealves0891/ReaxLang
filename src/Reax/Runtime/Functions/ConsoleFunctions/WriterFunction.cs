@@ -2,7 +2,7 @@ using System;
 using Reax.Parser.Node;
 using Reax.Runtime.Functions.Attributes;
 
-namespace Reax.Runtime.Functions;
+namespace Reax.Runtime.Functions.ConsoleFunctions;
 
 [FunctionBuiltIn("writer", false, 1, 10)]
 public class WriterFunction : Function
