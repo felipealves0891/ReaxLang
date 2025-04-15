@@ -5,12 +5,14 @@ namespace Reax.Lexer;
 public class ReaxLexer 
 {
     private readonly string _source;
+    private int _numberOfRows;
     private int _position;
 
     public ReaxLexer(string source)
     {
         _source = source;
         _position = 0;
+        _numberOfRows = 0;
     }
 
     public bool EndOfFile => _position >= _source.Length;
@@ -32,7 +34,7 @@ public class ReaxLexer
     public Token NextToken() 
     {
         if(EndOfFile)
-            return new Token(TokenType.EOF, "", _position);
+            return new Token(TokenType.EOF, "", _position, _numberOfRows);
 
         if(char.IsWhiteSpace(CurrentChar)) 
             Advance();
@@ -43,33 +45,35 @@ public class ReaxLexer
         if(CurrentChar == '\'') 
             return GetString();
         if(CurrentChar == '(') 
-            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, "(", _position));   
+            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, "(", _position, _numberOfRows));   
         if(CurrentChar == ',') 
-            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, ",", _position));   
+            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, ",", _position, _numberOfRows));   
         if(CurrentChar == ')') 
-            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ")", _position));       
+            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ")", _position, _numberOfRows));       
         if(CurrentChar == ';') 
-            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, ";", _position));   
+            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, ";", _position, _numberOfRows));   
         if(IsLetterOrIsDigitOrWhiteSpace(BeforeChar) && CurrentChar == '=' && IsLetterOrIsDigitOrWhiteSpace(NextChar)) 
-            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, "=", _position));   
+            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, "=", _position, _numberOfRows));   
         if(BeforeChar == '=' && CurrentChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "==", _position));   
+            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "==", _position, _numberOfRows));   
         if(CurrentChar == '!' && NextChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "!=", _position));   
+            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "!=", _position, _numberOfRows));   
         if(CurrentChar == '-' && NextChar == '>')
             return GetArrow();
         if(CurrentChar == '<' || CurrentChar == '>') 
             return GetComparison();
         if(CurrentChar == '+' || CurrentChar == '-') 
-            return AdvanceAndReturn(new Token(TokenType.TERM, CurrentChar.ToString(), _position));   
+            return AdvanceAndReturn(new Token(TokenType.TERM, CurrentChar.ToString(), _position, _numberOfRows));   
         if(CurrentChar == '*' || CurrentChar == '/')
-            return AdvanceAndReturn(new Token(TokenType.FACTOR, CurrentChar.ToString(), _position));   
+            return AdvanceAndReturn(new Token(TokenType.FACTOR, CurrentChar.ToString(), _position, _numberOfRows));   
         if(CurrentChar == '!')
-            return AdvanceAndReturn(new Token(TokenType.UNARY, CurrentChar.ToString(), _position)); 
+            return AdvanceAndReturn(new Token(TokenType.UNARY, CurrentChar.ToString(), _position, _numberOfRows)); 
         if(CurrentChar == '{')
-            return AdvanceAndReturn(new Token(TokenType.START_BLOCK, CurrentChar.ToString(), _position)); 
+            return AdvanceAndReturn(new Token(TokenType.START_BLOCK, CurrentChar.ToString(), _position, _numberOfRows)); 
         if(CurrentChar == '}')
-            return AdvanceAndReturn(new Token(TokenType.END_BLOCK, CurrentChar.ToString(), _position));
+            return AdvanceAndReturn(new Token(TokenType.END_BLOCK, CurrentChar.ToString(), _position, _numberOfRows));
+        if(CurrentChar == '\n')
+            _numberOfRows++;
         
         Advance();
         return NextToken();
@@ -88,7 +92,7 @@ public class ReaxLexer
             Advance();
 
         var number = _source[start.._position];
-        return new Token(TokenType.NUMBER, number, _position);
+        return new Token(TokenType.NUMBER, number, _position, _numberOfRows);
     }
 
     private Token GetIdentifierOrKeyword() 
@@ -100,18 +104,22 @@ public class ReaxLexer
         var identifier = _source[start.._position];
         return identifier switch 
         {
-            "let" => new Token(TokenType.LET, identifier, start),
-            "if" =>  new Token(TokenType.IF, identifier, start),
-            "else" => new Token(TokenType.ELSE, identifier, start),
-            "on" =>  new Token(TokenType.ON, identifier, start),
-            "true" =>  new Token(TokenType.TRUE, identifier, start),
-            "false" => new Token(TokenType.FALSE, identifier, start),
-            "fun" => new Token(TokenType.FUNCTION, identifier, start),
-            "return" => new Token(TokenType.RETURN, identifier, start),
-            "when" =>  new Token(TokenType.WHEN, identifier, start),
-            "for" =>  new Token(TokenType.FOR, identifier, start),
-            "to" =>  new Token(TokenType.TO, identifier, start),
-            _ => new Token(TokenType.IDENTIFIER, identifier, start)
+            "let" => new Token(TokenType.LET, identifier, start, _numberOfRows),
+            "if" =>  new Token(TokenType.IF, identifier, start, _numberOfRows),
+            "else" => new Token(TokenType.ELSE, identifier, start, _numberOfRows),
+            "on" =>  new Token(TokenType.ON, identifier, start, _numberOfRows),
+            "true" =>  new Token(TokenType.TRUE, identifier, start, _numberOfRows),
+            "false" => new Token(TokenType.FALSE, identifier, start, _numberOfRows),
+            "fun" => new Token(TokenType.FUNCTION, identifier, start, _numberOfRows),
+            "return" => new Token(TokenType.RETURN, identifier, start, _numberOfRows),
+            "when" =>  new Token(TokenType.WHEN, identifier, start, _numberOfRows),
+            "for" =>  new Token(TokenType.FOR, identifier, start, _numberOfRows),
+            "to" =>  new Token(TokenType.TO, identifier, start, _numberOfRows),
+            "while" =>  new Token(TokenType.WHILE, identifier, start, _numberOfRows),
+            "and" =>  new Token(TokenType.AND, identifier, start, _numberOfRows),
+            "or" =>  new Token(TokenType.OR, identifier, start, _numberOfRows),
+            "not" =>  new Token(TokenType.NOT, identifier, start, _numberOfRows),
+            _ => new Token(TokenType.IDENTIFIER, identifier, start, _numberOfRows)
         };
     }
 
@@ -125,7 +133,7 @@ public class ReaxLexer
         var end = _position;
         var text = _source[start..end];
         Advance();
-        return new Token(TokenType.STRING, text, _position);
+        return new Token(TokenType.STRING, text, _position, _numberOfRows);
     }
 
     private Token GetComparison() 
@@ -133,11 +141,11 @@ public class ReaxLexer
         var start = _position;
         _position++;
         if(_source[_position] != '=')
-            return new Token(TokenType.COMPARISON, _source[start].ToString(), _position);
+            return new Token(TokenType.COMPARISON, _source[start].ToString(), _position, _numberOfRows);
         
         var end = _position;
         Advance();
-        return new Token(TokenType.COMPARISON, _source[start..end], _position);
+        return new Token(TokenType.COMPARISON, _source[start..end], _position, _numberOfRows);
     }
 
     private Token GetArrow() 
@@ -145,7 +153,7 @@ public class ReaxLexer
         var start = _position;
         Advance();
         Advance();
-        return new Token(TokenType.ARROW, "->", start);
+        return new Token(TokenType.ARROW, "->", start, _numberOfRows);
     }
 
     private void Advance() 

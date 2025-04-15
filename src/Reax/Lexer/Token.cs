@@ -2,7 +2,7 @@ using Reax.Parser.Node;
 
 namespace Reax.Lexer;
 
-public record Token(TokenType Type, string Source, int Position)
+public record Token(TokenType Type, string Source, int Position, int Row)
 {
     public override string ToString()
     {
@@ -60,6 +60,8 @@ public static class TokenExtensions
             TokenType.IDENTIFIER => new VarNode(token.Source),
             TokenType.STRING => new StringNode(token.Source),
             TokenType.NUMBER => new NumberNode(token.Source),
+            TokenType.FALSE => new BooleanNode(token.Source),
+            TokenType.TRUE => new BooleanNode(token.Source),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }
@@ -70,6 +72,9 @@ public static class TokenExtensions
         {
             TokenType.COMPARISON => new ComparisonNode(token.Source),
             TokenType.EQUALITY => new EqualityNode(token.Source),
+            TokenType.AND => new LogicNode(token.Source),
+            TokenType.OR => new LogicNode(token.Source),
+            TokenType.NOT => new LogicNode(token.Source),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }

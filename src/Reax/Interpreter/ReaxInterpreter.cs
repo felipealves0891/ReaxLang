@@ -88,6 +88,8 @@ public class ReaxInterpreter
                 Output = ExecuteContextAndReturnValue(contextNode);
             else if(node is ForNode @for)
                 ExecuteFor(@for);
+            else if(node is WhileNode @while)
+                ExecuteWhile(@while);
         }
     }
 
@@ -221,13 +223,30 @@ public class ReaxInterpreter
         }
     }
 
+    private void ExecuteWhile(WhileNode node)
+    {
+        var condition = (BinaryNode)node.condition;
+        var block = (ContextNode)node.Block;
+
+        while(ExecuteBinary(condition))
+        {
+            var interpreter = new ReaxInterpreter(block.Block, _context);
+            interpreter.Interpret();
+        }
+    }
+
     private bool ExecuteBinary(BinaryNode condition) 
     {
-        var left = GetValue(condition.Left);
-        var right = GetValue(condition.Right);
+        var left = condition.Left is BinaryNode 
+                 ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Left).ToString()) 
+                 : GetValue(condition.Left);
+
+        var right = condition.Right is BinaryNode 
+                 ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Right).ToString()) 
+                 : GetValue(condition.Right);
+
         var logical = (ILogicOperator)condition.Operator;
         return logical.Compare(left, right);
-
     }
 
     private ReaxNode GetValue(ReaxNode node) 

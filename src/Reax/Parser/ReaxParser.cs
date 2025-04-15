@@ -58,8 +58,10 @@ public class ReaxParser
             return ReturnParse();
         else if(nextToken.Type == TokenType.FOR)
             return ForParse();
+        else if(nextToken.Type == TokenType.WHILE)
+            return WhileParse();
         
-        throw new Exception();
+        throw new Exception($"Token invalido na linha {CurrentToken.Row}: {CurrentToken}");
     }
 
     private ReaxNode DeclarationParse() 
@@ -136,6 +138,9 @@ public class ReaxParser
                 expression.Add(statement);
         }
 
+        if(identifier is null || expression is null)
+            throw new Exception();
+        
         if(expression.Count() == 1)
         {
             value = expression[0].ToReaxValue();
@@ -147,9 +152,6 @@ public class ReaxParser
             value = new ContextNode(expressionNodes.ToArray());
         }
 
-        if(identifier is null || expression is null)
-            throw new Exception();
-        
         return new AssignmentNode(identifier.Source, value);
     }
 
@@ -293,32 +295,46 @@ public class ReaxParser
         return new ForNode(declaration, condition, block);
     }
 
+    private ReaxNode WhileParse() 
+    {
+        Advance();
+        var statement = NextStatement();
+        var helper = new ComparisonHelper(statement);
+        var condition = helper.Parse();
+
+        var block = NextBlock();
+        return new WhileNode(condition, block);
+    }
+
     private IEnumerable<Token> NextStatement() 
     {
         while(true)
         {
             if(EndOfTokens)
                 break;
-
-            if(_tokens[_position].Type == TokenType.END_STATEMENT) 
+            
+            if(CurrentToken.Type == TokenType.START_BLOCK)                
+                break;
+        
+            if(CurrentToken.Type == TokenType.END_STATEMENT) 
             {
-                _position++;
+                Advance();
                 break;
             }
             
-            yield return _tokens[_position];
-            _position++;
+            yield return CurrentToken;
+            Advance();
         }
     }
 
     private ReaxNode NextBlock()
     {
         var block = new List<ReaxNode>();
-        if(_tokens[_position].Type != TokenType.START_BLOCK)
+        if(CurrentToken.Type != TokenType.START_BLOCK)
             return new ContextNode(block.ToArray());
 
-        _position++;
-        while(_tokens[_position].Type != TokenType.END_BLOCK)
+        Advance();
+        while(CurrentToken.Type != TokenType.END_BLOCK)
         {
             var node = NextNode();
             if(node is null)
@@ -327,13 +343,13 @@ public class ReaxParser
             block.Add(node);
         }
 
-        _position++;
+        Advance();
         return new ContextNode(block.ToArray());
     }
 
     private void Advance() 
     {
-        if(_position + 1 >= _tokens.Length)
+        if(_position + 1 > _tokens.Length)
             throw new InvalidOperationException("Não é possivel avançar após o fim dos tokens");
 
         _position++;

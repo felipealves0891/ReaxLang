@@ -31,5 +31,8 @@ public enum TokenType
     WHEN,
     FOR,
     TO,
-    WHILE
+    WHILE,
+    AND,
+    OR,
+    NOT
 } 

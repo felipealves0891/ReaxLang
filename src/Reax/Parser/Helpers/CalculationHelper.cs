@@ -12,7 +12,7 @@ class CalculationHelper
 
     public CalculationHelper(IEnumerable<Token> tokens) => _tokens = tokens.ToList();
 
-    private Token? Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, "", _pos);
+    private Token? Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, "", -1, -1);
     private Token Consume() => _tokens[_pos++];
 
     public ReaxNode ParseExpression() => ParseAddSub();

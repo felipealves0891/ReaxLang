@@ -16,6 +16,11 @@ public interface ILogicOperator : IOperator
 
 public abstract record ReaxNode 
 {
+    public bool AsVar() 
+    {
+        return this is VarNode;
+    }
+
     public ReaxNode GetValue(ReaxExecutionContext context) 
     {
         if(this is NumberNode number)
@@ -40,6 +45,16 @@ public record StringNode(string Value) : ReaxNode, IReaxValue
 public record NumberNode(string Value) : ReaxNode, IReaxValue
 {
     public decimal ValueConverted => decimal.Parse(Value);
+
+    public override string ToString()
+    {
+        return $"{Value}";
+    }
+}
+
+public record BooleanNode(string Value) : ReaxNode, IReaxValue
+{
+    public bool ValueConverted => bool.Parse(Value);
 
     public override string ToString()
     {
@@ -114,6 +129,27 @@ public record EqualityNode(string Operator) : ReaxNode, ILogicOperator
         return Operator == "==" 
              ? x.ToString() == y.ToString()
              : x.ToString() != y.ToString();
+    }
+
+    public override string ToString()
+    {
+        return Operator.ToString();
+    }
+}
+
+public record LogicNode(string Operator) : ReaxNode, ILogicOperator
+{
+    public bool Compare(ReaxNode x, ReaxNode y)
+    {
+        var left = (BooleanNode)x;
+        var right = (BooleanNode)y;
+
+        return Operator switch 
+        {
+            "and" => left.ValueConverted && right.ValueConverted,
+            "or" => left.ValueConverted || right.ValueConverted,
+            _ => throw new InvalidOperationException($"Operador invalido para operação logica {Operator}!")
+        };
     }
 
     public override string ToString()
@@ -211,3 +247,5 @@ public record ReturnNode(ReaxNode Expression) : ReaxNode
 }
 
 public record ForNode(ReaxNode declaration, ReaxNode condition, ReaxNode Block) : ReaxNode;
+
+public record WhileNode(ReaxNode condition, ReaxNode Block) : ReaxNode;
