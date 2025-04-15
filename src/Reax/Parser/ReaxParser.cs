@@ -158,9 +158,9 @@ public class ReaxParser
     private ReaxNode IfParse()
     {
         _position++;
-        var left = _tokens[_position++];
-        var @perator = _tokens[_position++];
-        var right = _tokens[_position++];
+        var statement = NextStatement();
+        var comparisonHelper = new ComparisonHelper(statement);
+        var condition = comparisonHelper.Parse();
         var @true = NextBlock();
         ReaxNode? @else = null;
 
@@ -170,10 +170,6 @@ public class ReaxParser
             @else = NextBlock();
         }
 
-        var condition = new BinaryNode(
-            left.ToReaxValue(), 
-            @perator.ToLogicOperator(), 
-            right.ToReaxValue());
 
         return new IfNode(condition, @true, @else);
     }
@@ -187,14 +183,9 @@ public class ReaxParser
         if(_tokens[_position].Type == TokenType.WHEN)
         {
             _position++;    
-            var left = _tokens[_position++];
-            var @perator = _tokens[_position++];
-            var right = _tokens[_position++];
-
-            condition = new BinaryNode(
-                left.ToReaxValue(), 
-                @perator.ToLogicOperator(), 
-                right.ToReaxValue());
+            var statement = NextStatement();
+            var comparisonHelper = new ComparisonHelper(statement);
+            condition = comparisonHelper.Parse();
         }
 
         if(_tokens[_position].Type == TokenType.START_BLOCK)
