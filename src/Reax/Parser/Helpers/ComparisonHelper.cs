@@ -23,6 +23,12 @@ public class ComparisonHelper
         var left = GetBinaryNode();
         while(!EndOfTokens)
         {
+            if(CurrentToken.Type == TokenType.END_PARAMETER)
+            {
+                Advance();
+                return left;
+            }
+            
             var operation = CurrentToken;
             Advance();
             var right = GetBinaryNode();
@@ -35,8 +41,8 @@ public class ComparisonHelper
     {
         if(!CurrentToken.IsReaxValue() && CurrentToken.Type == TokenType.START_PARAMETER)
         {
-            var node = Parse();
             Advance();
+            var node = Parse();            
             return node;
         }
         
