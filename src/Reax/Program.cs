@@ -2,16 +2,25 @@
 using Reax.Lexer;
 using Reax.Parser;
 
-var code = File.ReadAllText(@"D:\Source\simple.reax");
+/*
+Proximos:
+- Adicionar Stream de caracteres
+- Alterar Parser para ler do stream
+- Adicionar os importes como pila para que os mais novos seja processados primeiro
+*/
+
+var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
+
+var code = File.ReadAllText(fileInfo.FullName);
 
 var lexer = new ReaxLexer(code);
 var tokens = lexer.Tokenize();
 
 var parser = new ReaxParser(tokens);
-var ast = parser.Parse().ToArray();
- 
+var ast = parser.Parse();
+
 var interpreter = new ReaxInterpreterBuilder()
                         .AddFunctionsBuiltIn()
-                        .Build(ast);
+                        .Build(ast.ToArray());
                         
 interpreter.Interpret();

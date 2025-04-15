@@ -34,5 +34,6 @@ public enum TokenType
     WHILE,
     AND,
     OR,
-    NOT
+    NOT,
+    IMPORT
 } 

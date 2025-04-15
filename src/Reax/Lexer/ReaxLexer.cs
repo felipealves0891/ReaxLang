@@ -119,6 +119,7 @@ public class ReaxLexer
             "and" =>  new Token(TokenType.AND, identifier, start, _numberOfRows),
             "or" =>  new Token(TokenType.OR, identifier, start, _numberOfRows),
             "not" =>  new Token(TokenType.NOT, identifier, start, _numberOfRows),
+            "import" =>  new Token(TokenType.IMPORT, identifier, start, _numberOfRows),
             _ => new Token(TokenType.IDENTIFIER, identifier, start, _numberOfRows)
         };
     }

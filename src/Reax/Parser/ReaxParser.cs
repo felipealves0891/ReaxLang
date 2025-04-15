@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Reax.Lexer;
 using Reax.Parser.Helpers;
 using Reax.Parser.Node;
@@ -6,14 +7,18 @@ namespace Reax.Parser;
 
 public class ReaxParser
 {
+    private readonly IList<string> _imports;
     private readonly Token[] _tokens;
     private int _position;
 
     public ReaxParser(IEnumerable<Token> tokens)
     {
         _tokens = tokens.ToArray();
+        _imports = new List<string>();
         _position = 0;
     }
+
+    public IReadOnlyCollection<string> Imports => new ReadOnlyCollection<string>(_imports);
 
     public bool EndOfTokens => _position >= _tokens.Length;
     public Token BeforeToken => _tokens[_position-1];
@@ -40,6 +45,8 @@ public class ReaxParser
         var nextToken = _tokens[_position];
         if(nextToken.Type == TokenType.EOF) 
             return null;
+        if(nextToken.Type == TokenType.IMPORT)
+            return ImportScripts();
         else if(nextToken.Type == TokenType.LET) 
             return DeclarationParse();
         else if(IsFunctionCall()) 
@@ -62,6 +69,19 @@ public class ReaxParser
             return WhileParse();
         
         throw new Exception($"Token invalido na linha {CurrentToken.Row}: {CurrentToken}");
+    }
+
+    private ReaxNode? ImportScripts() 
+    {
+        Advance();
+        var file = CurrentToken.Source;
+        _imports.Add(file);
+        Advance();
+        if(CurrentToken.Type == TokenType.END_STATEMENT)
+            throw new InvalidOperationException($"Era esperado o fim da expressão na linha {CurrentToken.Row}!");
+
+        Advance();
+        return NextNode();
     }
 
     private ReaxNode DeclarationParse() 
