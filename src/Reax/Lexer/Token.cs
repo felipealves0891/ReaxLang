@@ -6,7 +6,7 @@ public record Token(TokenType Type, string Source, int Position, int Row)
 {
     public override string ToString()
     {
-        return $"{Source} is {Type} at {Position}";
+        return $"#{Row} {Source} is {Type} at {Position}";
     }
 }
 

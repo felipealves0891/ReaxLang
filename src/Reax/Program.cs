@@ -1,5 +1,6 @@
 ﻿using Reax.Interpreter;
 using Reax.Lexer;
+using Reax.Lexer.Readers;
 using Reax.Parser;
 
 /*
@@ -10,10 +11,9 @@ Proximos:
 */
 
 var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
-
 var code = File.ReadAllText(fileInfo.FullName);
 
-var lexer = new ReaxLexer(code);
+var lexer = new ReaxLexer(new ReaxTextReader(code));
 var tokens = lexer.Tokenize();
 
 var parser = new ReaxParser(tokens);

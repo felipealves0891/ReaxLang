@@ -1,24 +1,18 @@
 using System;
+using Reax.Lexer.Readers;
 
 namespace Reax.Lexer;
 
 public class ReaxLexer 
 {
-    private readonly string _source;
+    private readonly IReader _source;
     private int _numberOfRows;
-    private int _position;
 
-    public ReaxLexer(string source)
+    public ReaxLexer(IReader source)
     {
         _source = source;
-        _position = 0;
         _numberOfRows = 0;
     }
-
-    public bool EndOfFile => _position >= _source.Length;
-    public char BeforeChar => _source[_position-1];
-    public char CurrentChar => _source[_position];
-    public char NextChar => _source[_position+1];
 
     public IEnumerable<Token> Tokenize() 
     {
@@ -33,75 +27,75 @@ public class ReaxLexer
 
     public Token NextToken() 
     {
-        if(EndOfFile)
-            return new Token(TokenType.EOF, "", _position, _numberOfRows);
+        if(_source.EndOfFile)
+            return new Token(TokenType.EOF, "", _source.Position, _numberOfRows);
 
-        if(char.IsWhiteSpace(CurrentChar)) 
-            Advance();
-        if(char.IsLetter(CurrentChar)) 
+        if(char.IsWhiteSpace(_source.CurrentChar)) 
+            _source.Advance();
+        if(char.IsLetter(_source.CurrentChar)) 
             return GetIdentifierOrKeyword();
-        if(char.IsDigit(CurrentChar)) 
+        if(char.IsDigit(_source.CurrentChar)) 
             return GetDigit();
-        if(CurrentChar == '\'') 
+        if(_source.CurrentChar == '\'') 
             return GetString();
-        if(CurrentChar == '(') 
-            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, "(", _position, _numberOfRows));   
-        if(CurrentChar == ',') 
-            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, ",", _position, _numberOfRows));   
-        if(CurrentChar == ')') 
-            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ")", _position, _numberOfRows));       
-        if(CurrentChar == ';') 
-            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, ";", _position, _numberOfRows));   
-        if(IsLetterOrIsDigitOrWhiteSpace(BeforeChar) && CurrentChar == '=' && IsLetterOrIsDigitOrWhiteSpace(NextChar)) 
-            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, "=", _position, _numberOfRows));   
-        if(BeforeChar == '=' && CurrentChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "==", _position, _numberOfRows));   
-        if(CurrentChar == '!' && NextChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "!=", _position, _numberOfRows));   
-        if(CurrentChar == '-' && NextChar == '>')
+        if(_source.CurrentChar == '(') 
+            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, "(", _source.Position, _numberOfRows));   
+        if(_source.CurrentChar == ',') 
+            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, ",", _source.Position, _numberOfRows));   
+        if(_source.CurrentChar == ')') 
+            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ")", _source.Position, _numberOfRows));       
+        if(_source.CurrentChar == ';') 
+            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, ";", _source.Position, _numberOfRows));   
+        if(IsLetterOrIsDigitOrWhiteSpace(_source.BeforeChar) && _source.CurrentChar == '=' && IsLetterOrIsDigitOrWhiteSpace(_source.NextChar)) 
+            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, "=", _source.Position, _numberOfRows));   
+        if(_source.BeforeChar == '=' && _source.CurrentChar == '=') 
+            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "==", _source.Position, _numberOfRows));   
+        if(_source.CurrentChar == '!' && _source.NextChar == '=') 
+            return AdvanceAndReturn(new Token(TokenType.EQUALITY, "!=", _source.Position, _numberOfRows));   
+        if(_source.CurrentChar == '-' && _source.NextChar == '>')
             return GetArrow();
-        if(CurrentChar == '<' || CurrentChar == '>') 
+        if(_source.CurrentChar == '<' || _source.CurrentChar == '>') 
             return GetComparison();
-        if(CurrentChar == '+' || CurrentChar == '-') 
-            return AdvanceAndReturn(new Token(TokenType.TERM, CurrentChar.ToString(), _position, _numberOfRows));   
-        if(CurrentChar == '*' || CurrentChar == '/')
-            return AdvanceAndReturn(new Token(TokenType.FACTOR, CurrentChar.ToString(), _position, _numberOfRows));   
-        if(CurrentChar == '!')
-            return AdvanceAndReturn(new Token(TokenType.UNARY, CurrentChar.ToString(), _position, _numberOfRows)); 
-        if(CurrentChar == '{')
-            return AdvanceAndReturn(new Token(TokenType.START_BLOCK, CurrentChar.ToString(), _position, _numberOfRows)); 
-        if(CurrentChar == '}')
-            return AdvanceAndReturn(new Token(TokenType.END_BLOCK, CurrentChar.ToString(), _position, _numberOfRows));
-        if(CurrentChar == '\n')
+        if(_source.CurrentChar == '+' || _source.CurrentChar == '-') 
+            return AdvanceAndReturn(new Token(TokenType.TERM, _source.CurrentChar.ToString(), _source.Position, _numberOfRows));   
+        if(_source.CurrentChar == '*' || _source.CurrentChar == '/')
+            return AdvanceAndReturn(new Token(TokenType.FACTOR, _source.CurrentChar.ToString(), _source.Position, _numberOfRows));   
+        if(_source.CurrentChar == '!')
+            return AdvanceAndReturn(new Token(TokenType.UNARY, _source.CurrentChar.ToString(), _source.Position, _numberOfRows)); 
+        if(_source.CurrentChar == '{')
+            return AdvanceAndReturn(new Token(TokenType.START_BLOCK, _source.CurrentChar.ToString(), _source.Position, _numberOfRows)); 
+        if(_source.CurrentChar == '}')
+            return AdvanceAndReturn(new Token(TokenType.END_BLOCK, _source.CurrentChar.ToString(), _source.Position, _numberOfRows));
+        if(_source.CurrentChar == '\n')
             _numberOfRows++;
         
-        Advance();
+        _source.Advance();
         return NextToken();
     }
 
     private Token AdvanceAndReturn(Token token) 
     {
-        Advance();
+        _source.Advance();
         return token;
     }
 
     public Token GetDigit() 
     {
-        var start = _position;
-        while(!EndOfFile && (char.IsDigit(CurrentChar) || CurrentChar == '.'))
-            Advance();
+        var start = _source.Position;
+        while(!_source.EndOfFile && (char.IsDigit(_source.CurrentChar) || _source.CurrentChar == '.'))
+            _source.Advance();
 
-        var number = _source[start.._position];
-        return new Token(TokenType.NUMBER, number, _position, _numberOfRows);
+        var number = _source.GetString(start, _source.Position);
+        return new Token(TokenType.NUMBER, number, _source.Position, _numberOfRows);
     }
 
     private Token GetIdentifierOrKeyword() 
     {
-        var start = _position;
-        while(!EndOfFile && IsIdentifier(CurrentChar))
-            Advance();
+        var start = _source.Position;
+        while(!_source.EndOfFile && IsIdentifier(_source.CurrentChar))
+            _source.Advance();
 
-        var identifier = _source[start.._position];
+        var identifier = _source.GetString(start,_source.Position);
         return identifier switch 
         {
             "let" => new Token(TokenType.LET, identifier, start, _numberOfRows),
@@ -126,42 +120,35 @@ public class ReaxLexer
 
     private Token GetString() 
     {
-        Advance();
-        var start = _position;
-        while (!EndOfFile && CurrentChar != '\'')
-            Advance();
+        _source.Advance();
+        var start = _source.Position;
+        while (!_source.EndOfFile && _source.CurrentChar != '\'')
+            _source.Advance();
         
-        var end = _position;
-        var text = _source[start..end];
-        Advance();
-        return new Token(TokenType.STRING, text, _position, _numberOfRows);
+        var end = _source.Position;
+        var text = _source.GetString(start, end);
+        _source.Advance();
+        return new Token(TokenType.STRING, text, _source.Position, _numberOfRows);
     }
 
     private Token GetComparison() 
     {
-        var start = _position;
-        _position++;
-        if(_source[_position] != '=')
-            return new Token(TokenType.COMPARISON, _source[start].ToString(), _position, _numberOfRows);
+        var start = _source.Position;
+        _source.Advance();
+        if(_source.BeforeChar != '=')
+            return new Token(TokenType.COMPARISON, _source.BeforeChar.ToString(), _source.Position, _numberOfRows);
         
-        var end = _position;
-        Advance();
-        return new Token(TokenType.COMPARISON, _source[start..end], _position, _numberOfRows);
+        var end = _source.Position;
+        _source.Advance();
+        return new Token(TokenType.COMPARISON, _source.GetString(start, end), _source.Position, _numberOfRows);
     }
 
     private Token GetArrow() 
     {
-        var start = _position;
-        Advance();
-        Advance();
+        var start = _source.Position;
+        _source.Advance();
+        _source.Advance();
         return new Token(TokenType.ARROW, "->", start, _numberOfRows);
-    }
-
-    private void Advance() 
-    {
-        if(EndOfFile)
-            throw new InvalidOperationException("Não é possivel avançar após o fim do arquivo!");
-        _position++;
     }
 
     public bool IsIdentifier(char c) 

@@ -113,7 +113,7 @@ public record ComparisonNode(string Operator) : ReaxNode, ILogicOperator
         else if(Operator == ">=")
             return left.ValueConverted > rigth.ValueConverted;
         else
-            throw new InvalidOperationException("Operador de comparação invalido");
+            throw new InvalidOperationException($"Operador de comparação invalido: {Operator}");
     }
 
     public override string ToString()
