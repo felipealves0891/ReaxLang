@@ -7,7 +7,6 @@ using Reax.Parser;
 var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
 ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
 
-
 var code = File.ReadAllText(fileInfo.FullName);
 var lexer = new ReaxLexer(new ReaxTextReader(code));
 var tokens = lexer.Tokenize();
