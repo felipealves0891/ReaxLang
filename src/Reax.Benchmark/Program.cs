@@ -30,7 +30,7 @@ public class Program
 
         var interpreter = new ReaxInterpreterBuilder()
                                 .AddFunctionsBuiltIn()
-                                .Build(ast.ToArray());
+                                .BuildMain(ast.ToArray());
                                 
         interpreter.Interpret();
     }

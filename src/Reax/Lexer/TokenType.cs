@@ -35,5 +35,6 @@ public enum TokenType
     AND,
     OR,
     NOT,
-    IMPORT
+    IMPORT,
+    ACCESS
 } 

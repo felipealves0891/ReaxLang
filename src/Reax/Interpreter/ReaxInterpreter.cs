@@ -11,29 +11,49 @@ public class ReaxInterpreter
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
     
-    private ReaxInterpreter(ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
-        : this(nodes, context)
+    private ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
+        : this(name, nodes, context)
     {
         for (int i = 0; i < parameters.Length; i++)
             _parameters[i] = parameters[i];
     }
 
-    private ReaxInterpreter(ReaxNode[] nodes, ReaxExecutionContext context)
+    private ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context)
         : this(nodes)
     {
-        _context = new ReaxExecutionContext(context);
+        _context = new ReaxExecutionContext(name, context);
+    }
+
+    private ReaxInterpreter(string name, ReaxNode[] nodes)
+    {
+        _nodes = nodes;
+        _context = new ReaxExecutionContext(name);
+        _parameters = new Dictionary<int, ReaxNode>();
     }
 
     private ReaxInterpreter(ReaxNode[] nodes)
     {
         _nodes = nodes;
-        _context = new ReaxExecutionContext();
+        _context = new ReaxExecutionContext("main");
         _parameters = new Dictionary<int, ReaxNode>();
     }
     
     public static ReaxInterpreter CreateMain(ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
     {
         var interpreter = new ReaxInterpreter(nodes);
+
+        foreach (var fun in functions)
+        {
+            interpreter._context.DeclareFunction(fun.Identifier);
+            interpreter._context.SetFunction(fun.Identifier, fun.Function);
+        }
+
+        return interpreter;
+    }
+
+    public static ReaxInterpreter Create(string name, ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
+    {
+        var interpreter = new ReaxInterpreter(name, nodes);
 
         foreach (var fun in functions)
         {
@@ -68,7 +88,9 @@ public class ReaxInterpreter
     {
         foreach (var node in _nodes)
         {
-            if(node is FunctionCallNode functionCall)
+            if(node is ModuleNode module)
+                ExecuteDeclarationModule(module);
+            else if(node is FunctionCallNode functionCall)
                 Output = ExecuteFunctionCall(functionCall);
             else if (node is DeclarationNode declaration)
                 ExecuteDeclaration(declaration);
@@ -90,7 +112,16 @@ public class ReaxInterpreter
                 ExecuteFor(@for);
             else if(node is WhileNode @while)
                 ExecuteWhile(@while);
+            else if(node is ModuleFunctionCallNode moduleFunctionCallNode)
+                Output = ExecuteModuleFunctionCallNode(moduleFunctionCallNode);
         }
+    }
+
+    private void ExecuteDeclarationModule(ModuleNode module) 
+    {
+        module.Interpreter.Interpret();
+        _context.DeclareModule(module.Identifier);
+        _context.SetModule(module.Identifier, module.Interpreter);
     }
 
     private ReaxNode? ExecuteFunctionCall(FunctionCallNode functionCall) 
@@ -151,13 +182,13 @@ public class ReaxInterpreter
         if(logical.Compare(left, right))
         {
             var contextNode = (ContextNode)node.True;
-            var interpreter = new ReaxInterpreter(contextNode.Block, _context);
+            var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
             interpreter.Interpret();
         }
         else if(node.False is not null)
         {
             var contextNode = (ContextNode)node.False;
-            var interpreter = new ReaxInterpreter(contextNode.Block, _context);
+            var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
             interpreter.Interpret();
         }
     }
@@ -166,13 +197,13 @@ public class ReaxInterpreter
     {
         var identifier = node.Var.ToString();
         var contextNode = (ContextNode)node.Block;
-        var interpreter = new ReaxInterpreter(contextNode.Block, _context);
+        var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
         _context.SetObservable(identifier, interpreter, node.Condition);
     }
 
     private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 
     {
-        var interpreter = new ReaxInterpreter(node.Block, _context);
+        var interpreter = new ReaxInterpreter(node.ToString(), node.Block, _context);
         interpreter.Interpret();
 
         if(interpreter.Output is null)
@@ -187,7 +218,7 @@ public class ReaxInterpreter
             return GetValue(returnNode.Expression);
         
         var block = (ContextNode)returnNode.Expression;
-        var interpreter = new ReaxInterpreter(block.Block, _context);
+        var interpreter = new ReaxInterpreter(returnNode.ToString(), block.Block, _context);
         interpreter.Interpret();
 
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
@@ -197,7 +228,7 @@ public class ReaxInterpreter
     {
         var block = (ContextNode)node.Block;
         var identifier = node.Identifier.ToString();
-        var interpreter = new ReaxInterpreter(block.Block, _context, node.Parameters);
+        var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context, node.Parameters);
         _context.DeclareFunction(identifier);
         _context.SetFunction(identifier, interpreter);
     }
@@ -211,7 +242,7 @@ public class ReaxInterpreter
         ExecuteDeclaration(declaration);
         while(ExecuteBinary(condition))
         {
-            var interpreter = new ReaxInterpreter(block.Block, _context);
+            var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context);
             interpreter.Interpret();
 
             var value = _context.GetVariable(declaration.Identifier) as NumberNode;
@@ -230,9 +261,17 @@ public class ReaxInterpreter
 
         while(ExecuteBinary(condition))
         {
-            var interpreter = new ReaxInterpreter(block.Block, _context);
+            var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context);
             interpreter.Interpret();
         }
+    }
+    
+    private ReaxNode? ExecuteModuleFunctionCallNode(ModuleFunctionCallNode node)
+    {
+        var interpreter = _context.GetModule(node.moduleName);
+        var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
+        var identifier = node.functionCall.Identifier;
+        return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters));
     }
 
     private bool ExecuteBinary(BinaryNode condition) 

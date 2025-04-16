@@ -1,4 +1,5 @@
 using System;
+using Reax.Interpreter;
 using Reax.Runtime;
 
 namespace Reax.Parser.Node;
@@ -77,6 +78,8 @@ public record FunctionCallNode(string Identifier, ReaxNode[] Parameter) : ReaxNo
         return $"{Identifier}({string.Join(',', Parameter.Select(x => x.ToString()))});";
     }
 }
+
+public record ModuleFunctionCallNode(string moduleName, FunctionCallNode functionCall) : ReaxNode;
 
 public record DeclarationNode(string Identifier, ReaxNode? Assignment) : ReaxNode
 {
@@ -249,3 +252,5 @@ public record ReturnNode(ReaxNode Expression) : ReaxNode
 public record ForNode(ReaxNode declaration, ReaxNode condition, ReaxNode Block) : ReaxNode;
 
 public record WhileNode(ReaxNode condition, ReaxNode Block) : ReaxNode;
+
+public record ModuleNode(string Identifier, ReaxInterpreter Interpreter) : ReaxNode;

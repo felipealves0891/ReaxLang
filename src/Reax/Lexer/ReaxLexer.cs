@@ -66,6 +66,8 @@ public class ReaxLexer
             return AdvanceAndReturn(new Token(TokenType.START_BLOCK, _source.CurrentChar.ToString(), _source.Position, _numberOfRows)); 
         if(_source.CurrentChar == '}')
             return AdvanceAndReturn(new Token(TokenType.END_BLOCK, _source.CurrentChar.ToString(), _source.Position, _numberOfRows));
+        if(_source.CurrentChar == '.')
+            return AdvanceAndReturn(new Token(TokenType.ACCESS, _source.CurrentChar.ToString(), _source.Position, _numberOfRows));
         if(_source.CurrentChar == '\n')
             _numberOfRows++;
         

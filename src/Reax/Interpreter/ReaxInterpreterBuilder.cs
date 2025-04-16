@@ -8,13 +8,13 @@ namespace Reax.Interpreter;
 
 public class ReaxInterpreterBuilder
 {
-    private static ReaxInterpreter? _instanceMain = null; 
-
-    public IEnumerable<(string identifier, Function function)> FunctionsBuiltIn { get; set; }
-
-    public ReaxInterpreterBuilder()
+    public IEnumerable<(string identifier, Function function)> FunctionsBuiltIn { get; private set; }
+    public string Name { get; init; }
+    
+    public ReaxInterpreterBuilder(string? name = null)
     {
         FunctionsBuiltIn = Enumerable.Empty<(string identifier, Function function)>();
+        Name = name ?? "main";
     }
 
     public ReaxInterpreterBuilder AddFunctionsBuiltIn() 
@@ -33,12 +33,16 @@ public class ReaxInterpreterBuilder
         return this;
     }
 
-    public ReaxInterpreter Build(ReaxNode[] nodes) 
+    public ReaxInterpreter BuildMain(ReaxNode[] nodes) 
     {
-        if(_instanceMain != null)
-            return _instanceMain;
+        if(ReaxEnvironment.MainInterpreter != null)
+            return ReaxEnvironment.MainInterpreter;
 
-        _instanceMain = ReaxInterpreter.CreateMain(nodes, FunctionsBuiltIn);
-        return _instanceMain;
+        ReaxEnvironment.MainInterpreter = ReaxInterpreter.CreateMain(nodes, FunctionsBuiltIn);
+        return ReaxEnvironment.MainInterpreter;
     }
+
+    public ReaxInterpreter BuildModule(ReaxNode[] nodes) 
+        =>  ReaxInterpreter.Create(Name, nodes, FunctionsBuiltIn);
+    
 }

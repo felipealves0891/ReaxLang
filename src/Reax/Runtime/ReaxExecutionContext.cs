@@ -11,24 +11,28 @@ public class ReaxExecutionContext
 {
     private readonly IDictionary<string, Guid> _variableKeys;
     private readonly IDictionary<string, Guid> _functionKeys;
+    private readonly IDictionary<string, Guid> _moduleKeys;
     private readonly IDictionary<Guid, ReaxNode> _variableContext;
     private readonly IDictionary<Guid, Function> _functionContext;
+    private readonly IDictionary<Guid, ReaxInterpreter> _moduleContext;
     private readonly IDictionary<Guid, IList<VariableObservable>> _observableContext;
-
     private readonly ReaxExecutionContext? _parentContext;
-    
+    private readonly string _name;
 
-    public ReaxExecutionContext()
+    public ReaxExecutionContext(string name)
     {
         _variableKeys = new ConcurrentDictionary<string, Guid>();
         _variableContext = new ConcurrentDictionary<Guid, ReaxNode>();
         _functionKeys = new Dictionary<string, Guid>();
         _functionContext = new Dictionary<Guid, Function>();
         _observableContext = new Dictionary<Guid, IList<VariableObservable>>();
+        _moduleKeys = new Dictionary<string, Guid>();
+        _moduleContext = new Dictionary<Guid, ReaxInterpreter>();
+        _name = name;
     }
 
-    public ReaxExecutionContext(ReaxExecutionContext parentContext)
-        : this()
+    public ReaxExecutionContext(string name, ReaxExecutionContext parentContext)
+        : this($"{parentContext._name}->{name}")
     {
         _parentContext = parentContext;
     }
@@ -51,6 +55,11 @@ public class ReaxExecutionContext
         _functionKeys[identifier] = Guid.NewGuid();
     }
 
+    public void DeclareModule(string identifier)
+    {
+        _moduleKeys[identifier] = Guid.NewGuid();
+    }
+
     public void SetVariable(string identifier, ReaxNode value)
     {
         if(!_variableKeys.TryGetValue(identifier, out var key))
@@ -62,7 +71,7 @@ public class ReaxExecutionContext
                 return;
             }
 
-            throw new InvalidOperationException($"Variavel '{identifier}' não declarada!");
+            throw new InvalidOperationException($"{_name}: Variavel '{identifier}' não declarada!");
         }
 
         _variableContext[key] = value;
@@ -82,22 +91,15 @@ public class ReaxExecutionContext
     public void SetFunction(string identifier, ReaxInterpreter value)
     {
         if(!_functionKeys.TryGetValue(identifier, out var key))
-            throw new InvalidOperationException($"Função '{identifier}' não declarada!");
+            throw new InvalidOperationException($"{_name}: Função '{identifier}' não declarada!");
         
         _functionContext[key] = new InterpreterFunction(identifier, value);
-        
-        if(_observableContext.TryGetValue(key, out var observables))
-        {
-            Parallel.ForEach(observables, observable => {
-                if(observable.CanRun(this)) observable.Run();
-            });
-        }
     }
 
     public void SetFunction(string identifier, Function value)
     {
         if(!_functionKeys.TryGetValue(identifier, out var key))
-            throw new InvalidOperationException($"Função '{identifier}' não declarada!");
+            throw new InvalidOperationException($"{_name}: Função '{identifier}' não declarada!");
         
         _functionContext[key] = value;
     }
@@ -108,7 +110,7 @@ public class ReaxExecutionContext
         if(_variableKeys.TryGetValue(identifier, out var local))
             SetObservable(local, observable);
         else if(_parentContext is null)
-            throw new InvalidOperationException($"Não é possivel observar uma variavel não declarada: variavel '{identifier}'!");
+            throw new InvalidOperationException($"{_name}: Não é possivel observar uma variavel não declarada: variavel '{identifier}'!");
         else if(_parentContext._variableKeys.TryGetValue(identifier, out var parent))
             SetObservable(parent, observable);
     }
@@ -120,6 +122,14 @@ public class ReaxExecutionContext
         else 
             _observableContext[key] = new List<VariableObservable>([observable]);
     }
+    
+    public void SetModule(string identifier, ReaxInterpreter interpreter)
+    {
+        if(!_moduleKeys.TryGetValue(identifier, out var key))
+            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi importado!");
+        
+        _moduleContext[key] = interpreter;
+    } 
 
     public ReaxNode GetVariable(string identifier)
     {
@@ -129,11 +139,11 @@ public class ReaxExecutionContext
             if(valueContext is not null)
                 return valueContext;
 
-            throw new InvalidOperationException($"Variavel '{identifier}' não declarada!");
+            throw new InvalidOperationException($"{_name}: Variavel '{identifier}' não declarada!");
         }
         
         if(!_variableContext.TryGetValue(key, out var value) || value is null)    
-            throw new InvalidOperationException($"Variavel '{identifier}' não foi atribuida!");
+            throw new InvalidOperationException($"{_name}: Variavel '{identifier}' não foi atribuida!");
         
         return value;
     }
@@ -146,11 +156,11 @@ public class ReaxExecutionContext
             if(valueContext is not null)
                 return valueContext;
 
-            throw new InvalidOperationException($"Função '{identifier}' não declarada!");
+            throw new InvalidOperationException($"{_name}: Função '{identifier}' não declarada!");
         }   
         
         if(!_functionContext.TryGetValue(key, out var value) || value is null)    
-            throw new InvalidOperationException($"Função '{identifier}' não foi atribuida!");
+            throw new InvalidOperationException($"{_name}: Função '{identifier}' não foi atribuida!");
         
         return value;
     }
@@ -172,6 +182,38 @@ public class ReaxExecutionContext
         try
         {
             return _parentContext?.GetFunction(identifier);
+        }
+        catch (System.Exception)
+        {
+            return null;
+        }
+    }
+
+    public ReaxInterpreter GetModule(string identifier)
+    {
+        if(!_moduleKeys.TryGetValue(identifier, out var key))
+        {
+            var module = GetParentModule(identifier);
+            if(module is not null)
+                return module;
+
+            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi declarado");
+        }
+
+        if(!_moduleContext.TryGetValue(key, out var interpreter))
+            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi definido");
+
+        return interpreter;
+    }
+
+    private ReaxInterpreter? GetParentModule(string identifier) 
+    {
+        try
+        {
+            if(_parentContext is null)
+                return null;
+
+            return _parentContext.GetModule(identifier);
         }
         catch (System.Exception)
         {

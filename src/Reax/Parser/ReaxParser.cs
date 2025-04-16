@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Reax.Interpreter;
 using Reax.Lexer;
 using Reax.Parser.Helpers;
 using Reax.Parser.Node;
@@ -7,18 +8,14 @@ namespace Reax.Parser;
 
 public class ReaxParser
 {
-    private readonly IList<string> _imports;
     private readonly Token[] _tokens;
     private int _position;
 
     public ReaxParser(IEnumerable<Token> tokens)
     {
         _tokens = tokens.ToArray();
-        _imports = new List<string>();
         _position = 0;
     }
-
-    public IReadOnlyCollection<string> Imports => new ReadOnlyCollection<string>(_imports);
 
     public bool EndOfTokens => _position >= _tokens.Length;
     public Token BeforeToken => _tokens[_position-1];
@@ -42,31 +39,32 @@ public class ReaxParser
         if(_position >= _tokens.Length)
             return null;
 
-        var nextToken = _tokens[_position];
-        if(nextToken.Type == TokenType.EOF) 
+        if(CurrentToken.Type == TokenType.EOF) 
             return null;
-        if(nextToken.Type == TokenType.IMPORT)
+        if(CurrentToken.Type == TokenType.IMPORT)
             return ImportScripts();
-        else if(nextToken.Type == TokenType.LET) 
+        else if(CurrentToken.Type == TokenType.LET) 
             return DeclarationParse();
         else if(IsFunctionCall()) 
             return FunctionCallParse();
         else if(IsAssignment()) 
             return AssignmentParse();
-        else if(nextToken.Type == TokenType.IF)
+        else if(CurrentToken.Type == TokenType.IF)
             return IfParse();
-        else if(nextToken.Type == TokenType.ON)
+        else if(CurrentToken.Type == TokenType.ON)
             return ObservableParse();
-        else if(nextToken.Type == TokenType.FUNCTION)
+        else if(CurrentToken.Type == TokenType.FUNCTION)
             return FunctionDeclarationParse();
         else if(IsArithmeticOperation())
             return ArithmeticOperationParse();
-        else if(nextToken.Type == TokenType.RETURN)
+        else if(CurrentToken.Type == TokenType.RETURN)
             return ReturnParse();
-        else if(nextToken.Type == TokenType.FOR)
+        else if(CurrentToken.Type == TokenType.FOR)
             return ForParse();
-        else if(nextToken.Type == TokenType.WHILE)
+        else if(CurrentToken.Type == TokenType.WHILE)
             return WhileParse();
+        else if(CurrentToken.Type == TokenType.IDENTIFIER && NextToken.Type == TokenType.ACCESS)
+            return ModuleFunctionCallParse();
         
         throw new Exception($"Token invalido na linha {CurrentToken.Row}: {CurrentToken}");
     }
@@ -75,12 +73,28 @@ public class ReaxParser
     {
         Advance();
         var file = CurrentToken.Source;
-        _imports.Add(file);
+        var info = new FileInfo(Path.Combine(ReaxEnvironment.DirectoryRoot, file));
+        
+        if(!info.Exists) throw new InvalidOperationException($"Modulo '{file}' não localizado!");
+        ReaxInterpreter? interpreter = null;
+        if(!ReaxEnvironment.ImportedFiles.Contains(file))
+        {
+            interpreter = ReaxCompiler.CompileModule(file, info.FullName);
+            ReaxEnvironment.ImportedFiles.Add(file);      
+        }
+
         Advance();
-        if(CurrentToken.Type == TokenType.END_STATEMENT)
+        if(CurrentToken.Type != TokenType.END_STATEMENT)
             throw new InvalidOperationException($"Era esperado o fim da expressão na linha {CurrentToken.Row}!");
 
         Advance();
+        if(interpreter is not null)
+        {
+            var moduleName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
+            return new ModuleNode(moduleName, interpreter);
+        }
+            
+
         return NextNode();
     }
 
@@ -316,6 +330,32 @@ public class ReaxParser
         var block = NextBlock();
         return new WhileNode(condition, block);
     }
+
+    private ReaxNode ModuleFunctionCallParse() 
+    {
+        var moduleName = CurrentToken;
+        Advance();
+        Advance();
+        var identifier = CurrentToken;
+        Advance();
+        if(CurrentToken.Type != TokenType.START_PARAMETER)
+            throw new InvalidOperationException($"Era esperado um abre parenteses '(' na linha {CurrentToken.Row}!");
+        
+        Advance();
+        var parameters = new List<ReaxNode>();
+        while(CurrentToken.Type != TokenType.END_PARAMETER)
+        {
+            if(CurrentToken.IsReaxValue())
+                parameters.Add(CurrentToken.ToReaxValue());
+            else if(CurrentToken.Type != TokenType.PARAMETER_SEPARATOR)
+                throw new InvalidOperationException($"Token invalido na linha {CurrentToken.Row}.");
+
+            Advance();
+        }
+        Advance();
+
+        return new ModuleFunctionCallNode(moduleName.Source, new FunctionCallNode(identifier.Source, parameters.ToArray()));
+    }       
 
     private IEnumerable<Token> NextStatement() 
     {
