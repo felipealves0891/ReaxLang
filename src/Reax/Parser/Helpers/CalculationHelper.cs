@@ -12,7 +12,7 @@ class CalculationHelper
 
     public CalculationHelper(IEnumerable<Token> tokens) => _tokens = tokens.ToList();
 
-    private Token? Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, "", -1, -1);
+    private Token Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, ' ', -1, -1);
     private Token Consume() => _tokens[_pos++];
 
     public ReaxNode ParseExpression() => ParseAddSub();
@@ -20,7 +20,9 @@ class CalculationHelper
     private ReaxNode ParseAddSub()
     {
         var node = ParseMulDiv();
-        while (Peek()?.Source is "+" or "-")
+        while (
+            Peek().ReadOnlySource.SequenceEqual(['+']) || 
+            Peek().ReadOnlySource.SequenceEqual(['-']))
         {
             var op = Consume();
             var right = ParseMulDiv();
@@ -32,7 +34,9 @@ class CalculationHelper
     private ReaxNode ParseMulDiv()
     {
         var node = ParseFactor();
-        while (Peek()?.Source is "*" or "/")
+        while (
+            Peek().ReadOnlySource.SequenceEqual(['*']) || 
+            Peek().ReadOnlySource.SequenceEqual(['/']))
         {
             var op = Consume();
             var right = ParseFactor();
@@ -44,16 +48,16 @@ class CalculationHelper
     private ReaxNode ParseFactor()
     {
         var token = Peek();
-        if (token is not null && token.IsReaxValue())
+        if (token.IsReaxValue())
         {
             Consume();
             return token.ToReaxValue();
         }
-        else if (token is not null && token.Type == TokenType.START_PARAMETER)
+        else if (token.Type == TokenType.START_PARAMETER)
         {
             Consume();
             var node = ParseExpression();
-            if (Peek()?.Type != TokenType.END_PARAMETER) throw new Exception("Esperado ')'");
+            if (Peek().Type != TokenType.END_PARAMETER) throw new Exception("Esperado ')'");
             Consume();
             return node;
         }

@@ -10,5 +10,5 @@ public interface IReader
     public char NextChar { get; }
     public int Position { get; }
     public void Advance();
-    public string GetString(int start, int end);
+    public char[] GetString(int start, int end);
 }

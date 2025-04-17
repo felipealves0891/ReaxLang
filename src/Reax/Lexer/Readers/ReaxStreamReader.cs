@@ -56,17 +56,18 @@ public class ReaxStreamReader : IReader
         _stream.Position++;
     }
 
-    public string GetString(int start, int end)
+    public char[] GetString(int start, int end)
     {
         var currentChar = _stream.Position;
         _stream.Position = start;
 
+        var chars = new char[end - start];
         StringBuilder builder = new StringBuilder();
         while (_stream.Position < end)
             builder.Append((char)_stream.ReadByte());
         
         _stream.Position = currentChar;
-        return builder.ToString();
+        return chars;
 
     }
 }

@@ -17,7 +17,7 @@ public class Program
     }
 
     [Benchmark]
-    public void TextRun()
+    public void TextLexer()
     {
         var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
         ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
@@ -26,35 +26,17 @@ public class Program
         var reader = new ReaxTextReader(code);
 
         var lexer = new ReaxLexer(reader);
-        var tokens = lexer.Tokenize().ToArray();
-
-        // var parser = new ReaxParser(tokens);
-        // var ast = parser.Parse();
-
-        // var interpreter = new ReaxInterpreterBuilder()
-        //                         .AddFunctionsBuiltIn()
-        //                         .BuildMain(ast.ToArray());
-                                
-        // interpreter.Interpret();
+        lexer.Tokenize().ToArray();
     }
     
-    //[Benchmark]
-    public void StreamRun()
+    [Benchmark]
+    public void StreamLexer()
     {
         var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
         ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
 
         var lexer = new ReaxLexer(new ReaxStreamReader(fileInfo.FullName));
-        var tokens = lexer.Tokenize().ToArray();
-
-        // var parser = new ReaxParser(tokens);
-        // var ast = parser.Parse();
-
-        // var interpreter = new ReaxInterpreterBuilder()
-        //                         .AddFunctionsBuiltIn()
-        //                         .BuildMain(ast.ToArray());
-                                
-        // interpreter.Interpret();
+        lexer.Tokenize().ToArray();
     }
 }
 

@@ -72,15 +72,22 @@ public class ReaxParser
     private ReaxNode? ImportScripts() 
     {
         Advance();
-        var file = CurrentToken.Source;
+        var file = CurrentToken.ReadOnlySource.ToString();
         var info = new FileInfo(Path.Combine(ReaxEnvironment.DirectoryRoot, file));
         
         if(!info.Exists) throw new InvalidOperationException($"Modulo '{file}' não localizado!");
-        ReaxInterpreter? interpreter = null;
-        if(!ReaxEnvironment.ImportedFiles.Contains(file))
+        ModuleNode? module = null;
+
+        if(!ReaxEnvironment.ImportedFiles.ContainsKey(file))
         {
-            interpreter = ReaxCompiler.CompileModule(file, info.FullName);
-            ReaxEnvironment.ImportedFiles.Add(file);      
+            var interpreter = ReaxCompiler.CompileModule(file, info.FullName);
+            var moduleName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
+            module = new ModuleNode(moduleName, interpreter);
+            ReaxEnvironment.ImportedFiles.Add(file, module);      
+        }
+        else
+        {
+            module = ReaxEnvironment.ImportedFiles[file];
         }
 
         Advance();
@@ -88,14 +95,10 @@ public class ReaxParser
             throw new InvalidOperationException($"Era esperado o fim da expressão na linha {CurrentToken.Row}!");
 
         Advance();
-        if(interpreter is not null)
-        {
-            var moduleName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
-            return new ModuleNode(moduleName, interpreter);
-        }
-            
+        if(module is null)
+            throw new InvalidOperationException($"ERRO: modulo não foi importado!");
 
-        return NextNode();
+        return module;
     }
 
     private ReaxNode DeclarationParse() 
@@ -114,10 +117,11 @@ public class ReaxParser
         if(identifier is null)
             throw new Exception();
 
+        var textIdentifier = identifier.Value.ReadOnlySource.ToString();
         if(value is not null)
-            return new DeclarationNode(identifier.Source, value.ToReaxValue());
+            return new DeclarationNode(textIdentifier, value.Value.ToReaxValue());
         else 
-            return new DeclarationNode(identifier.Source, null);
+            return new DeclarationNode(textIdentifier, null);
     }
 
     private bool IsFunctionCall() 
@@ -145,9 +149,10 @@ public class ReaxParser
 
         if(identifier is null)
             throw new Exception();
-            
+        
+        var textIdentifier = identifier.Value.ReadOnlySource.ToString();
         var values = parameter.Select(x => x.ToReaxValue()).ToArray();
-        return new FunctionCallNode(identifier.Source, values);
+        return new FunctionCallNode(textIdentifier, values);
     }
 
     private bool IsAssignment() 
@@ -186,7 +191,7 @@ public class ReaxParser
             value = new ContextNode(expressionNodes.ToArray());
         }
 
-        return new AssignmentNode(identifier.Source, value);
+        return new AssignmentNode(identifier.Value.ReadOnlySource.ToString(), value);
     }
 
     private ReaxNode IfParse()
@@ -211,7 +216,7 @@ public class ReaxParser
     private ReaxNode ObservableParse() 
     {
         _position++;
-        var variable = new VarNode(_tokens[_position++].Source);
+        var variable = new VarNode(_tokens[_position++].ReadOnlySource.ToString());
         BinaryNode? condition = null;
 
         if(_tokens[_position].Type == TokenType.WHEN)
@@ -303,7 +308,7 @@ public class ReaxParser
         Advance();
         var initialValue = CurrentToken;
         Advance();
-        var declaration = new DeclarationNode(identifierControl.Source, initialValue.ToReaxValue());
+        var declaration = new DeclarationNode(identifierControl.ReadOnlySource.ToString(), initialValue.ToReaxValue());
         if(CurrentToken.Type != TokenType.TO)
             throw new InvalidOperationException("Era esperado uma expresão 'TO'!");
         Advance();
@@ -354,7 +359,9 @@ public class ReaxParser
         }
         Advance();
 
-        return new ModuleFunctionCallNode(moduleName.Source, new FunctionCallNode(identifier.Source, parameters.ToArray()));
+        return new ModuleFunctionCallNode(
+            moduleName.ReadOnlySource.ToString(), 
+            new FunctionCallNode(identifier.ReadOnlySource.ToString(), parameters.ToArray()));
     }       
 
     private IEnumerable<Token> NextStatement() 

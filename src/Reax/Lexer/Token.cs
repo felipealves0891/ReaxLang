@@ -2,11 +2,34 @@ using Reax.Parser.Node;
 
 namespace Reax.Lexer;
 
-public record Token(TokenType Type, string Source, int Position, int Row)
+public struct Token
 {
+    private readonly char[] _source;
+
+    public Token(TokenType type, char[] source, int position, int row)
+    {
+        Type = type;
+        _source = source;
+        Position = position;
+        Row = row;
+    }
+
+    public Token(TokenType type, char source, int position, int row)
+    {
+        Type = type;
+        _source = new char[] { source };
+        Position = position;
+        Row = row;
+    }
+
+    public TokenType Type { get; init; }
+    public int Position { get; init; }
+    public int Row { get; init; }
+    public ReadOnlySpan<char> ReadOnlySource => new ReadOnlySpan<char>(_source);
+
     public override string ToString()
     {
-        return $"#{Row} {Source} is {Type} at {Position}";
+        return $"#{Row} {ReadOnlySource} is {Type} at {Position}";
     }
 }
 
@@ -47,8 +70,8 @@ public static class TokenExtensions
     {
         return token.Type switch 
         {
-            TokenType.TERM => new TermNode(token.Source),
-            TokenType.FACTOR => new FactorNode(token.Source),
+            TokenType.TERM => new TermNode(token.ReadOnlySource.ToString()),
+            TokenType.FACTOR => new FactorNode(token.ReadOnlySource.ToString()),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em operador aritimetico!")
         };
     }
@@ -57,11 +80,11 @@ public static class TokenExtensions
     {
         return token.Type switch 
         {
-            TokenType.IDENTIFIER => new VarNode(token.Source),
-            TokenType.STRING => new StringNode(token.Source),
-            TokenType.NUMBER => new NumberNode(token.Source),
-            TokenType.FALSE => new BooleanNode(token.Source),
-            TokenType.TRUE => new BooleanNode(token.Source),
+            TokenType.IDENTIFIER => new VarNode(token.ReadOnlySource.ToString()),
+            TokenType.STRING => new StringNode(token.ReadOnlySource.ToString()),
+            TokenType.NUMBER => new NumberNode(token.ReadOnlySource.ToString()),
+            TokenType.FALSE => new BooleanNode(token.ReadOnlySource.ToString()),
+            TokenType.TRUE => new BooleanNode(token.ReadOnlySource.ToString()),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }
@@ -70,11 +93,11 @@ public static class TokenExtensions
     {
         return token.Type switch 
         {
-            TokenType.COMPARISON => new ComparisonNode(token.Source),
-            TokenType.EQUALITY => new EqualityNode(token.Source),
-            TokenType.AND => new LogicNode(token.Source),
-            TokenType.OR => new LogicNode(token.Source),
-            TokenType.NOT => new LogicNode(token.Source),
+            TokenType.COMPARISON => new ComparisonNode(token.ReadOnlySource.ToString()),
+            TokenType.EQUALITY => new EqualityNode(token.ReadOnlySource.ToString()),
+            TokenType.AND => new LogicNode(token.ReadOnlySource.ToString()),
+            TokenType.OR => new LogicNode(token.ReadOnlySource.ToString()),
+            TokenType.NOT => new LogicNode(token.ReadOnlySource.ToString()),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }

@@ -27,8 +27,8 @@ public class ReaxTextReader : IReader
         _position++;
     }
 
-    public string GetString(int start, int end)
+    public char[] GetString(int start, int end)
     {
-        return _source[start..end];
+        return _source[start..end].ToCharArray();
     }
 }
