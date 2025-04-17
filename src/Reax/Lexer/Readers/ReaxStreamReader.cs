@@ -62,9 +62,8 @@ public class ReaxStreamReader : IReader
         _stream.Position = start;
 
         var chars = new char[end - start];
-        StringBuilder builder = new StringBuilder();
-        while (_stream.Position < end)
-            builder.Append((char)_stream.ReadByte());
+        for (int i = 0; i < end - start; i++)
+            chars[i] = (char)_stream.ReadByte();
         
         _stream.Position = currentChar;
         return chars;
