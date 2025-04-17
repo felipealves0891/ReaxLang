@@ -1,13 +1,12 @@
-using System.Collections.ObjectModel;
-using Reax.Interpreter;
 using Reax.Lexer;
-using Reax.Parser.Helper;
 using Reax.Parser.Node;
+using Reax.Parser.NodeParser;
 
 namespace Reax.Parser;
 
-public class ReaxParser
+public class ReaxParser : ITokenSource
 {
+    private readonly IList<INodeParser> _parsers;
     private readonly Token[] _tokens;
     private int _position;
 
@@ -15,12 +14,19 @@ public class ReaxParser
     {
         _tokens = tokens.ToArray();
         _position = 0;
+        _parsers = this.GetType()
+                       .Assembly
+                       .GetTypes()
+                       .Where(x => x.GetInterface(nameof(INodeParser)) != null)
+                       .Select(x => Activator.CreateInstance(x))
+                       .Cast<INodeParser>()
+                       .ToList();
     }
 
     public bool EndOfTokens => _position >= _tokens.Length;
-    public Token BeforeToken => _tokens[_position-1];
-    public Token CurrentToken => _tokens[_position];
-    public Token NextToken => _tokens[_position+1];
+    public Token BeforeToken => _position > 0 ? _tokens[_position-1] : new Token(TokenType.UNKNOW, ' ', -1, -1);
+    public Token CurrentToken => !EndOfTokens ? _tokens[_position] : new Token(TokenType.UNKNOW, ' ', -1, -1);
+    public Token NextToken => _position < _tokens.Length ? _tokens[_position+1] : new Token(TokenType.UNKNOW, ' ', -1, -1);
 
     public IEnumerable<ReaxNode> Parse() 
     {
@@ -41,330 +47,20 @@ public class ReaxParser
 
         if(CurrentToken.Type == TokenType.EOF) 
             return null;
-        if(CurrentToken.Type == TokenType.IMPORT)
-            return ImportScripts();
-        else if(CurrentToken.Type == TokenType.LET) 
-            return DeclarationParse();
-        else if(IsFunctionCall()) 
-            return FunctionCallParse();
-        else if(IsAssignment()) 
-            return AssignmentParse();
-        else if(CurrentToken.Type == TokenType.IF)
-            return IfParse();
-        else if(CurrentToken.Type == TokenType.ON)
-            return ObservableParse();
-        else if(CurrentToken.Type == TokenType.FUNCTION)
-            return FunctionDeclarationParse();
-        else if(IsArithmeticOperation())
-            return ArithmeticOperationParse();
-        else if(CurrentToken.Type == TokenType.RETURN)
-            return ReturnParse();
-        else if(CurrentToken.Type == TokenType.FOR)
-            return ForParse();
-        else if(CurrentToken.Type == TokenType.WHILE)
-            return WhileParse();
-        else if(CurrentToken.Type == TokenType.IDENTIFIER && NextToken.Type == TokenType.ACCESS)
-            return ModuleFunctionCallParse();
+
+        foreach (var parser in _parsers)
+        {
+            if(parser.IsParse(BeforeToken, CurrentToken, NextToken))
+            {
+                return parser.Parse(this); 
+            }
+                
+        }
         
         throw new Exception($"Token invalido na linha {CurrentToken.Row}: {CurrentToken}");
     }
 
-    private ReaxNode? ImportScripts() 
-    {
-        Advance();
-        var file = CurrentToken.ReadOnlySource.ToString();
-        var info = new FileInfo(Path.Combine(ReaxEnvironment.DirectoryRoot, file));
-        
-        if(!info.Exists) throw new InvalidOperationException($"Modulo '{file}' não localizado!");
-        ModuleNode? module = null;
-
-        if(!ReaxEnvironment.ImportedFiles.ContainsKey(file))
-        {
-            var interpreter = ReaxCompiler.CompileModule(file, info.FullName);
-            var moduleName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
-            module = new ModuleNode(moduleName, interpreter);
-            ReaxEnvironment.ImportedFiles.Add(file, module);      
-        }
-        else
-        {
-            module = ReaxEnvironment.ImportedFiles[file];
-        }
-
-        Advance();
-        if(CurrentToken.Type != TokenType.END_STATEMENT)
-            throw new InvalidOperationException($"Era esperado o fim da expressão na linha {CurrentToken.Row}!");
-
-        Advance();
-        if(module is null)
-            throw new InvalidOperationException($"ERRO: modulo não foi importado!");
-
-        return module;
-    }
-
-    private ReaxNode DeclarationParse() 
-    {
-        Token? identifier = null;
-        Token? value = null;
-
-        foreach (var statement in NextStatement())
-        {
-            if(statement.Type == TokenType.IDENTIFIER)
-                identifier = statement;
-            else if (statement.IsReaxValue())
-                value = statement;
-        }
-
-        if(identifier is null)
-            throw new Exception();
-
-        var textIdentifier = identifier.Value.ReadOnlySource.ToString();
-        if(value is not null)
-            return new DeclarationNode(textIdentifier, value.Value.ToReaxValue());
-        else 
-            return new DeclarationNode(textIdentifier, null);
-    }
-
-    private bool IsFunctionCall() 
-    {
-        return _tokens[_position].Type == TokenType.IDENTIFIER 
-            && _tokens[_position+1].Type == TokenType.START_PARAMETER;
-    }
-
-    private ReaxNode FunctionCallParse() 
-    {
-        bool startParameter = false;
-
-        Token? identifier = null;
-        List<Token> parameter = new List<Token>();
-        
-        foreach (var statement in NextStatement())
-        {
-            if(!startParameter && statement.Type == TokenType.IDENTIFIER)
-                identifier = statement;
-            else if (startParameter && statement.IsReaxValue())
-                parameter.Add(statement);
-            else if (statement.Type == TokenType.START_PARAMETER)
-                startParameter = true;
-        }
-
-        if(identifier is null)
-            throw new Exception();
-        
-        var textIdentifier = identifier.Value.ReadOnlySource.ToString();
-        var values = parameter.Select(x => x.ToReaxValue()).ToArray();
-        return new FunctionCallNode(textIdentifier, values);
-    }
-
-    private bool IsAssignment() 
-    {
-        return _tokens[_position].Type == TokenType.IDENTIFIER 
-            && _tokens[_position+1].Type == TokenType.ASSIGNMENT;
-    }
-
-    private ReaxNode AssignmentParse() 
-    {
-        Token? identifier = null;
-        bool isExpression = false;
-        List<Token> expression = new List<Token>();
-        ReaxNode? value = null;
-        foreach (var statement in NextStatement())
-        {
-            if(!isExpression && statement.Type == TokenType.IDENTIFIER)
-                identifier = statement;
-            else if (!isExpression && statement.Type == TokenType.ASSIGNMENT)
-                isExpression = true;
-            else if (isExpression)
-                expression.Add(statement);
-        }
-
-        if(identifier is null || expression is null)
-            throw new Exception();
-        
-        if(expression.Count() == 1)
-        {
-            value = expression[0].ToReaxValue();
-        }
-        else 
-        {
-            var parser = new ReaxParser(expression);
-            var expressionNodes = parser.Parse();
-            value = new ContextNode(expressionNodes.ToArray());
-        }
-
-        return new AssignmentNode(identifier.Value.ReadOnlySource.ToString(), value);
-    }
-
-    private ReaxNode IfParse()
-    {
-        _position++;
-        var statement = NextStatement();
-        var comparisonHelper = new ComparisonHelper(statement);
-        var condition = comparisonHelper.Parse();
-        var @true = NextBlock();
-        ReaxNode? @else = null;
-
-        if(_tokens[_position].Type == TokenType.ELSE)
-        {
-            _position++;
-            @else = NextBlock();
-        }
-
-
-        return new IfNode(condition, @true, @else);
-    }
-    
-    private ReaxNode ObservableParse() 
-    {
-        _position++;
-        var variable = new VarNode(_tokens[_position++].ReadOnlySource.ToString());
-        BinaryNode? condition = null;
-
-        if(_tokens[_position].Type == TokenType.WHEN)
-        {
-            _position++;    
-            var statement = NextStatement();
-            var comparisonHelper = new ComparisonHelper(statement);
-            condition = comparisonHelper.Parse();
-        }
-
-        if(_tokens[_position].Type == TokenType.START_BLOCK)
-            return new ObservableNode(variable, NextBlock(), condition);
-        else if(_tokens[_position].Type == TokenType.ARROW)
-            return  new ObservableNode(variable, new ContextNode([ArrowParse()]), condition);
-        else
-            throw new InvalidOperationException($"Token invalido '{_tokens[_position].Type}' na posição: {_position}");
-    }
-
-    private bool IsArithmeticOperation() 
-    {
-        return CurrentToken.CanCalculated() && NextToken.IsArithmeticOperator();
-    }
-
-    private ReaxNode ArithmeticOperationParse() 
-    {
-        var statement = NextStatement();
-        var helper = new CalculationHelper(statement);
-        var node = helper.ParseExpression();
-        
-        if(node is null)
-            throw new InvalidOperationException("Valores faltando para a operação");
-
-        return node;
-    }
-
-    private ReaxNode ArrowParse() 
-    {
-        _position++;
-        return NextNode() ?? throw new InvalidOperationException();
-    }
-
-    private ReaxNode FunctionDeclarationParse() 
-    {
-        _position++;
-        var identifier = CurrentToken.ToReaxValue();
-        _position++;
-        var parameters = GetParameters().ToArray();
-        var block = NextBlock();
-        return new FunctionNode(identifier, block, parameters);
-    }
-
-    private IEnumerable<ReaxNode> GetParameters() 
-    {
-        var parameters = new List<ReaxNode>();
-        if(CurrentToken.Type != TokenType.START_PARAMETER)
-            return parameters;
-
-        _position++;
-        while(CurrentToken.Type != TokenType.END_PARAMETER) 
-        {
-            if(CurrentToken.Type == TokenType.IDENTIFIER)
-                parameters.Add(CurrentToken.ToReaxValue());
-
-            _position++;
-        }
-        _position++;
-        return parameters;
-    }
-
-    private ReaxNode ReturnParse() 
-    {
-        _position++;
-        var statement = NextStatement().ToArray();
-        if(statement.Length == 1)
-            return statement[0].ToReaxValue();
-        
-        var parser = new ReaxParser(statement);
-        var context = parser.Parse();
-        return new ContextNode(context.ToArray());
-    }
-
-    private ReaxNode ForParse() 
-    {
-        Advance();
-        var identifierControl = CurrentToken;
-        Advance();
-        if(CurrentToken.Type != TokenType.ASSIGNMENT)
-            throw new InvalidOperationException("Era esperado uma atribuição!");
-        Advance();
-        var initialValue = CurrentToken;
-        Advance();
-        var declaration = new DeclarationNode(identifierControl.ReadOnlySource.ToString(), initialValue.ToReaxValue());
-        if(CurrentToken.Type != TokenType.TO)
-            throw new InvalidOperationException("Era esperado uma expresão 'TO'!");
-        Advance();
-
-        var limitValue = CurrentToken;
-        var condition = new BinaryNode(
-            identifierControl.ToReaxValue(), 
-            new ComparisonNode("<"), 
-            limitValue.ToReaxValue());
-        
-        Advance();
-
-        var block = NextBlock();
-        return new ForNode(declaration, condition, block);
-    }
-
-    private ReaxNode WhileParse() 
-    {
-        Advance();
-        var statement = NextStatement();
-        var helper = new ComparisonHelper(statement);
-        var condition = helper.Parse();
-
-        var block = NextBlock();
-        return new WhileNode(condition, block);
-    }
-
-    private ReaxNode ModuleFunctionCallParse() 
-    {
-        var moduleName = CurrentToken;
-        Advance();
-        Advance();
-        var identifier = CurrentToken;
-        Advance();
-        if(CurrentToken.Type != TokenType.START_PARAMETER)
-            throw new InvalidOperationException($"Era esperado um abre parenteses '(' na linha {CurrentToken.Row}!");
-        
-        Advance();
-        var parameters = new List<ReaxNode>();
-        while(CurrentToken.Type != TokenType.END_PARAMETER)
-        {
-            if(CurrentToken.IsReaxValue())
-                parameters.Add(CurrentToken.ToReaxValue());
-            else if(CurrentToken.Type != TokenType.PARAMETER_SEPARATOR)
-                throw new InvalidOperationException($"Token invalido na linha {CurrentToken.Row}.");
-
-            Advance();
-        }
-        Advance();
-
-        return new ModuleFunctionCallNode(
-            moduleName.ReadOnlySource.ToString(), 
-            new FunctionCallNode(identifier.ReadOnlySource.ToString(), parameters.ToArray()));
-    }       
-
-    private IEnumerable<Token> NextStatement() 
+    public IEnumerable<Token> NextStatement() 
     {
         while(true)
         {
@@ -385,7 +81,7 @@ public class ReaxParser
         }
     }
 
-    private ReaxNode NextBlock()
+    public ReaxNode NextBlock()
     {
         var block = new List<ReaxNode>();
         if(CurrentToken.Type != TokenType.START_BLOCK)
@@ -405,7 +101,7 @@ public class ReaxParser
         return new ContextNode(block.ToArray());
     }
 
-    private void Advance() 
+    public void Advance() 
     {
         if(_position + 1 > _tokens.Length)
             throw new InvalidOperationException("Não é possivel avançar após o fim dos tokens");
