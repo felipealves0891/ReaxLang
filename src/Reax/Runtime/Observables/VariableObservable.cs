@@ -1,6 +1,7 @@
 using System;
 using Reax.Interpreter;
 using Reax.Parser.Node;
+using Reax.Parser.Node.Interfaces;
 
 namespace Reax.Runtime.Observables;
 

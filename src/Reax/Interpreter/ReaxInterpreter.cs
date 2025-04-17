@@ -1,5 +1,6 @@
 using System;
 using Reax.Parser.Node;
+using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
 using Reax.Runtime.Functions;
 

@@ -1,0 +1,10 @@
+namespace Reax.Parser.Node;
+
+public record IfNode(BinaryNode Condition, ReaxNode True, ReaxNode? False) : ReaxNode
+{
+    public override string ToString()
+    {
+        var elseText = False is null ? "" : "else {}";
+        return $"if {Condition} {{}} {elseText}";
+    }
+}
