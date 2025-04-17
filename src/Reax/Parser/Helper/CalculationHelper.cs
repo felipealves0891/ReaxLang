@@ -2,8 +2,7 @@ using System;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
-namespace Reax.Parser.Helpers;
-//CalculationHelper
+namespace Reax.Parser.Helper;
 
 class CalculationHelper
 {

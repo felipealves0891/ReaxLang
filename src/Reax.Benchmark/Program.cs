@@ -3,7 +3,7 @@ using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Toolchains.InProcess.NoEmit;
 using Reax.Interpreter;
 using Reax.Lexer;
-using Reax.Lexer.Readers;
+using Reax.Lexer.Reader;
 using Reax.Parser;
 
 namespace Reax.Benchmark;

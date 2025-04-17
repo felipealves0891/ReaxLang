@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace Reax.Lexer.Readers;
+namespace Reax.Lexer.Reader;
 
 public class ReaxStreamReader : IReader
 {

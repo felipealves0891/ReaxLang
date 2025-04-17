@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using Reax.Interpreter;
 using Reax.Lexer;
-using Reax.Parser.Helpers;
+using Reax.Parser.Helper;
 using Reax.Parser.Node;
 
 namespace Reax.Parser;

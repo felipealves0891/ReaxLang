@@ -1,5 +1,5 @@
 using System;
-using Reax.Lexer.Readers;
+using Reax.Lexer.Reader;
 
 namespace Reax.Lexer;
 

@@ -2,7 +2,7 @@ using System;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
-namespace Reax.Parser.Helpers;
+namespace Reax.Parser.Helper;
 
 public class ComparisonHelper
 {

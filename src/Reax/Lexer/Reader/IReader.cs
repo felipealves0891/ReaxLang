@@ -1,6 +1,6 @@
 using System;
 
-namespace Reax.Lexer.Readers;
+namespace Reax.Lexer.Reader;
 
 public interface IReader
 {

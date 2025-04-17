@@ -1,7 +1,7 @@
 ﻿using Reax;
 using Reax.Interpreter;
 using Reax.Lexer;
-using Reax.Lexer.Readers;
+using Reax.Lexer.Reader;
 using Reax.Parser;
 
 var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
