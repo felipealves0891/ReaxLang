@@ -26,17 +26,12 @@ public class ReaxCompiler
 
     private static IEnumerable<ReaxNode> GetNodes(string filename)
     {
-        var analizer = new Analyzer();        
-        analizer.Start();
         var reader = new ReaxStreamReader(filename);
         var lexer = new ReaxLexer(reader);
         var tokens = lexer.Tokenize().ToArray();
-        Logger.LogCompile(analizer.Stop());
 
-        analizer.Start();
         var parser = new ReaxParser(tokens);
         var ast = parser.Parse();
-        Logger.LogCompile(analizer.Stop());
 
         return ast;
     }
