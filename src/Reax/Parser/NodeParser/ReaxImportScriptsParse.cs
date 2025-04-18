@@ -9,11 +9,12 @@ public class ReaxImportScriptsParse : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
-        return current.Type == TokenType.IMPORT;
+        return current.Type == TokenType.IMPORT && next.Type == TokenType.SCRIPT;
     }
 
     public ReaxNode? Parse(ITokenSource source)
     {
+        source.Advance();
         source.Advance();
         var file = source.CurrentToken.ReadOnlySource.ToString();
         var info = new FileInfo(Path.Combine(ReaxEnvironment.DirectoryRoot, file));

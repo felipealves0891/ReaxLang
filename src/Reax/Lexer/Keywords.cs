@@ -4,37 +4,39 @@ namespace Reax.Lexer;
 
 public static class Keywords
 {
-    public static char[] LET => new char[] {'l', 'e', 't'};
+    public static char[] LET => ['l', 'e', 't'];
 
-    public static char[] IF => new char[] {'i', 'f'};
+    public static char[] IF => ['i', 'f'];
 
-    public static char[] ELSE => new char[] {'e', 'l', 's', 'e'};
+    public static char[] ELSE => ['e', 'l', 's', 'e'];
 
-    public static char[] ON => new char[] {'o', 'n'};
+    public static char[] ON => ['o', 'n'];
 
-    public static char[] TRUE => new char[] {'t', 'r', 'u', 'e'};
+    public static char[] TRUE => ['t', 'r', 'u', 'e'];
 
-    public static char[] FALSE => new char[] {'f', 'a', 'l', 's', 'e'};
+    public static char[] FALSE => ['f', 'a', 'l', 's', 'e'];
 
-    public static char[] FUN => new char[] {'f', 'u', 'n'};
+    public static char[] FUN => ['f', 'u', 'n'];
 
-    public static char[] RETURN => new char[] {'r', 'e', 't', 'u', 'r', 'n'};
+    public static char[] RETURN => ['r', 'e', 't', 'u', 'r', 'n'];
 
-    public static char[] WHEN => new char[] {'w', 'h', 'e', 'n'};
+    public static char[] WHEN => ['w', 'h', 'e', 'n'];
 
-    public static char[] FOR => new char[] {'f', 'o', 'r'};
+    public static char[] FOR => ['f', 'o', 'r'];
     
-    public static char[] TO => new char[] {'t', 'o'};
+    public static char[] TO => ['t', 'o'];
 
-    public static char[] WHILE => new char[] {'w', 'h', 'i', 'l', 'e'};
+    public static char[] WHILE => ['w', 'h', 'i', 'l', 'e'];
 
-    public static char[] AND => new char[] {'a', 'n', 'd'};
+    public static char[] AND => ['a', 'n', 'd'];
     
-    public static char[] OR => new char[] {'o', 'r'};
+    public static char[] OR => ['o', 'r'];
     
-    public static char[] NOT => new char[] {'n', 'o', 't'};
+    public static char[] NOT => ['n', 'o', 't'];
 
-    public static char[] IMPORT => new char[] {'i', 'm', 'p', 'o', 'r', 't'};
+    public static char[] IMPORT => ['i', 'm', 'p', 'o', 'r', 't'];
+    
+    public static char[] SCRIPT => ['s', 'c', 'r', 'i', 'p', 't'];
 
     public static TokenType IsKeyword(char[] chars)
     {
@@ -54,6 +56,7 @@ public static class Keywords
         if (OR.SequenceEqual(chars)) return TokenType.OR;
         if (NOT.SequenceEqual(chars)) return TokenType.NOT;
         if (IMPORT.SequenceEqual(chars)) return TokenType.IMPORT;
+        if (SCRIPT.SequenceEqual(chars)) return TokenType.SCRIPT;
         return TokenType.IDENTIFIER;
     }
     
