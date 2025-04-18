@@ -122,9 +122,20 @@ public class ReaxInterpreter
 
     private void ExecuteDeclaration(DeclarationNode declaration) 
     {
-        _context.DeclareVariable(declaration.Identifier);
-        if(declaration.Assignment is not null)
-            ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment));
+        if(!declaration.immutable)
+        {
+            _context.DeclareVariable(declaration.Identifier);
+            if(declaration.Assignment is not null)
+                ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment));    
+        }
+        else 
+        {
+            if(declaration.Assignment is null)
+                throw new InvalidOperationException("A constante deve ser definida na declaração!");
+
+            _context.DeclareImmutable(declaration.Identifier, new AssignmentNode(declaration.Identifier, declaration.Assignment));
+        }
+        
     }
 
     public void ExecuteAssignment(AssignmentNode assignment)

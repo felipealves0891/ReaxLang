@@ -9,6 +9,7 @@ namespace Reax.Runtime;
 
 public class ReaxExecutionContext
 {
+    private readonly ISet<Guid> _immutableKeys;
     private readonly IDictionary<string, Guid> _variableKeys;
     private readonly IDictionary<string, Guid> _functionKeys;
     private readonly IDictionary<string, Guid> _scriptKeys;
@@ -33,6 +34,7 @@ public class ReaxExecutionContext
         _scriptContext = new Dictionary<Guid, ReaxInterpreter>();
         _moduleContext = new Dictionary<Guid, Dictionary<string, Function>>();
         _name = name;
+        _immutableKeys = new HashSet<Guid>();
     }
 
     public ReaxExecutionContext(string name, ReaxExecutionContext parentContext)
@@ -65,6 +67,14 @@ public class ReaxExecutionContext
     {
         _variableKeys[identifier] = Guid.NewGuid();
     }
+    
+    public void DeclareImmutable(string identifier, ReaxNode node)
+    {
+        var key = Guid.NewGuid();
+        _variableKeys[identifier] = key;
+        _immutableKeys.Add(key);
+        _variableContext[key] = node;
+    }
 
     public void DeclareFunction(string identifier)
     {
@@ -94,6 +104,9 @@ public class ReaxExecutionContext
 
             throw new InvalidOperationException($"{_name}: Variavel '{identifier}' não declarada!");
         }
+
+        if(_immutableKeys.Contains(key))
+            throw new InvalidOperationException($"A variavel {identifier} é imutavel, não pode ser reatribuida!");
 
         _variableContext[key] = value;
         OnChange(key);

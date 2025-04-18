@@ -40,6 +40,8 @@ public static class Keywords
     
     public static byte[] MODULE => [(byte)'m', (byte)'o', (byte)'d', (byte)'u', (byte)'l', (byte)'e'];
 
+    public static byte[] CONST => [(byte)'c', (byte)'o', (byte)'n', (byte)'s', (byte)'t'];
+
     public static TokenType IsKeyword(byte[] chars)
     {
         if (LET.SequenceEqual(chars)) return TokenType.LET;
@@ -60,6 +62,7 @@ public static class Keywords
         if (IMPORT.SequenceEqual(chars)) return TokenType.IMPORT;
         if (SCRIPT.SequenceEqual(chars)) return TokenType.SCRIPT;
         if (MODULE.SequenceEqual(chars)) return TokenType.MODULE;
+        if (CONST.SequenceEqual(chars)) return TokenType.CONST;
         return TokenType.IDENTIFIER;
     }
     

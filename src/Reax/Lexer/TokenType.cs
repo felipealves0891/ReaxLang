@@ -38,5 +38,6 @@ public enum TokenType
     IMPORT,
     ACCESS,
     SCRIPT,
-    MODULE
+    MODULE,
+    CONST
 } 
