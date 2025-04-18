@@ -14,7 +14,7 @@ public class BindNodeParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         source.Advance();
-        var identifier = source.CurrentToken.Source;
+        var identifier = source.CurrentToken;
         source.Advance();
 
         if(source.CurrentToken.Type != TokenType.ARROW)
@@ -25,6 +25,6 @@ public class BindNodeParse : INodeParser
         if(node is null)
             throw new InvalidOperationException($"Era esperado o inicio de uma expressão. Posição: {source.CurrentToken.Position}. Linha: {source.CurrentToken.Row}");
             
-        return new BindNode(identifier.ToString(), [node]);
+        return new BindNode(identifier.Source.ToString(), [node], identifier.Location);
     }
 }

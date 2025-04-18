@@ -1,6 +1,7 @@
 namespace Reax.Parser.Node;
 
-public record CalculateNode(ReaxNode Left, ReaxNode Operator, ReaxNode Right) : ReaxNode
+public record CalculateNode(ReaxNode Left, ReaxNode Operator, ReaxNode Right, 
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {

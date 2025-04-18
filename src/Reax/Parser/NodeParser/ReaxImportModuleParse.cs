@@ -16,16 +16,16 @@ public class ReaxImportModuleParse : INodeParser
     {
         source.Advance();
         source.Advance();
-        var identifier = source.CurrentToken.Source;
+        var identifier = source.CurrentToken;
         source.Advance();
         
         if(source.CurrentToken.Type != TokenType.END_STATEMENT)
             throw new InvalidOperationException("Era esperado o encerramento da expressão!");
 
         source.Advance();
-        var functions = ReaxEnvironment.BuiltInRegistry.Get(identifier);
+        var functions = ReaxEnvironment.BuiltInRegistry.Get(identifier.Source);
 
-        var node = new ModuleNode(identifier, functions);
+        var node = new ModuleNode(identifier.Source, functions, identifier.Location);
         Logger.LogParse(node.ToString());
         return node;
     }

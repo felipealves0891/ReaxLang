@@ -40,7 +40,8 @@ public class ReaxExternalFunctionCallParse : INodeParser
 
         var node = new ExternalFunctionCallNode(
             scriptName.Source, 
-            new FunctionCallNode(identifier.Source, parameters.ToArray()));
+            new FunctionCallNode(identifier.Source, parameters.ToArray(), identifier.Location),
+            identifier.Location);
 
         Logger.LogParse(node.ToString());
         return node;

@@ -2,7 +2,10 @@ using System;
 
 namespace Reax.Parser.Node;
 
-public record BindNode(string Identifier, ReaxNode[] Node) : ReaxNode
+public record BindNode(
+    string Identifier, 
+    ReaxNode[] Node, 
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {

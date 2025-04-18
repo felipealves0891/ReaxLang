@@ -2,7 +2,7 @@ using Reax.Runtime;
 
 namespace Reax.Parser.Node;
 
-public abstract record ReaxNode 
+public abstract record ReaxNode(SourceLocation Location)
 {
     public bool AsVar() 
     {

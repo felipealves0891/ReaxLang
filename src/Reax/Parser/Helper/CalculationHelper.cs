@@ -11,7 +11,7 @@ class CalculationHelper
 
     public CalculationHelper(IEnumerable<Token> tokens) => _tokens = tokens.ToList();
 
-    private Token Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, (byte)' ', -1, -1);
+    private Token Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, (byte)' ', "", -1, -1);
     private Token Consume() => _tokens[_pos++];
 
     public ReaxNode ParseExpression() => ParseAddSub();
@@ -25,7 +25,7 @@ class CalculationHelper
         {
             var op = Consume();
             var right = ParseMulDiv();
-            node = new CalculateNode(node, op.ToArithmeticOperator(), right);
+            node = new CalculateNode(node, op.ToArithmeticOperator(), right, node.Location);
         }
         return node;
     }
@@ -39,7 +39,7 @@ class CalculationHelper
         {
             var op = Consume();
             var right = ParseFactor();
-            node = new CalculateNode(node, op.ToArithmeticOperator(), right);
+            node = new CalculateNode(node, op.ToArithmeticOperator(), right, node.Location);
         }
         return node;
     }

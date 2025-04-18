@@ -20,7 +20,7 @@ public class ReaxFunctionDeclarationParse : INodeParser
         var parameters = GetParameters(source).ToArray();
         var block = source.NextBlock();
 
-        var node = new FunctionNode(identifier, block, parameters);
+        var node = new FunctionNode(identifier, block, parameters, identifier.Location);
         Logger.LogParse(node.ToString());
         return node;
     }

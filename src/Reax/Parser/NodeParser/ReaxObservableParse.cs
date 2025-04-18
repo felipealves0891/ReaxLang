@@ -16,7 +16,7 @@ public class ReaxObservableParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         source.Advance();
-        var variable = new VarNode(source.CurrentToken.Source);
+        var variable = new VarNode(source.CurrentToken.Source, source.CurrentToken.Location);
         source.Advance();
         
         BinaryNode? condition = null;
@@ -31,7 +31,7 @@ public class ReaxObservableParse : INodeParser
 
         if(source.CurrentToken.Type == TokenType.START_BLOCK)
         {
-            var node = new ObservableNode(variable, source.NextBlock(), condition);
+            var node = new ObservableNode(variable, source.NextBlock(), condition, source.CurrentToken.Location);
             Logger.LogParse(node.ToString());
             return node;
         }
@@ -39,7 +39,7 @@ public class ReaxObservableParse : INodeParser
         {
             source.Advance();
             var nextNode = source.NextNode() ?? throw new InvalidOperationException();
-            var node = new ObservableNode(variable, new ContextNode([nextNode]), condition);
+            var node = new ObservableNode(variable, new ContextNode([nextNode], variable.Location), condition, variable.Location);
             Logger.LogParse(node.ToString());
             return node;
         }

@@ -40,9 +40,9 @@ public class ReaxDeclarationParse : INodeParser
         var textIdentifier = identifier.Value.Source;
         ReaxNode node;
         if(value is not null)
-            node = new DeclarationNode(textIdentifier, immutable, isAsync, value.Value.ToReaxValue());
+            node = new DeclarationNode(textIdentifier, immutable, isAsync, value.Value.ToReaxValue(), identifier.Value.Location);
         else 
-            node = new DeclarationNode(textIdentifier, immutable,  isAsync, null);
+            node = new DeclarationNode(textIdentifier, immutable,  isAsync, null, identifier.Value.Location);
 
         Logger.LogParse(node.ToString());
         return node;

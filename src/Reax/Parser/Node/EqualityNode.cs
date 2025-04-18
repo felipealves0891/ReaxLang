@@ -2,7 +2,9 @@ using Reax.Parser.Node.Interfaces;
 
 namespace Reax.Parser.Node;
 
-public record EqualityNode(string Operator) : ReaxNode, ILogicOperator
+public record EqualityNode(
+    string Operator, 
+    SourceLocation Location) : ReaxNode(Location), ILogicOperator
 {
     public bool Compare(ReaxNode x, ReaxNode y)
     {

@@ -2,7 +2,8 @@ using Reax.Parser.Node.Interfaces;
 
 namespace Reax.Parser.Node;
 
-public record LogicNode(string Operator) : ReaxNode, ILogicOperator
+public record LogicNode(string Operator, 
+    SourceLocation Location) : ReaxNode(Location), ILogicOperator
 {
     public bool Compare(ReaxNode x, ReaxNode y)
     {

@@ -11,4 +11,5 @@ public interface IReader
     public int Position { get; }
     public void Advance();
     public byte[] GetString(int start, int end);
+    public string FileName { get; }
 }

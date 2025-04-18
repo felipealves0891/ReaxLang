@@ -5,10 +5,12 @@ namespace Reax.Lexer.Reader;
 
 public class ReaxStreamReader : IReader
 {
-    private readonly Stream _stream;
+    private readonly string _filename;
+    private readonly FileStream _stream;
 
     public ReaxStreamReader(string filename)
     {
+        _filename = filename;
         _stream = File.OpenRead(filename);
     }
 
@@ -47,6 +49,8 @@ public class ReaxStreamReader : IReader
     }
 
     public int Position => (int)_stream.Position;
+
+    public string FileName => _filename;
 
     public void Advance()
     {

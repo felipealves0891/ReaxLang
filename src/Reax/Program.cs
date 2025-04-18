@@ -11,7 +11,6 @@ try
 }
 catch (System.Exception ex)
 {
-    
+    Console.WriteLine(ex.Message);
     interpreter.PrintStackTrace();
-    Console.WriteLine(ex);
 }

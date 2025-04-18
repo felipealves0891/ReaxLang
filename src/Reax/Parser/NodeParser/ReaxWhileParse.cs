@@ -22,7 +22,7 @@ public class ReaxWhileParse : INodeParser
 
         var block = source.NextBlock();
 
-        var node = new WhileNode(condition, block);
+        var node = new WhileNode(condition, block, condition.Location);
         Logger.LogParse(node.ToString());
         return node;
     }

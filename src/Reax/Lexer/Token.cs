@@ -1,37 +1,38 @@
 using System.Text;
+using Reax.Parser;
 using Reax.Parser.Node;
 
 namespace Reax.Lexer;
 
 public struct Token
 {
+    private readonly SourceLocation _location;
     private readonly byte[] _source;
 
-    public Token(TokenType type, byte[] source, int position, int row)
+    public Token(TokenType type, byte[] source, string file, int position, int row)
     {
-        Type = type;
         _source = source;
-        Position = position;
-        Row = row;
+        _location = new SourceLocation(file, row, position);
+        Type = type;
     }
 
-    public Token(TokenType type, byte source, int position, int row)
+    public Token(TokenType type, byte source, string file, int position, int row)
     {
-        Type = type;
         _source = new byte[] { source };
-        Position = position;
-        Row = row;
+        _location = new SourceLocation(file, row, position);
+        Type = type;
     }
 
     public TokenType Type { get; init; }
-    public int Position { get; init; }
-    public int Row { get; init; }
+    public int Position => _location.Position;
+    public int Row  => _location.Line;
+    public string File => _location.File;
     public ReadOnlySpan<byte> ReadOnlySource => new ReadOnlySpan<byte>(_source);
     public string Source => Encoding.GetEncoding("utf-8").GetString(_source);
-
+    public SourceLocation Location => _location;
     public override string ToString()
     {
-        return $"#{Row} {Source} is {Type} at {Position}";
+        return $"{File}#{Row} {Source} is {Type} at {Position}";
     }
 }
 
@@ -72,8 +73,8 @@ public static class TokenExtensions
     {
         return token.Type switch 
         {
-            TokenType.TERM => new TermNode(token.Source),
-            TokenType.FACTOR => new FactorNode(token.Source.ToString()),
+            TokenType.TERM => new TermNode(token.Source, token.Location),
+            TokenType.FACTOR => new FactorNode(token.Source.ToString(), token.Location),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em operador aritimetico!")
         };
     }
@@ -82,11 +83,11 @@ public static class TokenExtensions
     {
         return token.Type switch 
         {
-            TokenType.IDENTIFIER => new VarNode(token.Source),
-            TokenType.STRING => new StringNode(token.Source),
-            TokenType.NUMBER => new NumberNode(token.Source),
-            TokenType.FALSE => new BooleanNode(token.Source),
-            TokenType.TRUE => new BooleanNode(token.Source),
+            TokenType.IDENTIFIER => new VarNode(token.Source, token.Location),
+            TokenType.STRING => new StringNode(token.Source, token.Location),
+            TokenType.NUMBER => new NumberNode(token.Source, token.Location),
+            TokenType.FALSE => new BooleanNode(token.Source, token.Location),
+            TokenType.TRUE => new BooleanNode(token.Source, token.Location),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }
@@ -95,11 +96,11 @@ public static class TokenExtensions
     {
         return token.Type switch 
         {
-            TokenType.COMPARISON => new ComparisonNode(token.Source),
-            TokenType.EQUALITY => new EqualityNode(token.Source),
-            TokenType.AND => new LogicNode(token.Source),
-            TokenType.OR => new LogicNode(token.Source),
-            TokenType.NOT => new LogicNode(token.Source),
+            TokenType.COMPARISON => new ComparisonNode(token.Source, token.Location),
+            TokenType.EQUALITY => new EqualityNode(token.Source, token.Location),
+            TokenType.AND => new LogicNode(token.Source, token.Location),
+            TokenType.OR => new LogicNode(token.Source, token.Location),
+            TokenType.NOT => new LogicNode(token.Source, token.Location),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
     }

@@ -5,11 +5,13 @@ namespace Reax.Lexer.Reader;
 public class ReaxTextReader : IReader
 {
     private readonly string _source;
+    private readonly string _filename;
     private int _position;
 
     public ReaxTextReader(string source)
     {
-        _source = source;
+        _source = File.ReadAllText(source);
+        _filename = source;
         _position = 0;
     }
 
@@ -18,6 +20,7 @@ public class ReaxTextReader : IReader
     public byte CurrentChar => (byte)_source[Position];
     public byte NextChar => (byte)_source[Position+1];
     public int Position => _position;
+    public string FileName => _filename;
 
     public void Advance() 
     {

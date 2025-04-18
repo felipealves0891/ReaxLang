@@ -22,7 +22,7 @@ public class ReaxReturnParse : INodeParser
         var parser = new ReaxParser(statement);
         var context = parser.Parse();
 
-        var node = new ContextNode(context.ToArray());
+        var node = new ContextNode(context.ToArray(), statement[0].Location);
         Logger.LogParse(node.ToString());
         return node;
     }

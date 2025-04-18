@@ -32,7 +32,7 @@ public class ComparisonHelper
             var operation = CurrentToken;
             Advance();
             var right = GetBinaryNode();
-            left = new BinaryNode(left, operation.ToLogicOperator(), right);
+            left = new BinaryNode(left, operation.ToLogicOperator(), right, operation.Location);
         }
         return left;
     } 
@@ -56,7 +56,8 @@ public class ComparisonHelper
         return new BinaryNode(
             left.ToReaxValue(), 
             operation.ToLogicOperator(), 
-            right.ToReaxValue());
+            right.ToReaxValue(), 
+            operation.Location);
     }
 
     private void Advance() 

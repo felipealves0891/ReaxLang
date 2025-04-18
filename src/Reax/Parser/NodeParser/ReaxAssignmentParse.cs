@@ -41,10 +41,10 @@ public class ReaxAssignmentParse : INodeParser
         {
             var parser = new ReaxParser(expression);
             var expressionNodes = parser.Parse();
-            value = new ContextNode(expressionNodes.ToArray());
+            value = new ContextNode(expressionNodes.ToArray(), identifier.Value.Location);
         }
 
-        var node = new AssignmentNode(identifier.Value.Source, value);
+        var node = new AssignmentNode(identifier.Value.Source, value, identifier.Value.Location);
         Logger.LogParse(node.ToString());
         return node;
     }

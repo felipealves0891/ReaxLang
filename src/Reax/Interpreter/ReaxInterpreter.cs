@@ -140,14 +140,14 @@ public class ReaxInterpreter
         {
             _context.DeclareVariable(declaration.Identifier, declaration.Async);
             if(declaration.Assignment is not null)
-                ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment));    
+                ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment, declaration.Location));    
         }
         else 
         {
             if(declaration.Assignment is null)
                 throw new InvalidOperationException("A constante deve ser definida na declaração!");
 
-            _context.DeclareImmutable(declaration.Identifier, new AssignmentNode(declaration.Identifier, declaration.Assignment));
+            _context.DeclareImmutable(declaration.Identifier, new AssignmentNode(declaration.Identifier, declaration.Assignment, declaration.Location));
         }
         
     }
@@ -263,7 +263,7 @@ public class ReaxInterpreter
             if(value is null)
                 throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
 
-            var newValue = new NumberNode((value.ValueConverted + 1).ToString());
+            var newValue = new NumberNode((value.ValueConverted + 1).ToString(), declaration.Location);
             _context.SetVariable(declaration.Identifier, newValue);
         }
     }
@@ -287,7 +287,7 @@ public class ReaxInterpreter
             var interpreter = _context.GetScript(node.scriptName);
             var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
             var identifier = node.functionCall.Identifier;
-            return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters));
+            return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters, node.Location));
         }
         else if(_context.ModuleExists(node.scriptName)) 
         {
@@ -303,11 +303,11 @@ public class ReaxInterpreter
     private bool ExecuteBinary(BinaryNode condition) 
     {
         var left = condition.Left is BinaryNode 
-                 ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Left).ToString()) 
+                 ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Left).ToString(), condition.Location) 
                  : GetValue(condition.Left);
 
         var right = condition.Right is BinaryNode 
-                 ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Right).ToString()) 
+                 ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Right).ToString(), condition.Location) 
                  : GetValue(condition.Right);
 
         var logical = (ILogicOperator)condition.Operator;
@@ -329,7 +329,7 @@ public class ReaxInterpreter
 
     public void PrintStackTrace() {
         foreach (var node in StackTrace.Reverse()) {
-            Console.WriteLine($"  at -> {node.ToString()}");
+            Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");
         }
     }
 }

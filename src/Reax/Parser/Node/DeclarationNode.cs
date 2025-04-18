@@ -1,6 +1,11 @@
 namespace Reax.Parser.Node;
 
-public record DeclarationNode(string Identifier, bool Immutable, bool Async, ReaxNode? Assignment) : ReaxNode
+public record DeclarationNode(
+    string Identifier, 
+    bool Immutable, 
+    bool Async, 
+    ReaxNode? Assignment, 
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {

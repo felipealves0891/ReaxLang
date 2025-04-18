@@ -1,6 +1,9 @@
 namespace Reax.Parser.Node;
 
-public record ExternalFunctionCallNode(string scriptName, FunctionCallNode functionCall) : ReaxNode
+public record ExternalFunctionCallNode(
+    string scriptName, 
+    FunctionCallNode functionCall, 
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
