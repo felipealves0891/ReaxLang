@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer.Reader;
 
 namespace Reax.Lexer;
@@ -19,6 +20,7 @@ public class ReaxLexer
         Token token;
         do
         {   
+            Logger.LogLexer("############################### Start read next token ###############################");
             token = NextToken();
             yield return token;
         } 
@@ -77,6 +79,7 @@ public class ReaxLexer
 
     private Token AdvanceAndReturn(Token token) 
     {
+        Logger.LogLexer(token.ToString());
         _source.Advance();
         return token;
     }
@@ -88,7 +91,9 @@ public class ReaxLexer
             _source.Advance();
 
         var number = _source.GetString(start, _source.Position);
-        return new Token(TokenType.NUMBER, number, _source.Position, _numberOfRows);
+        var token = new Token(TokenType.NUMBER, number, _source.Position, _numberOfRows);
+        Logger.LogLexer(token.ToString());
+        return token;
     }
 
     private Token GetIdentifierOrKeyword() 
@@ -99,7 +104,9 @@ public class ReaxLexer
 
         var identifier = _source.GetString(start,_source.Position);
         var type = Keywords.IsKeyword(identifier);
-        return new Token(type, identifier, start, _numberOfRows);
+        var token = new Token(type, identifier, start, _numberOfRows);
+        Logger.LogLexer(token.ToString());
+        return token;
     }
 
     private Token GetString() 
@@ -112,7 +119,9 @@ public class ReaxLexer
         var end = _source.Position;
         var text = _source.GetString(start, end);
         _source.Advance();
-        return new Token(TokenType.STRING, text, _source.Position, _numberOfRows);
+        var token = new Token(TokenType.STRING, text, _source.Position, _numberOfRows);
+        Logger.LogLexer(token.ToString());
+        return token;
     }
 
     private Token GetComparison() 
@@ -124,7 +133,9 @@ public class ReaxLexer
         
         var end = _source.Position;
         _source.Advance();
-        return new Token(TokenType.COMPARISON, _source.GetString(start, end), _source.Position, _numberOfRows);
+        var token = new Token(TokenType.COMPARISON, _source.GetString(start, end), _source.Position, _numberOfRows);
+        Logger.LogLexer(token.ToString());
+        return token;
     }
 
     private Token GetArrow() 
@@ -132,7 +143,9 @@ public class ReaxLexer
         var start = _source.Position;
         _source.Advance();
         _source.Advance();
-        return new Token(TokenType.ARROW, new byte[] {(byte)'-', (byte)'>'}, start, _numberOfRows);
+        var token = new Token(TokenType.ARROW, new byte[] {(byte)'-', (byte)'>'}, start, _numberOfRows);
+        Logger.LogLexer(token.ToString());
+        return token;
     }
 
     public bool IsIdentifier(byte b) 

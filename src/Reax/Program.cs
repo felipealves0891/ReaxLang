@@ -1,20 +1,7 @@
 ﻿using Reax;
 using Reax.Interpreter;
-using Reax.Lexer;
-using Reax.Lexer.Reader;
-using Reax.Parser;
 
 var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
 ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
-
-//var code = File.ReadAllText(fileInfo.FullName);
-var lexer = new ReaxLexer(new ReaxStreamReader(fileInfo.FullName));
-var tokens = lexer.Tokenize();
-
-var parser = new ReaxParser(tokens);
-var ast = parser.Parse();
-
-var interpreter = new ReaxInterpreterBuilder()
-                        .BuildMain(ast.ToArray());
-                        
+var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
 interpreter.Interpret();
