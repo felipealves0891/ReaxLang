@@ -39,5 +39,6 @@ public enum TokenType
     ACCESS,
     SCRIPT,
     MODULE,
-    CONST
+    CONST,
+    ASYNC
 } 

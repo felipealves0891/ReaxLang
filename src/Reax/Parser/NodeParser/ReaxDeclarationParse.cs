@@ -9,13 +9,17 @@ public class ReaxDeclarationParse : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
-        return current.Type == TokenType.LET || current.Type == TokenType.CONST;
+        return current.Type == TokenType.LET || current.Type == TokenType.CONST
+           || (current.Type == TokenType.ASYNC && next.Type == TokenType.LET);
     }
 
     public ReaxNode? Parse(ITokenSource source)
     {
         Token? identifier = null;
         Token? value = null;
+        
+        var isAsync = source.CurrentToken.Type == TokenType.ASYNC;
+        if(isAsync) source.Advance();
 
         var immutable = source.CurrentToken.Type == TokenType.CONST;
 
@@ -36,9 +40,9 @@ public class ReaxDeclarationParse : INodeParser
         var textIdentifier = identifier.Value.Source;
         ReaxNode node;
         if(value is not null)
-            node = new DeclarationNode(textIdentifier, immutable, value.Value.ToReaxValue());
+            node = new DeclarationNode(textIdentifier, immutable, isAsync, value.Value.ToReaxValue());
         else 
-            node = new DeclarationNode(textIdentifier, immutable, null);
+            node = new DeclarationNode(textIdentifier, immutable,  isAsync, null);
 
         Logger.LogParse(node.ToString());
         return node;

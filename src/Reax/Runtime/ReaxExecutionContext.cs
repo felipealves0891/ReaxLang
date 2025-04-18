@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Concurrent;
 using Reax.Interpreter;
 using Reax.Parser.Node;
@@ -10,6 +9,7 @@ namespace Reax.Runtime;
 public class ReaxExecutionContext
 {
     private readonly ISet<Guid> _immutableKeys;
+    private readonly ISet<Guid> _asyncKeys;
     private readonly IDictionary<string, Guid> _variableKeys;
     private readonly IDictionary<string, Guid> _functionKeys;
     private readonly IDictionary<string, Guid> _scriptKeys;
@@ -35,6 +35,7 @@ public class ReaxExecutionContext
         _moduleContext = new Dictionary<Guid, Dictionary<string, Function>>();
         _name = name;
         _immutableKeys = new HashSet<Guid>();
+        _asyncKeys = new HashSet<Guid>();
     }
 
     public ReaxExecutionContext(string name, ReaxExecutionContext parentContext)
@@ -63,9 +64,11 @@ public class ReaxExecutionContext
            || (_parentContext is not null && _parentContext.ModuleExists(identifier));
     }
 
-    public void DeclareVariable(string identifier)
+    public void DeclareVariable(string identifier, bool isAsync)
     {
-        _variableKeys[identifier] = Guid.NewGuid();
+        var key = Guid.NewGuid();
+        _variableKeys[identifier] = key;
+        if(isAsync) _asyncKeys.Add(key);
     }
     
     public void DeclareImmutable(string identifier, ReaxNode node)
@@ -114,11 +117,20 @@ public class ReaxExecutionContext
 
     private void OnChange(Guid key) 
     {
-        if(_observableContext.TryGetValue(key, out var observables))
+        if(!_observableContext.TryGetValue(key, out var observables))
+            return;
+
+        
+        if(_asyncKeys.Contains(key))
         {
             Parallel.ForEach(observables, observable => {
                 if(observable.CanRun(this)) observable.Run();
             });
+        }
+        else
+        {
+            foreach (var observable in observables)
+                if(observable.CanRun(this)) observable.Run();
         }
     }
 
@@ -142,11 +154,16 @@ public class ReaxExecutionContext
     {
         var observable = new VariableObservable(interpreter, condition);
         if(_variableKeys.TryGetValue(identifier, out var local))
+        {
+            if(_immutableKeys.Contains(local))
+                throw new InvalidOperationException("Não é possivel observar um constante!");
+
             SetObservable(local, observable);
+        }
         else if(_parentContext is null)
             throw new InvalidOperationException($"{_name}: Não é possivel observar uma variavel não declarada: variavel '{identifier}'!");
         else if(_parentContext._variableKeys.TryGetValue(identifier, out var parent))
-            SetObservable(parent, observable);
+            _parentContext.SetObservable(parent, observable);
     }
 
     private void SetObservable(Guid key, VariableObservable observable)

@@ -4,6 +4,6 @@ public record ObservableNode(ReaxNode Var, ReaxNode Block, BinaryNode? Condition
 {
     public override string ToString()
     {
-        return $"Observer {Var} {{}}";
+        return $"on {Var} {{...}}";
     }
 }

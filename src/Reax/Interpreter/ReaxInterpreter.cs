@@ -58,8 +58,7 @@ public class ReaxInterpreter
         {
             var variable = _parameters[i].ToString();
             var value = values[i];
-            _context.DeclareVariable(variable);
-            _context.SetVariable(variable, value);
+            _context.DeclareImmutable(variable, value);
         }
 
         Interpret();
@@ -122,9 +121,9 @@ public class ReaxInterpreter
 
     private void ExecuteDeclaration(DeclarationNode declaration) 
     {
-        if(!declaration.immutable)
+        if(!declaration.Immutable)
         {
-            _context.DeclareVariable(declaration.Identifier);
+            _context.DeclareVariable(declaration.Identifier, declaration.Async);
             if(declaration.Assignment is not null)
                 ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment));    
         }
