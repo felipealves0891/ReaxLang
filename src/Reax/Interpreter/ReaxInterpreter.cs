@@ -42,11 +42,12 @@ public class ReaxInterpreter
     public static ReaxInterpreter CreateMain(ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
     {
         var interpreter = new ReaxInterpreter(nodes);
+        var context = interpreter._context;
 
         foreach (var fun in functions)
         {
-            interpreter._context.DeclareFunction(fun.Identifier);
-            interpreter._context.SetFunction(fun.Identifier, fun.Function);
+            context.DeclareFunction(fun.Identifier);
+            context.SetFunction(fun.Identifier, fun.Function);
         }
 
         return interpreter;
@@ -55,18 +56,20 @@ public class ReaxInterpreter
     public static ReaxInterpreter Create(string name, ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
     {
         var interpreter = new ReaxInterpreter(name, nodes);
-
         foreach (var fun in functions)
-        {
-            interpreter._context.DeclareFunction(fun.Identifier);
-            interpreter._context.SetFunction(fun.Identifier, fun.Function);
-        }
-
+            interpreter.DeclareAndSetFunction(fun.Identifier, fun.Function);
+        
         return interpreter;
     }
 
     public bool IsOutput => Output is not null;
     public ReaxNode? Output { get; private set; }
+
+    public void DeclareAndSetFunction(string identifier, Function function) 
+    {
+        _context.DeclareFunction(identifier);
+        _context.SetFunction(identifier, function);
+    }
 
     public void Interpret(string identifier, params ReaxNode[] values) 
     {
