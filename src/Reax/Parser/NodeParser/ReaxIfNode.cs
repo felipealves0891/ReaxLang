@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Helper;
 using Reax.Parser.Node;
@@ -27,6 +28,8 @@ public class ReaxIfNodeParse : INodeParser
             @else = source.NextBlock();
         }
 
-        return new IfNode(condition, @true, @else);
+        var node = new IfNode(condition, @true, @else);
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

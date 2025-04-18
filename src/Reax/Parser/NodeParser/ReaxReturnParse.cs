@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -20,6 +21,9 @@ public class ReaxReturnParse : INodeParser
         
         var parser = new ReaxParser(statement);
         var context = parser.Parse();
-        return new ContextNode(context.ToArray());
+
+        var node = new ContextNode(context.ToArray());
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

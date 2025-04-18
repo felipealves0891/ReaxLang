@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -43,6 +44,8 @@ public class ReaxAssignmentParse : INodeParser
             value = new ContextNode(expressionNodes.ToArray());
         }
 
-        return new AssignmentNode(identifier.Value.Source, value);
+        var node = new AssignmentNode(identifier.Value.Source, value);
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

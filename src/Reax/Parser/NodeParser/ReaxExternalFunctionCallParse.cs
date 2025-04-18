@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -37,8 +38,11 @@ public class ReaxExternalFunctionCallParse : INodeParser
         if(!source.EndOfTokens)
             source.Advance();
 
-        return new ExternalFunctionCallNode(
+        var node = new ExternalFunctionCallNode(
             scriptName.Source, 
             new FunctionCallNode(identifier.Source, parameters.ToArray()));
+
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

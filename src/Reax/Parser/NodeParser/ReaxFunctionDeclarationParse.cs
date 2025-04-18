@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -18,7 +19,10 @@ public class ReaxFunctionDeclarationParse : INodeParser
         source.Advance();
         var parameters = GetParameters(source).ToArray();
         var block = source.NextBlock();
-        return new FunctionNode(identifier, block, parameters);
+
+        var node = new FunctionNode(identifier, block, parameters);
+        Logger.LogParse(node.ToString());
+        return node;
     }
     
     private IEnumerable<ReaxNode> GetParameters(ITokenSource source) 

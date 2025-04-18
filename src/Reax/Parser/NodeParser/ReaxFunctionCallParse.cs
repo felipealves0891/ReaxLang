@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -34,6 +35,9 @@ public class ReaxFunctionCallParse : INodeParser
         
         var textIdentifier = identifier.Value.Source;
         var values = parameter.Select(x => x.ToReaxValue()).ToArray();
-        return new FunctionCallNode(textIdentifier, values);
+
+        var node = new FunctionCallNode(textIdentifier, values);
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

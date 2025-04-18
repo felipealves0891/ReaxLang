@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -23,6 +24,9 @@ public class ReaxImportModuleParse : INodeParser
 
         source.Advance();
         var functions = ReaxEnvironment.BuiltInRegistry.Get(identifier);
-        return new ModuleNode(identifier, functions);
+
+        var node = new ModuleNode(identifier, functions);
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

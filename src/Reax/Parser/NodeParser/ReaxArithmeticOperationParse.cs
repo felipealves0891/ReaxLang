@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Helper;
 using Reax.Parser.Node;
@@ -21,6 +22,7 @@ public class ReaxArithmeticOperationParse : INodeParser
         if(node is null)
             throw new InvalidOperationException("Valores faltando para a operação");
 
+        Logger.LogParse(node.ToString());
         return node;
     }
 }

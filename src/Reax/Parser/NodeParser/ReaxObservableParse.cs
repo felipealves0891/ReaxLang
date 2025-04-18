@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Helper;
 using Reax.Parser.Node;
@@ -30,13 +31,17 @@ public class ReaxObservableParse : INodeParser
 
         if(source.CurrentToken.Type == TokenType.START_BLOCK)
         {
-            return new ObservableNode(variable, source.NextBlock(), condition);
+            var node = new ObservableNode(variable, source.NextBlock(), condition);
+            Logger.LogParse(node.ToString());
+            return node;
         }
         else if(source.CurrentToken.Type == TokenType.ARROW)
         {
             source.Advance();
             var nextNode = source.NextNode() ?? throw new InvalidOperationException();
-            return  new ObservableNode(variable, new ContextNode([nextNode]), condition);
+            var node = new ObservableNode(variable, new ContextNode([nextNode]), condition);
+            Logger.LogParse(node.ToString());
+            return node;
         }
         
         throw new InvalidOperationException($"Token invalido '{source.CurrentToken.Type}' na posição: {source.CurrentToken.Row}");

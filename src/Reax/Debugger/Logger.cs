@@ -24,6 +24,14 @@ public static class Logger
         Log(done, LoggerLevel.DEBUG);
     }
     
+    public static void LogParse(string message, [CallerMemberName] string caller = "") 
+    {
+        if(!Enabled) return;
+        var formateDate = DateTime.UtcNow.ToString(FormatDate);
+        var done = string.Format("DEB [{0}] | Parse.{2} | {1}", formateDate, message, caller.PadRight(25, ' '));
+        Log(done, LoggerLevel.DEBUG);
+    }
+    
     public static void LogCompile(string message, [CallerMemberName] string caller = "") 
     {
         if(!Enabled) return;

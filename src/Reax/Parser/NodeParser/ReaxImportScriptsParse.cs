@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Interpreter;
 using Reax.Lexer;
 using Reax.Parser.Node;
@@ -42,6 +43,7 @@ public class ReaxImportScriptsParse : INodeParser
         if(script is null)
             throw new InvalidOperationException($"ERRO: modulo não foi importado!");
 
+        Logger.LogParse(script.ToString());
         return script;
     }
 }

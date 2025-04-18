@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Helper;
 using Reax.Parser.Node;
@@ -20,6 +21,9 @@ public class ReaxWhileParse : INodeParser
         var condition = helper.Parse();
 
         var block = source.NextBlock();
-        return new WhileNode(condition, block);
+
+        var node = new WhileNode(condition, block);
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }

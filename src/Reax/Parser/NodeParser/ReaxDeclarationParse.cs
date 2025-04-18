@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -28,9 +29,13 @@ public class ReaxDeclarationParse : INodeParser
             throw new Exception();
 
         var textIdentifier = identifier.Value.Source;
+        ReaxNode node;
         if(value is not null)
-            return new DeclarationNode(textIdentifier, value.Value.ToReaxValue());
+            node = new DeclarationNode(textIdentifier, value.Value.ToReaxValue());
         else 
-            return new DeclarationNode(textIdentifier, null);
+            node = new DeclarationNode(textIdentifier, null);
+
+        Logger.LogParse(node.ToString());
+        return node;
     }
 }
