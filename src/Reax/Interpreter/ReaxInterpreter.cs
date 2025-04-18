@@ -92,8 +92,8 @@ public class ReaxInterpreter
     {
         foreach (var node in _nodes)
         {
-            if(node is ModuleNode module)
-                ExecuteDeclarationModule(module);
+            if(node is ScriptNode script)
+                ExecuteDeclarationScript(script);
             else if(node is FunctionCallNode functionCall)
                 Output = ExecuteFunctionCall(functionCall);
             else if (node is DeclarationNode declaration)
@@ -116,16 +116,16 @@ public class ReaxInterpreter
                 ExecuteFor(@for);
             else if(node is WhileNode @while)
                 ExecuteWhile(@while);
-            else if(node is ModuleFunctionCallNode moduleFunctionCallNode)
-                Output = ExecuteModuleFunctionCallNode(moduleFunctionCallNode);
+            else if(node is ScriptFunctionCallNode scriptFunctionCallNode)
+                Output = ExecuteScriptFunctionCallNode(scriptFunctionCallNode);
         }
     }
 
-    private void ExecuteDeclarationModule(ModuleNode module) 
+    private void ExecuteDeclarationScript(ScriptNode script) 
     {
-        module.Interpreter.Interpret();
-        _context.DeclareModule(module.Identifier);
-        _context.SetModule(module.Identifier, module.Interpreter);
+        script.Interpreter.Interpret();
+        _context.DeclareScript(script.Identifier);
+        _context.SetScript(script.Identifier, script.Interpreter);
     }
 
     private ReaxNode? ExecuteFunctionCall(FunctionCallNode functionCall) 
@@ -270,9 +270,9 @@ public class ReaxInterpreter
         }
     }
     
-    private ReaxNode? ExecuteModuleFunctionCallNode(ModuleFunctionCallNode node)
+    private ReaxNode? ExecuteScriptFunctionCallNode(ScriptFunctionCallNode node)
     {
-        var interpreter = _context.GetModule(node.moduleName);
+        var interpreter = _context.GetScript(node.scriptName);
         var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
         var identifier = node.functionCall.Identifier;
         return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters));

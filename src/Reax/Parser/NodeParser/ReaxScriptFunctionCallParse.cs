@@ -4,7 +4,7 @@ using Reax.Parser.Node;
 
 namespace Reax.Parser.NodeParser;
 
-public class ReaxModuleFunctionCallParse : INodeParser
+public class ReaxScriptFunctionCallParse : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
@@ -13,7 +13,7 @@ public class ReaxModuleFunctionCallParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        var moduleName = source.CurrentToken;
+        var scriptName = source.CurrentToken;
         source.Advance();
         source.Advance();
         var identifier = source.CurrentToken;
@@ -34,8 +34,8 @@ public class ReaxModuleFunctionCallParse : INodeParser
         }
         source.Advance();
 
-        return new ModuleFunctionCallNode(
-            moduleName.ReadOnlySource.ToString(), 
+        return new ScriptFunctionCallNode(
+            scriptName.ReadOnlySource.ToString(), 
             new FunctionCallNode(identifier.ReadOnlySource.ToString(), parameters.ToArray()));
     }
 }

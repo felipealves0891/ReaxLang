@@ -16,12 +16,12 @@ public class ReaxCompiler
                 .BuildMain(ast.ToArray());
     }
     
-    public static ReaxInterpreter CompileModule(string module, string filename) 
+    public static ReaxInterpreter CompileScript(string script, string filename) 
     {
         var ast = GetNodes(filename);
-        return new ReaxInterpreterBuilder(module)
+        return new ReaxInterpreterBuilder(script)
                 .AddFunctionsBuiltIn()
-                .BuildModule(ast.ToArray());
+                .BuildScript(ast.ToArray());
     }
 
     private static IEnumerable<ReaxNode> GetNodes(string filename)

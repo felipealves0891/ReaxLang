@@ -11,10 +11,10 @@ public class ReaxExecutionContext
 {
     private readonly IDictionary<string, Guid> _variableKeys;
     private readonly IDictionary<string, Guid> _functionKeys;
-    private readonly IDictionary<string, Guid> _moduleKeys;
+    private readonly IDictionary<string, Guid> _scriptKeys;
     private readonly IDictionary<Guid, ReaxNode> _variableContext;
     private readonly IDictionary<Guid, Function> _functionContext;
-    private readonly IDictionary<Guid, ReaxInterpreter> _moduleContext;
+    private readonly IDictionary<Guid, ReaxInterpreter> _scriptContext;
     private readonly IDictionary<Guid, IList<VariableObservable>> _observableContext;
     private readonly ReaxExecutionContext? _parentContext;
     private readonly string _name;
@@ -26,8 +26,8 @@ public class ReaxExecutionContext
         _functionKeys = new Dictionary<string, Guid>();
         _functionContext = new Dictionary<Guid, Function>();
         _observableContext = new Dictionary<Guid, IList<VariableObservable>>();
-        _moduleKeys = new Dictionary<string, Guid>();
-        _moduleContext = new Dictionary<Guid, ReaxInterpreter>();
+        _scriptKeys = new Dictionary<string, Guid>();
+        _scriptContext = new Dictionary<Guid, ReaxInterpreter>();
         _name = name;
     }
 
@@ -55,9 +55,9 @@ public class ReaxExecutionContext
         _functionKeys[identifier] = Guid.NewGuid();
     }
 
-    public void DeclareModule(string identifier)
+    public void DeclareScript(string identifier)
     {
-        _moduleKeys[identifier] = Guid.NewGuid();
+        _scriptKeys[identifier] = Guid.NewGuid();
     }
 
     public void SetVariable(string identifier, ReaxNode value)
@@ -123,12 +123,12 @@ public class ReaxExecutionContext
             _observableContext[key] = new List<VariableObservable>([observable]);
     }
     
-    public void SetModule(string identifier, ReaxInterpreter interpreter)
+    public void SetScript(string identifier, ReaxInterpreter interpreter)
     {
-        if(!_moduleKeys.TryGetValue(identifier, out var key))
+        if(!_scriptKeys.TryGetValue(identifier, out var key))
             throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi importado!");
         
-        _moduleContext[key] = interpreter;
+        _scriptContext[key] = interpreter;
     } 
 
     public ReaxNode GetVariable(string identifier)
@@ -189,31 +189,31 @@ public class ReaxExecutionContext
         }
     }
 
-    public ReaxInterpreter GetModule(string identifier)
+    public ReaxInterpreter GetScript(string identifier)
     {
-        if(!_moduleKeys.TryGetValue(identifier, out var key))
+        if(!_scriptKeys.TryGetValue(identifier, out var key))
         {
-            var module = GetParentModule(identifier);
-            if(module is not null)
-                return module;
+            var script = GetParentScript(identifier);
+            if(script is not null)
+                return script;
 
             throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi declarado");
         }
 
-        if(!_moduleContext.TryGetValue(key, out var interpreter))
+        if(!_scriptContext.TryGetValue(key, out var interpreter))
             throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi definido");
 
         return interpreter;
     }
 
-    private ReaxInterpreter? GetParentModule(string identifier) 
+    private ReaxInterpreter? GetParentScript(string identifier) 
     {
         try
         {
             if(_parentContext is null)
                 return null;
 
-            return _parentContext.GetModule(identifier);
+            return _parentContext.GetScript(identifier);
         }
         catch (System.Exception)
         {

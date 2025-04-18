@@ -42,7 +42,7 @@ public class ReaxInterpreterBuilder
         return ReaxEnvironment.MainInterpreter;
     }
 
-    public ReaxInterpreter BuildModule(ReaxNode[] nodes) 
+    public ReaxInterpreter BuildScript(ReaxNode[] nodes) 
         =>  ReaxInterpreter.Create(Name, nodes, FunctionsBuiltIn);
     
 }

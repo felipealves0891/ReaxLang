@@ -8,5 +8,5 @@ public static class ReaxEnvironment
 {
     public static ReaxInterpreter? MainInterpreter { get; set; }
     public static string DirectoryRoot { get; set; } = string.Empty;
-    public static IDictionary<string, ModuleNode> ImportedFiles { get; set; } = new Dictionary<string, ModuleNode>();
+    public static IDictionary<string, ScriptNode> ImportedFiles { get; set; } = new Dictionary<string, ScriptNode>();
 }

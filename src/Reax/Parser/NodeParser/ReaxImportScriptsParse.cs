@@ -19,18 +19,18 @@ public class ReaxImportScriptsParse : INodeParser
         var info = new FileInfo(Path.Combine(ReaxEnvironment.DirectoryRoot, file));
         
         if(!info.Exists) throw new InvalidOperationException($"Modulo '{file}' não localizado!");
-        ModuleNode? module = null;
+        ScriptNode? script = null;
 
         if(!ReaxEnvironment.ImportedFiles.ContainsKey(file))
         {
-            var interpreter = ReaxCompiler.CompileModule(file, info.FullName);
-            var moduleName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
-            module = new ModuleNode(moduleName, interpreter);
-            ReaxEnvironment.ImportedFiles.Add(file, module);      
+            var interpreter = ReaxCompiler.CompileScript(file, info.FullName);
+            var scriptName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
+            script = new ScriptNode(scriptName, interpreter);
+            ReaxEnvironment.ImportedFiles.Add(file, script);      
         }
         else
         {
-            module = ReaxEnvironment.ImportedFiles[file];
+            script = ReaxEnvironment.ImportedFiles[file];
         }
 
         source.Advance();
@@ -38,9 +38,9 @@ public class ReaxImportScriptsParse : INodeParser
             throw new InvalidOperationException($"Era esperado o fim da expressão na linha {source.CurrentToken.Row}!");
 
         source.Advance();
-        if(module is null)
+        if(script is null)
             throw new InvalidOperationException($"ERRO: modulo não foi importado!");
 
-        return module;
+        return script;
     }
 }
