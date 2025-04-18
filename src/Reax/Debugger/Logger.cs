@@ -5,7 +5,8 @@ namespace Reax.Debugger;
 
 public enum LoggerLevel 
 {
-    DEBUG = -1,
+    NONE = -2,
+    DEBUG,
     INFO,
     ERROR
 }
