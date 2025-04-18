@@ -4,4 +4,14 @@ using Reax.Interpreter;
 var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
 ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
 var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
-interpreter.Interpret();
+
+try
+{
+    interpreter.Interpret();    
+}
+catch (System.Exception ex)
+{
+    
+    interpreter.PrintStackTrace();
+    Console.WriteLine(ex);
+}

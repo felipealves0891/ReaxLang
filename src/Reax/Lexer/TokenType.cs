@@ -40,5 +40,6 @@ public enum TokenType
     SCRIPT,
     MODULE,
     CONST,
-    ASYNC
+    ASYNC,
+    BIND
 } 

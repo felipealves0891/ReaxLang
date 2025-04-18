@@ -44,6 +44,8 @@ public static class Keywords
 
     public static byte[] ASYNC => [(byte)'a', (byte)'s', (byte)'y', (byte)'n', (byte)'c'];
 
+    public static byte[] BIND => [(byte)'b', (byte)'i', (byte)'n', (byte)'d'];
+
     public static TokenType IsKeyword(byte[] chars)
     {
         if (LET.SequenceEqual(chars)) return TokenType.LET;
@@ -66,6 +68,7 @@ public static class Keywords
         if (MODULE.SequenceEqual(chars)) return TokenType.MODULE;
         if (CONST.SequenceEqual(chars)) return TokenType.CONST;
         if (ASYNC.SequenceEqual(chars)) return TokenType.ASYNC;
+        if (BIND.SequenceEqual(chars)) return TokenType.BIND;
         return TokenType.IDENTIFIER;
     }
     

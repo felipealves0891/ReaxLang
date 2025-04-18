@@ -10,13 +10,11 @@ public class ReaxExecutionContext
 {
     private readonly ISet<Guid> _immutableKeys;
     private readonly ISet<Guid> _asyncKeys;
-    private readonly IDictionary<string, Guid> _variableKeys;
-    private readonly IDictionary<string, Guid> _functionKeys;
-    private readonly IDictionary<string, Guid> _scriptKeys;
-    private readonly IDictionary<string, Guid> _moduleKeys;
+    private readonly IDictionary<string, Guid> _symbols;
     private readonly IDictionary<Guid, ReaxNode> _variableContext;
     private readonly IDictionary<Guid, Function> _functionContext;
     private readonly IDictionary<Guid, ReaxInterpreter> _scriptContext;
+    private readonly IDictionary<Guid, ReaxInterpreter> _bindContext;
     private readonly IDictionary<Guid, Dictionary<string, Function>> _moduleContext;
     private readonly IDictionary<Guid, IList<VariableObservable>> _observableContext;
     private readonly ReaxExecutionContext? _parentContext;
@@ -24,18 +22,16 @@ public class ReaxExecutionContext
 
     public ReaxExecutionContext(string name)
     {
-        _variableKeys = new ConcurrentDictionary<string, Guid>();
+        _symbols = new ConcurrentDictionary<string, Guid>();
         _variableContext = new ConcurrentDictionary<Guid, ReaxNode>();
-        _functionKeys = new Dictionary<string, Guid>();
-        _functionContext = new Dictionary<Guid, Function>();
-        _moduleKeys = new Dictionary<string, Guid>();
-        _observableContext = new Dictionary<Guid, IList<VariableObservable>>();
-        _scriptKeys = new Dictionary<string, Guid>();
-        _scriptContext = new Dictionary<Guid, ReaxInterpreter>();
-        _moduleContext = new Dictionary<Guid, Dictionary<string, Function>>();
+        _functionContext = new ConcurrentDictionary<Guid, Function>();
+        _observableContext = new ConcurrentDictionary<Guid, IList<VariableObservable>>();
+        _scriptContext = new ConcurrentDictionary<Guid, ReaxInterpreter>();
+        _moduleContext = new ConcurrentDictionary<Guid, Dictionary<string, Function>>();
         _name = name;
         _immutableKeys = new HashSet<Guid>();
         _asyncKeys = new HashSet<Guid>();
+        _bindContext = new ConcurrentDictionary<Guid, ReaxInterpreter>();
     }
 
     public ReaxExecutionContext(string name, ReaxExecutionContext parentContext)
@@ -54,51 +50,44 @@ public class ReaxExecutionContext
 
     public bool ScriptExists(string identifier) 
     {
-        return _scriptKeys.ContainsKey(identifier) 
-           || (_parentContext is not null && _parentContext.ScriptExists(identifier));
+        return (_symbols.TryGetValue(identifier, out var key) && _scriptContext.ContainsKey(key))
+            || (_parentContext is not null && _parentContext.ScriptExists(identifier));
     }
 
     public bool ModuleExists(string identifier) 
     {
-        return _moduleKeys.ContainsKey(identifier)
-           || (_parentContext is not null && _parentContext.ModuleExists(identifier));
+        return (_symbols.TryGetValue(identifier, out var key) && _moduleContext.ContainsKey(key))
+            || (_parentContext is not null && _parentContext.ModuleExists(identifier));
     }
 
     public void DeclareVariable(string identifier, bool isAsync)
     {
         var key = Guid.NewGuid();
-        _variableKeys[identifier] = key;
+        _symbols[identifier] = key;
         if(isAsync) _asyncKeys.Add(key);
     }
     
     public void DeclareImmutable(string identifier, ReaxNode node)
     {
         var key = Guid.NewGuid();
-        _variableKeys[identifier] = key;
+        _symbols[identifier] = key;
         _immutableKeys.Add(key);
         _variableContext[key] = node;
     }
 
-    public void DeclareFunction(string identifier)
+    public void Declare(string identifier)
     {
-        _functionKeys[identifier] = Guid.NewGuid();
-    }
-
-    public void DeclareScript(string identifier)
-    {
-        _scriptKeys[identifier] = Guid.NewGuid();
-    }
-
-    public void DeclareModule(string identifier)
-    {
-        _moduleKeys[identifier] = Guid.NewGuid();
+        if(_symbols.ContainsKey(identifier))
+            throw new InvalidOperationException($"O simbolo '{identifier}' já foi declarado!");
+            
+        _symbols[identifier] = Guid.NewGuid();
     }
 
     public void SetVariable(string identifier, ReaxNode value)
     {
-        if(!_variableKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
         {
-            if(_parentContext is not null && _parentContext._variableKeys.TryGetValue(identifier, out var parentKey))
+            if(_parentContext is not null && _parentContext._symbols.TryGetValue(identifier, out var parentKey))
             {
                 _parentContext._variableContext[parentKey] = value;
                 _parentContext.OnChange(parentKey);
@@ -136,7 +125,7 @@ public class ReaxExecutionContext
 
     public void SetFunction(string identifier, ReaxInterpreter value)
     {
-        if(!_functionKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
             throw new InvalidOperationException($"{_name}: Função '{identifier}' não declarada!");
         
         _functionContext[key] = new InterpreterFunction(identifier, value);
@@ -144,7 +133,7 @@ public class ReaxExecutionContext
 
     public void SetFunction(string identifier, Function value)
     {
-        if(!_functionKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
             throw new InvalidOperationException($"{_name}: Função '{identifier}' não declarada!");
         
         _functionContext[key] = value;
@@ -153,7 +142,7 @@ public class ReaxExecutionContext
     public void SetObservable(string identifier, ReaxInterpreter interpreter, BinaryNode? condition)
     {
         var observable = new VariableObservable(interpreter, condition);
-        if(_variableKeys.TryGetValue(identifier, out var local))
+        if(_symbols.TryGetValue(identifier, out var local))
         {
             if(_immutableKeys.Contains(local))
                 throw new InvalidOperationException("Não é possivel observar um constante!");
@@ -162,7 +151,7 @@ public class ReaxExecutionContext
         }
         else if(_parentContext is null)
             throw new InvalidOperationException($"{_name}: Não é possivel observar uma variavel não declarada: variavel '{identifier}'!");
-        else if(_parentContext._variableKeys.TryGetValue(identifier, out var parent))
+        else if(_parentContext._symbols.TryGetValue(identifier, out var parent))
             _parentContext.SetObservable(parent, observable);
     }
 
@@ -176,7 +165,7 @@ public class ReaxExecutionContext
     
     public void SetScript(string identifier, ReaxInterpreter interpreter)
     {
-        if(!_scriptKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
             throw new InvalidOperationException($"{_name}: O script {identifier} não foi importado!");
         
         _scriptContext[key] = interpreter;
@@ -184,15 +173,23 @@ public class ReaxExecutionContext
     
     public void SetModule(string identifier, Dictionary<string, Function> functions)
     {
-        if(!_moduleKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
             throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi importado!");
         
         _moduleContext[key] = functions;
     } 
 
+    public void SetBind(string identifier, ReaxInterpreter interpreter)
+    {
+        if(!_symbols.TryGetValue(identifier, out var key))
+            throw new InvalidOperationException($"{_name}: O vinculo {identifier} não foi definido!");
+        
+        _bindContext[key] = interpreter;
+    }
+
     public ReaxNode GetVariable(string identifier)
     {
-        if(!_variableKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
         {
             var valueContext = GetParentVariable(identifier);
             if(valueContext is not null)
@@ -201,15 +198,54 @@ public class ReaxExecutionContext
             throw new InvalidOperationException($"{_name}: Variavel '{identifier}' não declarada!");
         }
         
-        if(!_variableContext.TryGetValue(key, out var value) || value is null)    
+        if(!_variableContext.TryGetValue(key, out var value) || value is null)
+        {
+            var valueBind = GetBind(identifier);
+            if (valueBind is not null)
+                return valueBind;
+
             throw new InvalidOperationException($"{_name}: Variavel '{identifier}' não foi atribuida!");
+        } 
         
         return value;
     }
 
+    public ReaxNode? GetBind(string identifier)
+    {
+        if(!_symbols.TryGetValue(identifier, out var key))
+        {
+            var valueContext = GetParentBind(identifier);
+            if(valueContext is not null)
+                return valueContext;
+
+            throw new InvalidOperationException($"{_name}: Vinculo '{identifier}' não declarada!");
+        }
+        
+        if(!_bindContext.TryGetValue(key, out var value) || value is null)    
+            throw new InvalidOperationException($"{_name}: Vinculo '{identifier}' não foi atribuida!");
+        
+        value.Interpret();
+        return value.Output;
+    }
+
+    private ReaxNode? GetParentBind(string identificar) 
+    {
+        try
+        {
+            if(_parentContext is null)
+                return null;
+
+            return _parentContext.GetBind(identificar);
+        }
+        catch (System.Exception)
+        {
+            return null;
+        }
+    }
+
     public Function GetFunction(string identifier)
     {
-        if(!_functionKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
         {
             var valueContext = GetParentFunction(identifier);
             if(valueContext is not null)
@@ -250,7 +286,7 @@ public class ReaxExecutionContext
 
     public ReaxInterpreter GetScript(string identifier)
     {
-        if(!_scriptKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
         {
             var script = GetParentScript(identifier);
             if(script is not null)
@@ -282,7 +318,7 @@ public class ReaxExecutionContext
     
     public Function GetModule(string identifier, string functionName)
     {
-        if(!_moduleKeys.TryGetValue(identifier, out var key))
+        if(!_symbols.TryGetValue(identifier, out var key))
         {
             var module = GetParentModule(identifier, functionName);
             if(module is not null)

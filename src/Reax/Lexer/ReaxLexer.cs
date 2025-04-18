@@ -105,7 +105,7 @@ public class ReaxLexer
         var identifier = _source.GetString(start,_source.Position);
         var type = Keywords.IsKeyword(identifier);
         var token = new Token(type, identifier, start, _numberOfRows);
-        Logger.LogLexer(token.ToString());
+        Logger.LogLexer(token.ToString());        
         return token;
     }
 

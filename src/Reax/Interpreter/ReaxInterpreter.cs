@@ -8,6 +8,8 @@ namespace Reax.Interpreter;
 
 public class ReaxInterpreter
 {
+    public static Stack<ReaxNode> StackTrace = new Stack<ReaxNode>();
+
     private readonly ReaxNode[] _nodes;
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
@@ -44,7 +46,7 @@ public class ReaxInterpreter
 
     public void DeclareAndSetFunction(string identifier, Function function) 
     {
-        _context.DeclareFunction(identifier);
+        _context.Declare(identifier);
         _context.SetFunction(identifier, function);
     }
 
@@ -65,9 +67,11 @@ public class ReaxInterpreter
     }
 
     public void Interpret() 
-    {
+    {   
         foreach (var node in _nodes)
         {
+            StackTrace.Push(node);
+
             if(node is ScriptNode script)
                 ExecuteDeclarationScript(script);
             else if(node is ModuleNode module)
@@ -96,19 +100,30 @@ public class ReaxInterpreter
                 ExecuteWhile(@while);
             else if(node is ExternalFunctionCallNode scriptFunctionCallNode)
                 Output = ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
+            else if(node is BindNode bind)
+                ExecuteDeclareBind(bind);
+
+            StackTrace.Pop();
         }
+    }
+
+    private void ExecuteDeclareBind(BindNode bind) 
+    {
+        var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", bind.Node, _context);
+        _context.Declare(bind.Identifier);
+        _context.SetBind(bind.Identifier, interpreter);
     }
 
     private void ExecuteDeclarationScript(ScriptNode script) 
     {
         script.Interpreter.Interpret();
-        _context.DeclareScript(script.Identifier);
+        _context.Declare(script.Identifier);
         _context.SetScript(script.Identifier, script.Interpreter);
     }
 
     private void ExecuteDeclarationModule(ModuleNode module)
     {
-        _context.DeclareModule(module.identifier);
+        _context.Declare(module.identifier);
         _context.SetModule(module.identifier, module.functions);   
     }
 
@@ -228,7 +243,7 @@ public class ReaxInterpreter
         var block = (ContextNode)node.Block;
         var identifier = node.Identifier.ToString();
         var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context, node.Parameters);
-        _context.DeclareFunction(identifier);
+        _context.Declare(identifier);
         _context.SetFunction(identifier, interpreter);
     }
 
@@ -310,5 +325,11 @@ public class ReaxInterpreter
         else
             throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
             
+    }
+
+    public void PrintStackTrace() {
+        foreach (var node in StackTrace.Reverse()) {
+            Console.WriteLine($"  at -> {node.ToString()}");
+        }
     }
 }
