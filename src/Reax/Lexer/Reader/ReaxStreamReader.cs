@@ -14,27 +14,27 @@ public class ReaxStreamReader : IReader
 
     public bool EndOfFile => _stream.CanRead && _stream.Position >= _stream.Length;
 
-    public char BeforeChar 
+    public byte BeforeChar 
     {
         get
         {
             _stream.Position--;
             var b = _stream.ReadByte();
-            return (char)b;
+            return (byte)b;
         }
     }
 
-    public char CurrentChar 
+    public byte CurrentChar 
     {
         get
         {
             var b = _stream.ReadByte();
             _stream.Position--;
-            return (char)b;
+            return (byte)b;
         }
     }
 
-    public char NextChar 
+    public byte NextChar 
     {
         get
         {
@@ -42,7 +42,7 @@ public class ReaxStreamReader : IReader
             var b = _stream.ReadByte();
             _stream.Position--;
             _stream.Position--;
-            return (char)b;
+            return (byte)b;
         }
     }
 
@@ -56,14 +56,14 @@ public class ReaxStreamReader : IReader
         _stream.Position++;
     }
 
-    public char[] GetString(int start, int end)
+    public byte[] GetString(int start, int end)
     {
         var currentChar = _stream.Position;
         _stream.Position = start;
 
-        var chars = new char[end - start];
+        var chars = new byte[end - start];
         for (int i = 0; i < end - start; i++)
-            chars[i] = (char)_stream.ReadByte();
+            chars[i] = (byte)_stream.ReadByte();
         
         _stream.Position = currentChar;
         return chars;

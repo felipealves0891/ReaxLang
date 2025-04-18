@@ -14,9 +14,9 @@ public class ReaxTextReader : IReader
     }
 
     public bool EndOfFile => Position >= _source.Length;
-    public char BeforeChar => Position > 0 ? _source[Position-1] : ' ';
-    public char CurrentChar => _source[Position];
-    public char NextChar => _source[Position+1];
+    public byte BeforeChar => Position > 0 ? (byte)_source[Position-1] : (byte)' ';
+    public byte CurrentChar => (byte)_source[Position];
+    public byte NextChar => (byte)_source[Position+1];
     public int Position => _position;
 
     public void Advance() 
@@ -27,8 +27,8 @@ public class ReaxTextReader : IReader
         _position++;
     }
 
-    public char[] GetString(int start, int end)
+    public byte[] GetString(int start, int end)
     {
-        return _source[start..end].ToCharArray();
+        return _source[start..end].ToCharArray().Select(x => (byte)x).ToArray();
     }
 }

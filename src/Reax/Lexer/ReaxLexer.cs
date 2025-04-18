@@ -28,30 +28,30 @@ public class ReaxLexer
     public Token NextToken() 
     {
         if(_source.EndOfFile)
-            return new Token(TokenType.EOF, ' ', _source.Position, _numberOfRows);
+            return new Token(TokenType.EOF, (byte)' ', _source.Position, _numberOfRows);
 
-        if(char.IsWhiteSpace(_source.CurrentChar)) 
+        if(char.IsWhiteSpace((char)_source.CurrentChar)) 
             _source.Advance();
-        if(char.IsLetter(_source.CurrentChar)) 
+        if(char.IsLetter((char)_source.CurrentChar)) 
             return GetIdentifierOrKeyword();
-        if(char.IsDigit(_source.CurrentChar)) 
+        if(char.IsDigit((char)_source.CurrentChar)) 
             return GetDigit();
         if(_source.CurrentChar == '\'') 
             return GetString();
         if(_source.CurrentChar == '(') 
-            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, '(', _source.Position, _numberOfRows));   
+            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, (byte)'(', _source.Position, _numberOfRows));   
         if(_source.CurrentChar == ',') 
-            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, ',', _source.Position, _numberOfRows));   
+            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, (byte)',', _source.Position, _numberOfRows));   
         if(_source.CurrentChar == ')') 
-            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, ')', _source.Position, _numberOfRows));       
+            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, (byte)')', _source.Position, _numberOfRows));       
         if(_source.CurrentChar == ';') 
-            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, ';', _source.Position, _numberOfRows));   
+            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, (byte)';', _source.Position, _numberOfRows));   
         if(IsLetterOrIsDigitOrWhiteSpace(_source.BeforeChar) && _source.CurrentChar == '=' && IsLetterOrIsDigitOrWhiteSpace(_source.NextChar)) 
-            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, '=', _source.Position, _numberOfRows));   
+            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, (byte)'=', _source.Position, _numberOfRows));   
         if(_source.BeforeChar == '=' && _source.CurrentChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, new char[] {'=', '='}, _source.Position, _numberOfRows));   
+            return AdvanceAndReturn(new Token(TokenType.EQUALITY, new byte[] {(byte)'=', (byte)'='}, _source.Position, _numberOfRows));   
         if(_source.CurrentChar == '!' && _source.NextChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, new char[] {'!', '='}, _source.Position, _numberOfRows));   
+            return AdvanceAndReturn(new Token(TokenType.EQUALITY, new byte[] {(byte)'!', (byte)'='}, _source.Position, _numberOfRows));   
         if(_source.CurrentChar == '-' && _source.NextChar == '>')
             return GetArrow();
         if(_source.CurrentChar == '<' || _source.CurrentChar == '>') 
@@ -84,7 +84,7 @@ public class ReaxLexer
     public Token GetDigit() 
     {
         var start = _source.Position;
-        while(!_source.EndOfFile && (char.IsDigit(_source.CurrentChar) || _source.CurrentChar == '.'))
+        while(!_source.EndOfFile && (char.IsDigit((char)_source.CurrentChar) || _source.CurrentChar == '.'))
             _source.Advance();
 
         var number = _source.GetString(start, _source.Position);
@@ -132,14 +132,14 @@ public class ReaxLexer
         var start = _source.Position;
         _source.Advance();
         _source.Advance();
-        return new Token(TokenType.ARROW, new char[] {'-', '>'}, start, _numberOfRows);
+        return new Token(TokenType.ARROW, new byte[] {(byte)'-', (byte)'>'}, start, _numberOfRows);
     }
 
-    public bool IsIdentifier(char c) 
-        => char.IsLetter(c) || char.IsDigit(c) || c == '_';
+    public bool IsIdentifier(byte b) 
+        => char.IsLetter((char)b) || char.IsDigit((char)b) || (char)b == '_';
 
-    private bool IsLetterOrIsDigitOrWhiteSpace(char c) 
+    private bool IsLetterOrIsDigitOrWhiteSpace(byte c) 
     {
-        return char.IsLetter(c) || char.IsDigit(c) || char.IsWhiteSpace(c);
+        return char.IsLetter((char)c) || char.IsDigit((char)c) || char.IsWhiteSpace((char)c);
     }   
 }

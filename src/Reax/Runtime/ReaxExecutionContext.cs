@@ -12,9 +12,11 @@ public class ReaxExecutionContext
     private readonly IDictionary<string, Guid> _variableKeys;
     private readonly IDictionary<string, Guid> _functionKeys;
     private readonly IDictionary<string, Guid> _scriptKeys;
+    private readonly IDictionary<string, Guid> _moduleKeys;
     private readonly IDictionary<Guid, ReaxNode> _variableContext;
     private readonly IDictionary<Guid, Function> _functionContext;
     private readonly IDictionary<Guid, ReaxInterpreter> _scriptContext;
+    private readonly IDictionary<Guid, Dictionary<string, Function>> _moduleContext;
     private readonly IDictionary<Guid, IList<VariableObservable>> _observableContext;
     private readonly ReaxExecutionContext? _parentContext;
     private readonly string _name;
@@ -25,9 +27,11 @@ public class ReaxExecutionContext
         _variableContext = new ConcurrentDictionary<Guid, ReaxNode>();
         _functionKeys = new Dictionary<string, Guid>();
         _functionContext = new Dictionary<Guid, Function>();
+        _moduleKeys = new Dictionary<string, Guid>();
         _observableContext = new Dictionary<Guid, IList<VariableObservable>>();
         _scriptKeys = new Dictionary<string, Guid>();
         _scriptContext = new Dictionary<Guid, ReaxInterpreter>();
+        _moduleContext = new Dictionary<Guid, Dictionary<string, Function>>();
         _name = name;
     }
 
@@ -45,6 +49,18 @@ public class ReaxExecutionContext
             throw new InvalidOperationException("Não é possivel obter o contexto pai no contexto inicial");
     }
 
+    public bool ScriptExists(string identifier) 
+    {
+        return _scriptKeys.ContainsKey(identifier) 
+           || (_parentContext is not null && _parentContext.ScriptExists(identifier));
+    }
+
+    public bool ModuleExists(string identifier) 
+    {
+        return _moduleKeys.ContainsKey(identifier)
+           || (_parentContext is not null && _parentContext.ModuleExists(identifier));
+    }
+
     public void DeclareVariable(string identifier)
     {
         _variableKeys[identifier] = Guid.NewGuid();
@@ -58,6 +74,11 @@ public class ReaxExecutionContext
     public void DeclareScript(string identifier)
     {
         _scriptKeys[identifier] = Guid.NewGuid();
+    }
+
+    public void DeclareModule(string identifier)
+    {
+        _moduleKeys[identifier] = Guid.NewGuid();
     }
 
     public void SetVariable(string identifier, ReaxNode value)
@@ -126,9 +147,17 @@ public class ReaxExecutionContext
     public void SetScript(string identifier, ReaxInterpreter interpreter)
     {
         if(!_scriptKeys.TryGetValue(identifier, out var key))
-            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi importado!");
+            throw new InvalidOperationException($"{_name}: O script {identifier} não foi importado!");
         
         _scriptContext[key] = interpreter;
+    } 
+    
+    public void SetModule(string identifier, Dictionary<string, Function> functions)
+    {
+        if(!_moduleKeys.TryGetValue(identifier, out var key))
+            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi importado!");
+        
+        _moduleContext[key] = functions;
     } 
 
     public ReaxNode GetVariable(string identifier)
@@ -197,11 +226,11 @@ public class ReaxExecutionContext
             if(script is not null)
                 return script;
 
-            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi declarado");
+            throw new InvalidOperationException($"{_name}: O script {identifier} não foi declarado");
         }
 
         if(!_scriptContext.TryGetValue(key, out var interpreter))
-            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi definido");
+            throw new InvalidOperationException($"{_name}: O script {identifier} não foi definido");
 
         return interpreter;
     }
@@ -214,6 +243,42 @@ public class ReaxExecutionContext
                 return null;
 
             return _parentContext.GetScript(identifier);
+        }
+        catch (System.Exception)
+        {
+            return null;
+        }
+    }
+    
+    public Function GetModule(string identifier, string functionName)
+    {
+        if(!_moduleKeys.TryGetValue(identifier, out var key))
+        {
+            var module = GetParentModule(identifier, functionName);
+            if(module is not null)
+                return module;
+
+            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi localizado");
+        }
+
+        if(!_moduleContext.TryGetValue(key, out var functions))
+            throw new InvalidOperationException($"{_name}: O modulo {identifier} não foi localizado");
+
+        if(functions.TryGetValue(functionName, out var function))
+            return function;
+
+        throw new InvalidOperationException($"{_name}: A função {functionName} do modulo {identifier} não foi localizado");
+        
+    }
+
+    public Function? GetParentModule(string identifier, string functionName)
+    {
+        try
+        {
+            if(_parentContext is null)
+                return null;
+
+            return _parentContext.GetModule(identifier, functionName);
         }
         catch (System.Exception)
         {

@@ -27,7 +27,7 @@ public class ReaxDeclarationParse : INodeParser
         if(identifier is null)
             throw new Exception();
 
-        var textIdentifier = identifier.Value.ReadOnlySource.ToString();
+        var textIdentifier = identifier.Value.Source;
         if(value is not null)
             return new DeclarationNode(textIdentifier, value.Value.ToReaxValue());
         else 

@@ -24,9 +24,9 @@ public class ReaxParser : ITokenSource
     }
 
     public bool EndOfTokens => _position >= _tokens.Length;
-    public Token BeforeToken => _position > 0 ? _tokens[_position-1] : new Token(TokenType.UNKNOW, ' ', -1, -1);
-    public Token CurrentToken => !EndOfTokens ? _tokens[_position] : new Token(TokenType.UNKNOW, ' ', -1, -1);
-    public Token NextToken => _position < _tokens.Length ? _tokens[_position+1] : new Token(TokenType.UNKNOW, ' ', -1, -1);
+    public Token BeforeToken => _position > 0 ? _tokens[_position-1] : new Token(TokenType.UNKNOW, (byte)' ', -1, -1);
+    public Token CurrentToken => !EndOfTokens ? _tokens[_position] : new Token(TokenType.UNKNOW, (byte)' ', -1, -1);
+    public Token NextToken => _position < _tokens.Length ? _tokens[_position+1] : new Token(TokenType.UNKNOW, (byte)' ', -1, -1);
 
     public IEnumerable<ReaxNode> Parse() 
     {
@@ -104,7 +104,7 @@ public class ReaxParser : ITokenSource
     public void Advance() 
     {
         if(_position + 1 > _tokens.Length)
-            throw new InvalidOperationException("Não é possivel avançar após o fim dos tokens");
+            throw new InvalidOperationException($"Não é possivel avançar após o fim dos tokens: {BeforeToken} -> {CurrentToken}");
 
         _position++;
     }

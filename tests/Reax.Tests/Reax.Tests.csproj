@@ -17,12 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Reax\Reax.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Update=".\Assets\simple.reax">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />

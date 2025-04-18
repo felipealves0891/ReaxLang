@@ -32,7 +32,7 @@ public class ReaxFunctionCallParse : INodeParser
         if(identifier is null)
             throw new Exception();
         
-        var textIdentifier = identifier.Value.ReadOnlySource.ToString();
+        var textIdentifier = identifier.Value.Source;
         var values = parameter.Select(x => x.ToReaxValue()).ToArray();
         return new FunctionCallNode(textIdentifier, values);
     }

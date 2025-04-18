@@ -4,7 +4,7 @@ using Reax.Runtime.Functions.Attributes;
 
 namespace Reax.Runtime.Functions.ConsoleFunctions;
 
-[FunctionBuiltIn("writer", false, 1, 10)]
+[FunctionBuiltIn("console", "writer", 1, 10)]
 public class WriterFunction : Function
 {
     public override ReaxNode? Invoke(params ReaxNode[] parameters)

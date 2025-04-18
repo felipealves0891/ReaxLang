@@ -21,7 +21,7 @@ public class ReaxForParse : INodeParser
         source.Advance();
         var initialValue = source.CurrentToken;
         source.Advance();
-        var declaration = new DeclarationNode(identifierControl.ReadOnlySource.ToString(), initialValue.ToReaxValue());
+        var declaration = new DeclarationNode(identifierControl.Source, initialValue.ToReaxValue());
         if(source.CurrentToken.Type != TokenType.TO)
             throw new InvalidOperationException("Era esperado uma expresão 'TO'!");
         source.Advance();

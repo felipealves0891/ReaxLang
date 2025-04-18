@@ -43,6 +43,6 @@ public class ReaxAssignmentParse : INodeParser
             value = new ContextNode(expressionNodes.ToArray());
         }
 
-        return new AssignmentNode(identifier.Value.ReadOnlySource.ToString(), value);
+        return new AssignmentNode(identifier.Value.Source, value);
     }
 }

@@ -16,7 +16,7 @@ public class ReaxImportScriptsParse : INodeParser
     {
         source.Advance();
         source.Advance();
-        var file = source.CurrentToken.ReadOnlySource.ToString();
+        var file = source.CurrentToken.Source;
         var info = new FileInfo(Path.Combine(ReaxEnvironment.DirectoryRoot, file));
         
         if(!info.Exists) throw new InvalidOperationException($"Modulo '{file}' não localizado!");

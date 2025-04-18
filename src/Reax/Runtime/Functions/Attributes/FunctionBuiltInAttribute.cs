@@ -5,35 +5,33 @@ namespace Reax.Runtime.Functions.Attributes;
 [AttributeUsage(AttributeTargets.Class)]
 public class FunctionBuiltInAttribute : Attribute
 {
-    public FunctionBuiltInAttribute(string name, bool canReturn)
+    public FunctionBuiltInAttribute(string module, string name)
     {
         Name = name;
-        CanReturn = canReturn;
+        Module = module;
         MinParametersCount = 0;
         MaxParametersCount = 0;
     }
 
-    public FunctionBuiltInAttribute(string name, bool canReturn, int parametersCount)
+    public FunctionBuiltInAttribute(string module, string name, int parametersCount)
     {
+        Module = module;
         Name = name;
-        CanReturn = canReturn;
         MinParametersCount = parametersCount;
         MaxParametersCount = parametersCount;
     }
 
-    public FunctionBuiltInAttribute(string name, bool canReturn, int minParametersCount = 0, int maxParametersCount = 0)
+    public FunctionBuiltInAttribute(string module, string name, int minParametersCount = 0, int maxParametersCount = 0)
     {
+        Module = module;
         Name = name;
-        CanReturn = canReturn;
         MinParametersCount = minParametersCount;
         MaxParametersCount = maxParametersCount;
     }
 
+
+    public string Module { get; private set; }
     public string Name { get; private set; }
-
-    public bool CanReturn { get; private set; }
-
-    public int? MinParametersCount { get; set; }
-    
-    public int? MaxParametersCount { get; set; }
+    public int MinParametersCount { get; private set; }
+    public int MaxParametersCount { get; private set; }
 }

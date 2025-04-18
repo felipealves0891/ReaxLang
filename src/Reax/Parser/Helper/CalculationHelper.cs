@@ -11,7 +11,7 @@ class CalculationHelper
 
     public CalculationHelper(IEnumerable<Token> tokens) => _tokens = tokens.ToList();
 
-    private Token Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, ' ', -1, -1);
+    private Token Peek() => _pos < _tokens.Count ? _tokens[_pos] : new Token(TokenType.EOF, (byte)' ', -1, -1);
     private Token Consume() => _tokens[_pos++];
 
     public ReaxNode ParseExpression() => ParseAddSub();
@@ -20,8 +20,8 @@ class CalculationHelper
     {
         var node = ParseMulDiv();
         while (
-            Peek().ReadOnlySource.SequenceEqual(['+']) || 
-            Peek().ReadOnlySource.SequenceEqual(['-']))
+            Peek().ReadOnlySource.SequenceEqual([(byte)'+']) || 
+            Peek().ReadOnlySource.SequenceEqual([(byte)'-']))
         {
             var op = Consume();
             var right = ParseMulDiv();
@@ -34,8 +34,8 @@ class CalculationHelper
     {
         var node = ParseFactor();
         while (
-            Peek().ReadOnlySource.SequenceEqual(['*']) || 
-            Peek().ReadOnlySource.SequenceEqual(['/']))
+            Peek().ReadOnlySource.SequenceEqual([(byte)'*']) || 
+            Peek().ReadOnlySource.SequenceEqual([(byte)'/']))
         {
             var op = Consume();
             var right = ParseFactor();

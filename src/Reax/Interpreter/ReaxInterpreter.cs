@@ -12,54 +12,31 @@ public class ReaxInterpreter
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
     
-    private ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
+    public ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
         : this(name, nodes, context)
     {
         for (int i = 0; i < parameters.Length; i++)
             _parameters[i] = parameters[i];
     }
 
-    private ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context)
+    public ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context)
         : this(nodes)
     {
         _context = new ReaxExecutionContext(name, context);
     }
 
-    private ReaxInterpreter(string name, ReaxNode[] nodes)
+    public ReaxInterpreter(string name, ReaxNode[] nodes)
     {
         _nodes = nodes;
         _context = new ReaxExecutionContext(name);
         _parameters = new Dictionary<int, ReaxNode>();
     }
 
-    private ReaxInterpreter(ReaxNode[] nodes)
+    public ReaxInterpreter(ReaxNode[] nodes)
     {
         _nodes = nodes;
         _context = new ReaxExecutionContext("main");
         _parameters = new Dictionary<int, ReaxNode>();
-    }
-    
-    public static ReaxInterpreter CreateMain(ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
-    {
-        var interpreter = new ReaxInterpreter(nodes);
-        var context = interpreter._context;
-
-        foreach (var fun in functions)
-        {
-            context.DeclareFunction(fun.Identifier);
-            context.SetFunction(fun.Identifier, fun.Function);
-        }
-
-        return interpreter;
-    }
-
-    public static ReaxInterpreter Create(string name, ReaxNode[] nodes, IEnumerable<(string Identifier, Function Function)> functions)
-    {
-        var interpreter = new ReaxInterpreter(name, nodes);
-        foreach (var fun in functions)
-            interpreter.DeclareAndSetFunction(fun.Identifier, fun.Function);
-        
-        return interpreter;
     }
 
     public bool IsOutput => Output is not null;
@@ -94,6 +71,8 @@ public class ReaxInterpreter
         {
             if(node is ScriptNode script)
                 ExecuteDeclarationScript(script);
+            else if(node is ModuleNode module)
+                ExecuteDeclarationModule(module);
             else if(node is FunctionCallNode functionCall)
                 Output = ExecuteFunctionCall(functionCall);
             else if (node is DeclarationNode declaration)
@@ -116,8 +95,8 @@ public class ReaxInterpreter
                 ExecuteFor(@for);
             else if(node is WhileNode @while)
                 ExecuteWhile(@while);
-            else if(node is ScriptFunctionCallNode scriptFunctionCallNode)
-                Output = ExecuteScriptFunctionCallNode(scriptFunctionCallNode);
+            else if(node is ExternalFunctionCallNode scriptFunctionCallNode)
+                Output = ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
         }
     }
 
@@ -126,6 +105,12 @@ public class ReaxInterpreter
         script.Interpreter.Interpret();
         _context.DeclareScript(script.Identifier);
         _context.SetScript(script.Identifier, script.Interpreter);
+    }
+
+    private void ExecuteDeclarationModule(ModuleNode module)
+    {
+        _context.DeclareModule(module.identifier);
+        _context.SetModule(module.identifier, module.functions);   
     }
 
     private ReaxNode? ExecuteFunctionCall(FunctionCallNode functionCall) 
@@ -270,12 +255,24 @@ public class ReaxInterpreter
         }
     }
     
-    private ReaxNode? ExecuteScriptFunctionCallNode(ScriptFunctionCallNode node)
+    private ReaxNode? ExecuteExternalFunctionCallNode(ExternalFunctionCallNode node)
     {
-        var interpreter = _context.GetScript(node.scriptName);
-        var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
-        var identifier = node.functionCall.Identifier;
-        return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters));
+        if(_context.ScriptExists(node.scriptName))
+        {
+            var interpreter = _context.GetScript(node.scriptName);
+            var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
+            var identifier = node.functionCall.Identifier;
+            return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters));
+        }
+        else if(_context.ModuleExists(node.scriptName)) 
+        {
+            var function = _context.GetModule(node.scriptName, node.functionCall.Identifier);
+            var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
+            var identifier = node.functionCall.Identifier;
+            return function.Invoke(parameters);
+        }
+
+        throw new InvalidOperationException($"Função externa não localizada: {node.scriptName}.{node.functionCall.Identifier}"); 
     }
 
     private bool ExecuteBinary(BinaryNode condition) 

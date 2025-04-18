@@ -37,5 +37,6 @@ public enum TokenType
     NOT,
     IMPORT,
     ACCESS,
-    SCRIPT
+    SCRIPT,
+    MODULE
 } 

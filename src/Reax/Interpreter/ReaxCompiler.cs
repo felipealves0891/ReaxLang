@@ -12,7 +12,6 @@ public class ReaxCompiler
     {
         var ast = GetNodes(filename);   
         return new ReaxInterpreterBuilder()
-                .AddFunctionsBuiltIn()
                 .BuildMain(ast.ToArray());
     }
     
@@ -20,7 +19,6 @@ public class ReaxCompiler
     {
         var ast = GetNodes(filename);
         return new ReaxInterpreterBuilder(script)
-                .AddFunctionsBuiltIn()
                 .BuildScript(ast.ToArray());
     }
 
