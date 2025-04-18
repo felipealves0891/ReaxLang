@@ -11,8 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reax.Tests", "tests\Reax.Tests\Reax.Tests.csproj", "{67E12FFA-1D17-42B2-97D2-98F1EE4B95CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reax.Benchmark", "src\Reax.Benchmark\Reax.Benchmark.csproj", "{DBB0B04D-0BF3-4FA7-B4B1-5093E057FA02}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,10 +25,6 @@ Global
 		{67E12FFA-1D17-42B2-97D2-98F1EE4B95CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67E12FFA-1D17-42B2-97D2-98F1EE4B95CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67E12FFA-1D17-42B2-97D2-98F1EE4B95CF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DBB0B04D-0BF3-4FA7-B4B1-5093E057FA02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DBB0B04D-0BF3-4FA7-B4B1-5093E057FA02}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DBB0B04D-0BF3-4FA7-B4B1-5093E057FA02}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DBB0B04D-0BF3-4FA7-B4B1-5093E057FA02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +32,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{2ECF6892-2CDA-43DD-A8FE-AC80C9266282} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{67E12FFA-1D17-42B2-97D2-98F1EE4B95CF} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{DBB0B04D-0BF3-4FA7-B4B1-5093E057FA02} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal
