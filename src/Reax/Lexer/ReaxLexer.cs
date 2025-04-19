@@ -20,7 +20,6 @@ public class ReaxLexer
         Token token;
         do
         {   
-            Logger.LogLexer("############################### Start read next token ###############################");
             token = NextToken();
             yield return token;
         } 
@@ -63,7 +62,7 @@ public class ReaxLexer
         if(_source.CurrentChar == '*' || _source.CurrentChar == '/')
             return AdvanceAndReturn(new Token(TokenType.FACTOR, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows));   
         if(_source.CurrentChar == '!')
-            return AdvanceAndReturn(new Token(TokenType.UNARY, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows)); 
+            return AdvanceAndReturn(new Token(TokenType.NOT, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows)); 
         if(_source.CurrentChar == '{')
             return AdvanceAndReturn(new Token(TokenType.START_BLOCK, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows)); 
         if(_source.CurrentChar == '}')
