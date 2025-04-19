@@ -1,23 +1,48 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 
 namespace Reax.Runtime.Registries;
 
 public abstract class BaseRegistry<Tkey, TData>
     where Tkey : notnull
-    where TData : class
 {
     private static readonly ConcurrentDictionary<Tkey, TData> _registry = new();
+
+    public BaseRegistry()
+    {}
+    
+    public IReadOnlyDictionary<Tkey, TData> Registry => new ReadOnlyDictionary<Tkey, TData>(_registry);
 
     public virtual TData this[Tkey key]
     {
         get => Get(key);
-        set => Set(key, value);
+        set
+        {
+            if(Exists(key))
+                Update(key, value);
+            else
+                Set(key, value);
+        }
     }
 
     public virtual bool Set(Tkey key, TData data) 
     {
         return _registry.TryAdd(key, data);
+    }
+    
+    public virtual bool Update(Tkey key, TData data) 
+    {
+        try
+        {
+            _registry[key] = data;
+            return true;    
+        }
+        catch (System.Exception)
+        {
+            return false;
+        }
+        
     }
 
     public virtual bool Exists(Tkey key) 

@@ -1,6 +1,7 @@
 using System;
 using Reax.Debugger;
 using Reax.Lexer.Reader;
+using Reax.Runtime;
 
 namespace Reax.Lexer;
 
@@ -69,6 +70,8 @@ public class ReaxLexer
             return AdvanceAndReturn(new Token(TokenType.END_BLOCK, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows));
         if(_source.CurrentChar == '.')
             return AdvanceAndReturn(new Token(TokenType.ACCESS, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows));
+        if(_source.CurrentChar == ':')
+            return AdvanceAndReturn(new Token(TokenType.TYPING, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows));
         if(_source.CurrentChar == '\n')
             _numberOfRows++;
         
@@ -90,7 +93,7 @@ public class ReaxLexer
             _source.Advance();
 
         var number = _source.GetString(start, _source.Position);
-        var token = new Token(TokenType.NUMBER, number, _source.FileName, _source.Position, _numberOfRows);
+        var token = new Token(TokenType.NUMBER_LITERAL, number, _source.FileName, _source.Position, _numberOfRows);
         Logger.LogLexer(token.ToString());
         return token;
     }
@@ -104,6 +107,9 @@ public class ReaxLexer
         var identifier = _source.GetString(start,_source.Position);
         var type = Keywords.IsKeyword(identifier);
         var token = new Token(type, identifier, _source.FileName, start, _numberOfRows);
+        if (type == TokenType.IDENTIFIER)
+            ReaxEnvironment.Symbols[token.Source] = new Symbol();
+            
         Logger.LogLexer(token.ToString());        
         return token;
     }
@@ -118,7 +124,7 @@ public class ReaxLexer
         var end = _source.Position;
         var text = _source.GetString(start, end);
         _source.Advance();
-        var token = new Token(TokenType.STRING, text, _source.FileName, _source.Position, _numberOfRows);
+        var token = new Token(TokenType.STRING_LITERAL, text, _source.FileName, _source.Position, _numberOfRows);
         Logger.LogLexer(token.ToString());
         return token;
     }
@@ -144,6 +150,19 @@ public class ReaxLexer
         _source.Advance();
         var token = new Token(TokenType.ARROW, new byte[] {(byte)'-', (byte)'>'}, _source.FileName, start, _numberOfRows);
         Logger.LogLexer(token.ToString());
+        return token;
+    }
+
+    private Token GetTyping() 
+    {
+        _source.Advance();
+        var start = _source.Position;
+        while(!_source.EndOfFile && IsIdentifier(_source.CurrentChar))
+            _source.Advance();
+
+        var identifier = _source.GetString(start,_source.Position);
+        var token = new Token(TokenType.TYPING, identifier, _source.FileName, start, _numberOfRows);
+        Logger.LogLexer(token.ToString());        
         return token;
     }
 

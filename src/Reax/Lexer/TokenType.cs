@@ -10,8 +10,8 @@ public enum TokenType
     START_PARAMETER,
     PARAMETER_SEPARATOR,
     END_PARAMETER,
-    STRING,
-    NUMBER,
+    STRING_LITERAL,
+    NUMBER_LITERAL,
     LET,
     COMPARISON,
     EQUALITY,
@@ -40,5 +40,11 @@ public enum TokenType
     MODULE,
     CONST,
     ASYNC,
-    BIND
+    BIND,
+    TYPING,
+    BOOLEAN_TYPE,
+    FLOAT_TYPE,
+    INT_TYPE,
+    LONG_TYPE,
+    STRING_TYPE,
 } 

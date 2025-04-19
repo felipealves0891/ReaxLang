@@ -34,7 +34,6 @@ public class ReaxParser : ITokenSource
         ReaxNode? node = null;
         do 
         {
-            Logger.LogParse("############################### Start read next node ###############################");
             node = NextNode();
             if(node is not null)
                 yield return node;

@@ -43,8 +43,8 @@ public static class TokenExtensions
         return token.Type switch 
         {
             TokenType.IDENTIFIER => true,
-            TokenType.STRING => true,
-            TokenType.NUMBER => true,
+            TokenType.STRING_LITERAL => true,
+            TokenType.NUMBER_LITERAL => true,
             _ => false
         };
     }
@@ -54,7 +54,7 @@ public static class TokenExtensions
         return token.Type switch 
         {
             TokenType.IDENTIFIER => true,
-            TokenType.NUMBER => true,
+            TokenType.NUMBER_LITERAL => true,
             _ => false
         };
     }
@@ -84,8 +84,8 @@ public static class TokenExtensions
         return token.Type switch 
         {
             TokenType.IDENTIFIER => new VarNode(token.Source, token.Location),
-            TokenType.STRING => new StringNode(token.Source, token.Location),
-            TokenType.NUMBER => new NumberNode(token.Source, token.Location),
+            TokenType.STRING_LITERAL => new StringNode(token.Source, token.Location),
+            TokenType.NUMBER_LITERAL => new NumberNode(token.Source, token.Location),
             TokenType.FALSE => new BooleanNode(token.Source, token.Location),
             TokenType.TRUE => new BooleanNode(token.Source, token.Location),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")

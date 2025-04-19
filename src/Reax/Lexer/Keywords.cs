@@ -46,6 +46,16 @@ public static class Keywords
 
     public static byte[] BIND => [(byte)'b', (byte)'i', (byte)'n', (byte)'d'];
 
+    public static byte[] BOOLEAN_TYPE = [(byte)'b', (byte)'o', (byte)'o', (byte)'l'];
+
+    public static byte[] FLOAT_TYPE = [(byte)'f', (byte)'l', (byte)'o', (byte)'a', (byte)'t'];
+    
+    public static byte[] INT_TYPE = [(byte)'i', (byte)'n', (byte)'t'];
+    
+    public static byte[] LONG_TYPE = [(byte)'l', (byte)'o', (byte)'n', (byte)'g'];
+    
+    public static byte[] STRING_TYPE = [(byte)'s', (byte)'t', (byte)'r', (byte)'i', (byte)'n', (byte)'g'];
+
     public static TokenType IsKeyword(byte[] chars)
     {
         if (LET.SequenceEqual(chars)) return TokenType.LET;
@@ -69,6 +79,11 @@ public static class Keywords
         if (CONST.SequenceEqual(chars)) return TokenType.CONST;
         if (ASYNC.SequenceEqual(chars)) return TokenType.ASYNC;
         if (BIND.SequenceEqual(chars)) return TokenType.BIND;
+        if (BOOLEAN_TYPE.SequenceEqual(chars)) return TokenType.BOOLEAN_TYPE;
+        if (FLOAT_TYPE.SequenceEqual(chars)) return TokenType.FLOAT_TYPE;
+        if (INT_TYPE.SequenceEqual(chars)) return TokenType.INT_TYPE;
+        if (LONG_TYPE.SequenceEqual(chars)) return TokenType.LONG_TYPE;
+        if (STRING_TYPE.SequenceEqual(chars)) return TokenType.STRING_TYPE;
         return TokenType.IDENTIFIER;
     }
     

@@ -16,15 +16,25 @@ public class BindNodeParse : INodeParser
         source.Advance();
         var identifier = source.CurrentToken;
         source.Advance();
-
+        source.Advance();
+        var dataType = source.CurrentToken;
+        source.Advance();
+        
         if(source.CurrentToken.Type != TokenType.ARROW)
             throw new InvalidOperationException($"Token invalido na linha {source.CurrentToken.Row}, era esperado o inicio de uma expressão. Posição: {source.CurrentToken.Position}.");
 
+        ReaxEnvironment.Symbols.UpdateSymbol(
+            identifier.Source,
+            dataType.Source,
+            true,
+            false,
+            Runtime.Symbols.SymbolCategoty.BIND);
+            
         source.Advance();
         var node = source.NextNode();
         if(node is null)
             throw new InvalidOperationException($"Era esperado o inicio de uma expressão. Posição: {source.CurrentToken.Position}. Linha: {source.CurrentToken.Row}");
-            
+
         return new BindNode(identifier.Source.ToString(), [node], identifier.Location);
     }
 }

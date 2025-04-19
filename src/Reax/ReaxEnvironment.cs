@@ -11,4 +11,5 @@ public static class ReaxEnvironment
     public static string DirectoryRoot { get; set; } = string.Empty;
     public static Dictionary<string, ScriptNode> ImportedFiles { get; set; } = new();
     public static BuiltInRegistry BuiltInRegistry = new();
+    public static SymbolRegistry Symbols = new();
 }

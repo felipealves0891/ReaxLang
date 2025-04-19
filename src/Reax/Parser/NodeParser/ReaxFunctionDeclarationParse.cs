@@ -2,6 +2,7 @@ using System;
 using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
+using Reax.Runtime.Symbols;
 
 namespace Reax.Parser.NodeParser;
 
@@ -18,6 +19,17 @@ public class ReaxFunctionDeclarationParse : INodeParser
         var identifier = source.CurrentToken.ToReaxValue();
         source.Advance();
         var parameters = GetParameters(source).ToArray();
+        source.Advance();
+        var typeReturn = source.CurrentToken;
+
+        ReaxEnvironment.Symbols.UpdateSymbol(
+            identifier.ToString(),
+            typeReturn.Source,
+            false, 
+            false,
+            SymbolCategoty.FUNCTION);
+        
+        source.Advance();
         var block = source.NextBlock();
 
         var node = new FunctionNode(identifier, block, parameters, identifier.Location);
@@ -35,8 +47,22 @@ public class ReaxFunctionDeclarationParse : INodeParser
         while(source.CurrentToken.Type != TokenType.END_PARAMETER) 
         {
             if(source.CurrentToken.Type == TokenType.IDENTIFIER)
-                parameters.Add(source.CurrentToken.ToReaxValue());
-
+            {
+                var value = source.CurrentToken.ToReaxValue();
+                var identifier = source.CurrentToken.Source;
+                source.Advance();    
+                source.Advance();
+                var type = source.CurrentToken.Source;
+                ReaxEnvironment.Symbols.UpdateSymbol(
+                    identifier,
+                    type,
+                    true,
+                    false,
+                    SymbolCategoty.PARAMETER
+                );
+                    
+                parameters.Add(value);
+            }
             source.Advance();
         }
         

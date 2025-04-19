@@ -26,8 +26,9 @@ public class ReaxImportScriptsParse : INodeParser
         if(!ReaxEnvironment.ImportedFiles.ContainsKey(file))
         {
             var interpreter = ReaxCompiler.CompileScript(file, info.FullName);
-            var scriptName = file.Replace(".reax", "").Replace("\\", ".").Replace("/", ".");
-            script = new ScriptNode(scriptName, interpreter, source.CurrentToken.Location);
+            interpreter.Initialize();
+
+            script = new ScriptNode(interpreter.Name, interpreter, source.CurrentToken.Location);
             ReaxEnvironment.ImportedFiles.Add(file, script);      
         }
         else

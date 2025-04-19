@@ -41,13 +41,22 @@ public class ReaxInterpreter
         _parameters = new Dictionary<int, ReaxNode>();
     }
 
-    public bool IsOutput => Output is not null;
     public ReaxNode? Output { get; private set; }
+    public string Name { get; private set; } = "Main";
 
     public void DeclareAndSetFunction(string identifier, Function function) 
     {
         _context.Declare(identifier);
         _context.SetFunction(identifier, function);
+    }
+
+    public void Initialize() 
+    {
+        foreach (var node in _nodes)
+        {
+            if(node is ScriptDeclarationNode scriptDeclaration)
+                Name = scriptDeclaration.Identifier;
+        }
     }
 
     public void Interpret(string identifier, params ReaxNode[] values) 
