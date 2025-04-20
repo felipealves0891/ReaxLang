@@ -4,11 +4,6 @@ namespace Reax.Parser.Node;
 
 public abstract record ReaxNode(SourceLocation Location)
 {
-    public bool AsVar() 
-    {
-        return this is VarNode;
-    }
-
     public ReaxNode GetValue(ReaxExecutionContext context) 
     {
         if(this is NumberNode number)
