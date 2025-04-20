@@ -1,10 +1,18 @@
+using Reax.Parser.Node.Interfaces;
+using Reax.Runtime;
+
 namespace Reax.Parser.Node;
 
 public record ExternalFunctionCallNode(
     string scriptName, 
     FunctionCallNode functionCall, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxResultType
 {
+    public SymbolType GetDataType()
+    {
+        return ((IReaxResultType)functionCall).GetDataType();
+    }
+
     public override string ToString()
     {
         var parameters = functionCall.Parameter.Select(x => x.ToString());

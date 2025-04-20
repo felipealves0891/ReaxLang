@@ -26,10 +26,12 @@ public class ReaxExternalFunctionCallParse : INodeParser
         var parameters = new List<ReaxNode>();
         while(source.CurrentToken.Type != TokenType.END_PARAMETER)
         {
-            if(source.CurrentToken.IsReaxValue())
+            if(source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type == TokenType.START_PARAMETER)
+                parameters.Add(functionCall(source));
+            else if(source.CurrentToken.IsReaxValue())
                 parameters.Add(source.CurrentToken.ToReaxValue());
             else if(source.CurrentToken.Type != TokenType.PARAMETER_SEPARATOR)
-                throw new InvalidOperationException($"Token invalido na linha {source.CurrentToken.Row}.");
+                throw new InvalidOperationException($"Token invalido '{source.CurrentToken}' na linha {source.CurrentToken.Row}.");
 
             source.Advance();
         }
@@ -45,5 +47,12 @@ public class ReaxExternalFunctionCallParse : INodeParser
 
         Logger.LogParse(node.ToString());
         return node;
+    }
+
+    private ReaxNode functionCall(ITokenSource source) 
+    {
+        var location = source.CurrentToken.Location;
+        var parser = new ReaxFunctionCallParse();
+        return parser.Parse(source) ?? throw new InvalidOperationException($"{location} - Era esperado uma função!");
     }
 }

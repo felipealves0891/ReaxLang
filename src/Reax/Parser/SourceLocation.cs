@@ -14,4 +14,9 @@ public struct SourceLocation
     public string File { get;  }
     public int Line { get; }
     public int Position { get; }
+
+    public override string ToString()
+    {
+        return $"{File}({Line})#{Position}";
+    }
 }

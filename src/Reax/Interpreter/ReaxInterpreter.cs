@@ -13,7 +13,8 @@ public class ReaxInterpreter
     private readonly ReaxNode[] _nodes;
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
-    
+    private bool _isInitialized = false;
+
     public ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
         : this(name, nodes, context)
     {
@@ -52,11 +53,28 @@ public class ReaxInterpreter
 
     public void Initialize() 
     {
+        if(_isInitialized)
+            return;
+
         foreach (var node in _nodes)
         {
             if(node is ScriptDeclarationNode scriptDeclaration)
                 Name = scriptDeclaration.Identifier;
+            else if(node is ScriptNode script)
+                ExecuteDeclarationScript(script);
+            else if(node is ModuleNode module)
+                ExecuteDeclarationModule(module);
+            else if(node is BindNode bind)
+                ExecuteDeclareBind(bind);
+            else if (node is DeclarationNode declaration)
+                ExecuteDeclaration(declaration);
+            else if (node is ObservableNode observable)
+                ExecuteDeclarationOn(observable);
+            else if(node is FunctionNode function)
+                ExecuteDeclarationFunction(function);
         }
+
+        _isInitialized = true;
     }
 
     public void Interpret(string identifier, params ReaxNode[] values) 
@@ -76,29 +94,19 @@ public class ReaxInterpreter
     }
 
     public void Interpret() 
-    {   
+    {
         foreach (var node in _nodes)
         {
             StackTrace.Push(node);
 
-            if(node is ScriptNode script)
-                ExecuteDeclarationScript(script);
-            else if(node is ModuleNode module)
-                ExecuteDeclarationModule(module);
-            else if(node is FunctionCallNode functionCall)
+            if(node is FunctionCallNode functionCall)
                 Output = ExecuteFunctionCall(functionCall);
-            else if (node is DeclarationNode declaration)
-                ExecuteDeclaration(declaration);
             else if (node is AssignmentNode assignment)
                 ExecuteAssignment(assignment);
             else if (node is IfNode @if)
                 ExecuteIf(@if);
-            else if (node is ObservableNode observable)
-                ExecuteOn(observable);
             else if(node is CalculateNode calculate)
                 Output = Calculate(calculate);
-            else if(node is FunctionNode function)
-                ExecuteDeclarationFunction(function);
             else if(node is ReturnNode returnNode)
                 Output = ExecuteReturn(returnNode);
             else if(node is ContextNode contextNode)
@@ -109,8 +117,6 @@ public class ReaxInterpreter
                 ExecuteWhile(@while);
             else if(node is ExternalFunctionCallNode scriptFunctionCallNode)
                 Output = ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
-            else if(node is BindNode bind)
-                ExecuteDeclareBind(bind);
 
             StackTrace.Pop();
         }
@@ -216,7 +222,7 @@ public class ReaxInterpreter
         }
     }
 
-    private void ExecuteOn(ObservableNode node) 
+    private void ExecuteDeclarationOn(ObservableNode node) 
     {
         var identifier = node.Var.ToString();
         var contextNode = (ContextNode)node.Block;
@@ -331,6 +337,13 @@ public class ReaxInterpreter
             return text;
         else if(node is VarNode variable)
             return _context.GetVariable(variable.Identifier);
+        else if(node is FunctionCallNode functionCall)
+        {
+            var function = _context.GetFunction(functionCall.Identifier);
+            var parameters = functionCall.Parameter.Select(x => GetValue(x)).ToArray();
+            return function.Invoke(parameters) 
+                ?? throw new InvalidOperationException($"{functionCall.Location} - função {functionCall.Identifier} não retornou um valor");
+        }
         else
             throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
             

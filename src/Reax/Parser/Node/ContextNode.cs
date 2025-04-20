@@ -7,6 +7,8 @@ public record ContextNode(
     ReaxNode[] Block, 
     SourceLocation Location) : ReaxNode(Location), IReaxResultType
 {
+    public ReaxNode[] Context => Block;
+
     public SymbolType GetDataType()
     {
         foreach (var block in Block)

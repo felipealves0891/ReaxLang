@@ -28,6 +28,8 @@ public class ReaxFunctionCallParse : INodeParser
                 parameter.Add(statement);
             else if (statement.Type == TokenType.START_PARAMETER)
                 startParameter = true;
+            else if (statement.Type == TokenType.END_PARAMETER)
+                break;
         }
 
         if(identifier is null)
