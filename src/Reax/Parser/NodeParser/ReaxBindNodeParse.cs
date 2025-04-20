@@ -4,7 +4,7 @@ using Reax.Parser.Node;
 
 namespace Reax.Parser.NodeParser;
 
-public class BindNodeParse : INodeParser
+public class ReaxBindNodeParse : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
