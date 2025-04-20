@@ -163,12 +163,12 @@ public class ReaxInterpreter
 
     public void ExecuteAssignment(AssignmentNode assignment)
     {
-        if(assignment.Assignment is ContextNode node)
+        if(assignment.Assigned is ContextNode node)
             _context.SetVariable(assignment.Identifier, ExecuteContextAndReturnValue(node));
-        else if (assignment.Assignment is VarNode variable)
+        else if (assignment.Assigned is VarNode variable)
             _context.SetVariable(assignment.Identifier, _context.GetVariable(variable.Identifier));
         else
-            _context.SetVariable(assignment.Identifier, assignment.Assignment);
+            _context.SetVariable(assignment.Identifier, assignment.Assigned);
     }
 
     public ReaxNode Calculate(CalculateNode node)

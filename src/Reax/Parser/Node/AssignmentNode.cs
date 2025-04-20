@@ -2,11 +2,11 @@ namespace Reax.Parser.Node;
 
 public record AssignmentNode(
     string Identifier, 
-    ReaxNode Assignment, 
+    ReaxNode Assigned, 
     SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
-        return $"{Identifier} = {Assignment};";
+        return $"{Identifier} = {Assigned};";
     }
 }
