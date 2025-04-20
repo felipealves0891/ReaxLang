@@ -2,7 +2,4 @@ using Reax.Runtime;
 
 namespace Reax.Parser.Node.Interfaces;
 
-public interface IReaxValue
-{
-    SymbolType GetDataType();
-}
+public interface IReaxValue : IReaxResultType; 
