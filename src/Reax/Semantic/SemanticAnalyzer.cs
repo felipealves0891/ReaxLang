@@ -9,14 +9,14 @@ namespace Reax.Semantic;
 
 public class SemanticAnalyzer
 {
-    private ReaxScope _symbols;
+    private IReaxScope _symbols;
 
     public SemanticAnalyzer()
     {
         _symbols = new ReaxScope();
     }
 
-    public void Analyze(ReaxNode[] nodes, ReaxScope? parent = null, IReaxContext? context = null) 
+    public void Analyze(ReaxNode[] nodes, IReaxScope? parent = null, IReaxContext? context = null) 
     {
         if(parent is not null)
             _symbols = new ReaxScope(parent);
@@ -36,21 +36,11 @@ public class SemanticAnalyzer
             if(node is IReaxMultipleDeclaration moduleDeclaration)
                 _symbols.Declaration(moduleDeclaration);
 
-            if(node is AssignmentNode assignment)
-                ValidateAssignment(assignment);
-
             if(node is IReaxContext reaxContext)
                 Analyze(reaxContext.Context, _symbols, reaxContext);
         }    
 
-        _symbols = _symbols.GetParent();
-    }
-
-    private void ValidateAssignment(AssignmentNode assignment) 
-    {
-        var symbol = _symbols.Get(assignment.Identifier);
-
-        
-
+        if(_symbols.IsChild())
+            _symbols = _symbols.GetParent();
     }
 }

@@ -5,7 +5,7 @@ using Reax.Semantic.Symbols;
 
 namespace Reax.Semantic.Scopes;
 
-public class ReaxScope
+public class ReaxScope : IReaxScope
 {
     private readonly static Dictionary<Guid, Dictionary<string, Symbol>> _symbols 
         = new Dictionary<Guid, Dictionary<string, Symbol>>();
@@ -14,23 +14,24 @@ public class ReaxScope
 
     private readonly Guid _scopeId = Guid.NewGuid();
     private readonly Dictionary<string, Symbol> _internal = new Dictionary<string, Symbol>();
-    private readonly ReaxScope? _parent;
-    private readonly List<ReaxScope> _children = new List<ReaxScope>();
+    private readonly IReaxScope? _parent;
 
     public ReaxScope()
     {
         _symbols[_scopeId] = _internal;
     }
 
-    public ReaxScope(ReaxScope parent)
+    public ReaxScope(IReaxScope parent)
         : this()
     {
         _parent = parent;
-        _parent._children.Add(this);
     }
 
     public Guid Id => _scopeId;
-    public ReaxScope GetParent() => _parent 
+
+    public bool IsChild() => _parent is not null;
+
+    public IReaxScope GetParent() => _parent 
         ?? throw new InvalidOperationException("Não é possivel recuperar o parent do escopo main!");
 
     public bool Exists(string identifier)
