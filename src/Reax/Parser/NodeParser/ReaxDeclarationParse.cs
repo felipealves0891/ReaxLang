@@ -50,18 +50,19 @@ public class ReaxDeclarationParse : INodeParser
         if(dataType is null)
             throw new InvalidOperationException("Era esperado o tipo da variavel!");
 
+        var type = new DataTypeNode(dataType.Value.Source, dataType.Value.Location);
         var textIdentifier = identifier.Value.Source;
         ReaxNode node;
         if(values.Count == 1)
-            node = new DeclarationNode(textIdentifier, immutable, isAsync, values.First().ToReaxValue(), identifier.Value.Location);
+            node = new DeclarationNode(textIdentifier, immutable, isAsync, type, values.First().ToReaxValue(), identifier.Value.Location);
         else if(values.Any())
         {
             var parser = new ReaxParser(values);
             var context = new ContextNode(parser.Parse().ToArray(), identifier.Value.Location);
-            node = new DeclarationNode(textIdentifier, immutable, isAsync, context, identifier.Value.Location);
+            node = new DeclarationNode(textIdentifier, immutable, isAsync, type, context, identifier.Value.Location);
         }
         else 
-            node = new DeclarationNode(textIdentifier, immutable,  isAsync, null, identifier.Value.Location);
+            node = new DeclarationNode(textIdentifier, immutable,  isAsync, type, null, identifier.Value.Location);
 
         Logger.LogParse(node.ToString());
         return node;

@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 
@@ -28,6 +29,13 @@ public class ReaxBindNodeParse : INodeParser
         if(node is null)
             throw new InvalidOperationException($"Era esperado o inicio de uma expressão. Posição: {source.CurrentToken.Position}. Linha: {source.CurrentToken.Row}");
 
-        return new BindNode(identifier.Source.ToString(), new ContextNode([node], identifier.Location), identifier.Location);
+        var bind = new BindNode(
+            identifier.Source.ToString(), 
+            new ContextNode([node], identifier.Location), 
+            new DataTypeNode(dataType.Source, dataType.Location), 
+            identifier.Location);
+            
+        Logger.LogParse(bind.ToString());
+        return bind;
     }
 }

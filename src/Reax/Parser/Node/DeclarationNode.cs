@@ -6,6 +6,7 @@ public record DeclarationNode(
     string Identifier, 
     bool Immutable, 
     bool Async, 
+    DataTypeNode DataType,
     ReaxNode? Assignment, 
     SourceLocation Location) : ReaxNode(Location)
 {
@@ -14,8 +15,8 @@ public record DeclarationNode(
         var asc = Async ? "async " : "";
         var mut = Immutable ? "const" : "let";
         if(Assignment is not null)
-            return $"{asc}{mut} {Identifier} = {Assignment};";
+            return $"{asc}{mut} {Identifier}: {DataType} = {Assignment};";
         else 
-            return $"{asc}{mut} {Identifier};";
+            return $"{asc}{mut} {Identifier}: {DataType};";
     }
 }

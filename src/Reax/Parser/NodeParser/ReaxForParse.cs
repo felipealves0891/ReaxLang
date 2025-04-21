@@ -17,12 +17,22 @@ public class ReaxForParse : INodeParser
         source.Advance();
         var identifierControl = source.CurrentToken;
         source.Advance();
+        source.Advance();
+        var dataType = source.CurrentToken;
+        source.Advance();
         if(source.CurrentToken.Type != TokenType.ASSIGNMENT)
             throw new InvalidOperationException("Era esperado uma atribuição!");
         source.Advance();
         var initialValue = source.CurrentToken;
         source.Advance();
-        var declaration = new DeclarationNode(identifierControl.Source, false, false, initialValue.ToReaxValue(), identifierControl.Location);
+        var declaration = new DeclarationNode(
+            identifierControl.Source, 
+            false, 
+            false, 
+            new DataTypeNode(dataType.Source, dataType.Location), 
+            initialValue.ToReaxValue(), 
+            identifierControl.Location);
+            
         if(source.CurrentToken.Type != TokenType.TO)
             throw new InvalidOperationException("Era esperado uma expresão 'TO'!");
         source.Advance();
