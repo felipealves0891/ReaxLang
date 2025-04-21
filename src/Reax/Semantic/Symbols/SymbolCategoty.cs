@@ -1,6 +1,6 @@
 using System;
 
-namespace Reax.Runtime.Symbols;
+namespace Reax.Semantic.Symbols;
 
 public enum SymbolCategoty
 {

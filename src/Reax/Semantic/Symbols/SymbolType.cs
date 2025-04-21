@@ -1,4 +1,4 @@
-namespace Reax.Runtime;
+namespace Reax.Semantic.Symbols;
 
 public enum SymbolType
 {
