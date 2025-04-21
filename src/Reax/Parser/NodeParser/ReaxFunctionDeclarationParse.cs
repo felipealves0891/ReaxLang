@@ -28,9 +28,9 @@ public class ReaxFunctionDeclarationParse : INodeParser
         return node;
     }
     
-    private IEnumerable<ReaxNode> GetParameters(ITokenSource source) 
+    private IEnumerable<VarNode> GetParameters(ITokenSource source) 
     {
-        var parameters = new List<ReaxNode>();
+        var parameters = new List<VarNode>();
         if(source.CurrentToken.Type != TokenType.START_PARAMETER)
             return parameters;
 
@@ -43,7 +43,7 @@ public class ReaxFunctionDeclarationParse : INodeParser
                 source.Advance();    
                 source.Advance();
                 var type = source.CurrentToken;
-                parameters.Add(value.ToReaxValue(type));
+                parameters.Add((VarNode)value.ToReaxValue(type));
             }
             
             source.Advance();

@@ -9,30 +9,31 @@ namespace Reax.Semantic;
 
 public class SemanticAnalyzer
 {
-    private readonly ReaxScope _symbols;
+    private ReaxScope? _symbols;
 
-    public SemanticAnalyzer()
+    public void Analyze(ReaxNode[] nodes, ReaxScope? parent = null, IReaxContext? context = null) 
     {
-        _symbols = new ReaxScope();
-    }
+        _symbols = parent is null ? new ReaxScope() : new ReaxScope(parent);
+        
+        if(context is not null)
+        {
+            var parameters = context.GetParameters(_symbols.Id);
+            foreach (var parameter in parameters)
+                _symbols.Declaration(parameter);
+        }   
 
-    public SemanticAnalyzer(ReaxScope parent)
-    {
-        _symbols = new ReaxScope(parent);
-    }
-
-    public void Analyze(ReaxNode[] nodes) 
-    {
         foreach (var node in nodes)
         {
             if(node is IReaxDeclaration declaration)
                 _symbols.Declaration(declaration);
 
-            if(node is IReaxModuleDeclaration moduleDeclaration)
+            if(node is IReaxMultipleDeclaration moduleDeclaration)
                 _symbols.Declaration(moduleDeclaration);
 
-            if(node is IReaxContext context)
-                Analyze(context.Context);
+            if(node is IReaxContext reaxContext)
+                Analyze(reaxContext.Context, _symbols, reaxContext);
         }    
+
+        _symbols = _symbols.GetParent();
     }
 }

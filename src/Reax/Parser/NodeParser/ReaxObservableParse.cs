@@ -16,7 +16,7 @@ public class ReaxObservableParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         source.Advance();
-        var variable = source.CurrentToken.ToReaxValue();
+        var variable = (VarNode)source.CurrentToken.ToReaxValue();
         source.Advance();
         
         BinaryNode? condition = null;

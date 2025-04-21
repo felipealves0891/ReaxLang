@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Reax.Parser.Node;
 using Reax.Semantic.Interfaces;
 using Reax.Semantic.Symbols;
 
@@ -29,8 +30,7 @@ public class ReaxScope
     }
 
     public Guid Id => _scopeId;
-    
-    
+    public ReaxScope? GetParent() => _parent;
 
     public bool Exists(string identifier)
     {
@@ -42,6 +42,13 @@ public class ReaxScope
         else
             return _parent.Exists(identifier);
     }
+    public void Declaration(Symbol symbol)
+    {
+        if(Exists(symbol.Identifier))
+            throw new InvalidOperationException($"O simbulo {symbol.Identifier} já foi declarado!");
+        
+        _internal[symbol.Identifier] = symbol;
+    }
 
     public void Declaration(IReaxDeclaration declaration)
     {
@@ -52,7 +59,7 @@ public class ReaxScope
         _internal[symbol.Identifier] = symbol;
     }
 
-    public void Declaration(IReaxModuleDeclaration declaration)
+    public void Declaration(IReaxMultipleDeclaration declaration)
     {
         foreach (var symbol in declaration.GetSymbols(_scopeId))
         {

@@ -3,7 +3,7 @@ using Reax.Semantic.Symbols;
 
 namespace Reax.Semantic.Interfaces;
 
-public interface IReaxModuleDeclaration : IReaxDeclaration
+public interface IReaxMultipleDeclaration : IReaxDeclaration
 {
     Symbol[] GetSymbols(Guid scope);
 }

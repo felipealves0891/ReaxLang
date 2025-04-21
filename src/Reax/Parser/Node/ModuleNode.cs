@@ -5,7 +5,7 @@ using Reax.Semantic.Symbols;
 namespace Reax.Parser.Node;
 
 public record ModuleNode(string identifier, Dictionary<string, Function> functions, 
-    SourceLocation Location) : ReaxNode(Location), IReaxModuleDeclaration
+    SourceLocation Location) : ReaxNode(Location), IReaxMultipleDeclaration
 {
     public Symbol GetSymbol(Guid scope)
     {
