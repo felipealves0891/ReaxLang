@@ -30,7 +30,8 @@ public class ReaxScope
     }
 
     public Guid Id => _scopeId;
-    public ReaxScope? GetParent() => _parent;
+    public ReaxScope GetParent() => _parent 
+        ?? throw new InvalidOperationException("Não é possivel recuperar o parent do escopo main!");
 
     public bool Exists(string identifier)
     {
