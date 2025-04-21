@@ -5,38 +5,17 @@ namespace Reax.Debugger;
 
 public static class Printer
 {
-    public static void PrintTable<TKey, TData>(this IReadOnlyDictionary<TKey, TData> dic, IDictionary<string, int>? propLength = null) 
-        where TKey : notnull
+    public static void PrintTable<TData>(this IEnumerable<TData> values, IDictionary<string, int>? propLength = null)
     {
-        if(propLength is null) 
-        {
-            propLength ??= dic.MaxLengthForColumn();
-            propLength["_Key"] = dic.Keys.Select(x => x.ToString()).Select(x => x is null ? 0 : x.Length + 1).Max(); 
-        }
-        
-        var first = dic.First().Value;
-        var columns = typeof(TData)
-                        .GetProperties()
-                        .Select(x => x.Name)
-                        .Reverse()
-                        .ToList();
-
-        columns.Add("_Key");
-        columns.Reverse();
+        propLength ??= values.MaxLengthForColumn();
+        var columns = typeof(TData).GetPropertyNames();
 
         Console.WriteLine();
-        foreach (var key in dic.Keys)
+        foreach (var item in values)
         {
-            var item = dic[key];
             foreach (var column in columns)
             {
                 var columnLength = propLength[column];
-                if(column == "_Key")
-                {
-                    key.ToString()?.PrintColumn(columnLength);
-                    continue;
-                }
-
                 typeof(TData).GetProperty(column)?.Print(columnLength, item);
                 
             }
@@ -45,15 +24,10 @@ public static class Printer
         }
     }
 
-    public static IDictionary<string, int> PrintTableHeader<TKey, TData>(this IReadOnlyDictionary<TKey, TData> dic)
-        where TKey : notnull
+    public static IDictionary<string, int> PrintTableHeader<TData>(this IEnumerable<TData> list)
     {
-        var propLength = dic.MaxLengthForColumn();
-        var columns = typeof(TData).GetPropertyNames().Reverse().ToList();
-
-        propLength["_Key"]  = dic.Keys.Select(x => x.ToString()).Select(x => x is null ? 0 : x.Length +1).Max(); 
-        columns.Add("_Key");
-        columns.Reverse();
+        var propLength = list.MaxLengthForColumn();
+        var columns = typeof(TData).GetPropertyNames();
 
         for (int i = 0; i < columns.Count; i++)
             "|".PrintColumn(propLength[columns[i]], '-', false);
@@ -70,29 +44,16 @@ public static class Printer
         
     }
 
-    private static IList<string> GetPropertyNames(this Type type) 
-    {
-        return type
-                .GetProperties()
-                .Select(x => x.Name)
-                .ToList();
-    }
-
-    private static IDictionary<string, int> MaxLengthForColumn<TKey, TData>(this IReadOnlyDictionary<TKey, TData> dic)
-        where TKey : notnull
+    private static IDictionary<string, int> MaxLengthForColumn<TData>(this IEnumerable<TData> values)
     { 
-        var list = typeof(TData)
-                        .GetProperties()
-                        .Select(x => x.Name)
-                        .ToList();
+        var list = typeof(TData).GetPropertyNames();
 
         var props = new Dictionary<string, int>();
         foreach (var item in list)
             props[item] = 5;
 
-        foreach (var key in dic.Keys)
+        foreach (var value in values)
         {
-            var value = dic[key];
             foreach (var propKey in props.Keys)
             {
                 int length = props[propKey];
@@ -141,6 +102,14 @@ public static class Printer
             length--;
         }
         Console.Write(value.PadRight(length, fillment));
+    }
+    
+    private static IList<string> GetPropertyNames(this Type type) 
+    {
+        return type
+                .GetProperties()
+                .Select(x => x.Name)
+                .ToList();
     }
 
     

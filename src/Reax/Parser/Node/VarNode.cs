@@ -5,6 +5,7 @@ namespace Reax.Parser.Node;
 
 public record VarNode(
     string Identifier, 
+    DataTypeNode DataType,
     SourceLocation Location) : ReaxNode(Location), IReaxValue
 {
     public override string ToString()

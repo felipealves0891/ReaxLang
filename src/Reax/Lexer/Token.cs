@@ -79,17 +79,31 @@ public static class TokenExtensions
         };
     }
 
-    public static ReaxNode ToReaxValue(this Token token) 
+    public static ReaxNode ToReaxValue(this Token token, Token? type = null) 
     {
         return token.Type switch 
         {
-            TokenType.IDENTIFIER => new VarNode(token.Source, token.Location),
+            TokenType.IDENTIFIER => CreateVar(token, type),
             TokenType.STRING_LITERAL => new StringNode(token.Source, token.Location),
             TokenType.NUMBER_LITERAL => new NumberNode(token.Source, token.Location),
             TokenType.FALSE => new BooleanNode(token.Source, token.Location),
             TokenType.TRUE => new BooleanNode(token.Source, token.Location),
             _ => throw new InvalidOperationException($"Não é possivel converter {token.Type} em valor!")
         };
+    }
+
+    private static ReaxNode CreateVar(Token token, Token? type = null) 
+    {
+        DataTypeNode dataType;
+        if(type is null)
+            dataType = new DataTypeNode("NONE", token.Location);
+        else
+            dataType = new DataTypeNode(type.Value.Source, type.Value.Location);
+
+        return new VarNode(
+            token.Source, 
+            dataType, 
+            token.Location);
     }
 
     public static ReaxNode ToLogicOperator(this Token token) 

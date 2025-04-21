@@ -23,6 +23,28 @@ public struct Symbol
         ScopeId = scopeId;
     }
 
+    public Symbol(
+        string identifier, 
+        string type, 
+        SymbolCategoty categoty, 
+        Guid scopeId,
+        bool? observable = null, 
+        bool? immutable = null, 
+        bool? async = null) : this()
+    {
+        Id = Guid.NewGuid();
+        Identifier = identifier;
+        Categoty = categoty;
+        Observable = observable;
+        Immutable = immutable;
+        Async = async;
+        ScopeId = scopeId;
+        Type = Enum.TryParse<SymbolType>(type, true, out var result) 
+             ? result 
+             : throw new InvalidDataException($"Tipo {type} não localizado!");
+             
+    }
+
     public Guid Id { get; private set; }
 
     public string Identifier { get; private set; }

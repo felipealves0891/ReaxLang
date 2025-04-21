@@ -39,13 +39,13 @@ public class ReaxFunctionDeclarationParse : INodeParser
         {
             if(source.CurrentToken.Type == TokenType.IDENTIFIER)
             {
-                var value = source.CurrentToken.ToReaxValue();
-                var identifier = source.CurrentToken.Source;
+                var value = source.CurrentToken;
                 source.Advance();    
                 source.Advance();
-                var type = source.CurrentToken.Source;
-                parameters.Add(value);
+                var type = source.CurrentToken;
+                parameters.Add(value.ToReaxValue(type));
             }
+            
             source.Advance();
         }
         
