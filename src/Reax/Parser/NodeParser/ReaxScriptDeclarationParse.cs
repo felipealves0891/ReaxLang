@@ -19,11 +19,6 @@ public class ReaxScriptDeclarationParse : INodeParser
         source.Advance();
         var identifier = source.CurrentToken;
         source.Advance();
-
-        ReaxEnvironment.Symbols.UpdateSymbol(
-            identifier.Source,
-            Runtime.Symbols.SymbolCategoty.SCRIPT);
-            
         source.Advance();
 
         var node = new ScriptDeclarationNode(identifier.Source, location);

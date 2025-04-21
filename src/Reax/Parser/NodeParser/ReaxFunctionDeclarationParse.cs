@@ -21,14 +21,6 @@ public class ReaxFunctionDeclarationParse : INodeParser
         var parameters = GetParameters(source).ToArray();
         source.Advance();
         var typeReturn = source.CurrentToken;
-
-        ReaxEnvironment.Symbols.UpdateSymbol(
-            identifier.ToString(),
-            typeReturn.Source,
-            false, 
-            false,
-            SymbolCategoty.FUNCTION);
-        
         source.Advance();
         var block = source.NextBlock();
 
@@ -53,14 +45,6 @@ public class ReaxFunctionDeclarationParse : INodeParser
                 source.Advance();    
                 source.Advance();
                 var type = source.CurrentToken.Source;
-                ReaxEnvironment.Symbols.UpdateSymbol(
-                    identifier,
-                    type,
-                    true,
-                    false,
-                    SymbolCategoty.PARAMETER
-                );
-                    
                 parameters.Add(value);
             }
             source.Advance();

@@ -8,9 +8,7 @@ var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
 
 try
 {
-    interpreter.Interpret();    
-    var columns = ReaxEnvironment.Symbols.Registry.PrintTableHeader();
-    ReaxEnvironment.Symbols.Registry.PrintTable(columns);
+    interpreter.Interpret();
 }
 catch (System.Exception ex)
 {

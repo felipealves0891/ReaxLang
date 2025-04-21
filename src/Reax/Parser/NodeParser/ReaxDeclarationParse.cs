@@ -65,13 +65,6 @@ public class ReaxDeclarationParse : INodeParser
         else 
             node = new DeclarationNode(textIdentifier, immutable,  isAsync, null, identifier.Value.Location);
 
-        ReaxEnvironment.Symbols.UpdateSymbol(
-            textIdentifier, 
-            dataType.Value.Source, 
-            immutable, 
-            isAsync,
-            immutable ? SymbolCategoty.CONST : SymbolCategoty.LET);
-            
         Logger.LogParse(node.ToString());
         return node;
     }

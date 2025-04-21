@@ -24,21 +24,8 @@ public class ReaxImportModuleParse : INodeParser
         if(source.CurrentToken.Type != TokenType.END_STATEMENT)
             throw new InvalidOperationException("Era esperado o encerramento da expressão!");
 
-        ReaxEnvironment.Symbols.UpdateSymbol(
-            identifier.Source,
-            Runtime.Symbols.SymbolCategoty.MODULE);
-
         source.Advance();
-        var functions = ReaxEnvironment.BuiltInRegistry.Get(identifier.Source);
-
-        foreach (var key in functions.Keys)
-        {
-            if(ReaxEnvironment.Symbols.Exists(key))
-                ReaxEnvironment.Symbols.UpdateSymbol(key, SymbolCategoty.FUNCTION);
-            else
-                ReaxEnvironment.Symbols.Set(key, new Symbol(SymbolCategoty.FUNCTION));
-        }
-        
+        var functions = ReaxEnvironment.BuiltInRegistry.Get(identifier.Source);        
         var node = new ModuleNode(identifier.Source, functions, identifier.Location);
         Logger.LogParse(node.ToString());
         return node;

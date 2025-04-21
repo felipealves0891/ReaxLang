@@ -107,9 +107,6 @@ public class ReaxLexer
         var identifier = _source.GetString(start,_source.Position);
         var type = Keywords.IsKeyword(identifier);
         var token = new Token(type, identifier, _source.FileName, start, _numberOfRows);
-        if (type == TokenType.IDENTIFIER)
-            ReaxEnvironment.Symbols[token.Source] = new Symbol();
-            
         Logger.LogLexer(token.ToString());        
         return token;
     }
