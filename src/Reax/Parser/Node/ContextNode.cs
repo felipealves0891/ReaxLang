@@ -5,10 +5,8 @@ namespace Reax.Parser.Node;
 
 public record ContextNode(
     ReaxNode[] Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Nodes => Block;
-
     public override string ToString()
     {
         return "{...}";

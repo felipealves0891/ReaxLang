@@ -2,4 +2,4 @@ using Reax.Runtime;
 
 namespace Reax.Parser.Node.Interfaces;
 
-public interface IReaxValue : IReaxResultType; 
+public interface IReaxValue;

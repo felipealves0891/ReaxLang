@@ -7,21 +7,8 @@ public record DeclarationNode(
     bool Immutable, 
     bool Async, 
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Nodes
-    {
-        get
-        {
-            if(Assignment is IReaxContext context)
-                return context.Nodes;
-            else if (Assignment is not null)
-                return [Assignment];
-            else
-                return [];
-        }
-    }
-
     public override string ToString()
     {
         var asc = Async ? "async " : "";

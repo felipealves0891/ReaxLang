@@ -7,10 +7,8 @@ public record BinaryNode(
     ReaxNode Left, 
     ReaxNode Operator, 
     ReaxNode Right, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResultType
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public SymbolType GetDataType() => SymbolType.BOOLEAN;
-
     public override string ToString()
     {
         return $"{Left} {Operator} {Right}";

@@ -8,11 +8,6 @@ public record BooleanNode(string Value,
 {
     public bool ValueConverted => bool.Parse(Value);
 
-    public SymbolType GetDataType()
-    {
-        return SymbolType.BOOLEAN;
-    }
-
     public override string ToString()
     {
         return $"{Value}";

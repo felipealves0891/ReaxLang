@@ -6,19 +6,8 @@ public record ForNode(
     ReaxNode declaration, 
     ReaxNode condition, 
     ReaxNode Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Nodes
-    {
-        get
-        {
-            if(Block is IReaxContext context)
-                return context.Nodes;
-            else
-                return [Block];
-        }
-    }
-
     public override string ToString()
     {
         return $"for {declaration} to {condition} {{}}";
