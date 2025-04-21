@@ -8,8 +8,21 @@ public record DeclarationNode(
     bool Async, 
     DataTypeNode DataType,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
+    public ReaxNode[] Branchs 
+    {
+        get
+        {
+            if(Assignment is IReaxContext context)
+                return context.Branchs;
+            else if(Assignment is not null)
+                return [Assignment];
+            else
+                return [];
+        }
+    }
+
     public override string ToString()
     {
         var asc = Async ? "async " : "";

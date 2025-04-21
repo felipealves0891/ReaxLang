@@ -227,7 +227,7 @@ public class ReaxInterpreter
     private void ExecuteDeclarationOn(ObservableNode node) 
     {
         var identifier = node.Var.ToString();
-        var contextNode = (ContextNode)node.Block;
+        var contextNode = (ContextNode)node.Context;
         var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
         _context.SetObservable(identifier, interpreter, node.Condition);
     }
@@ -257,7 +257,7 @@ public class ReaxInterpreter
 
     private void ExecuteDeclarationFunction(FunctionNode node) 
     {
-        var block = (ContextNode)node.Block;
+        var block = (ContextNode)node.Context;
         var identifier = node.Identifier.ToString();
         var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context, node.Parameters);
         _context.Declare(identifier);
@@ -266,9 +266,9 @@ public class ReaxInterpreter
 
     private void ExecuteFor(ForNode node) 
     {
-        var declaration = (DeclarationNode)node.declaration;
-        var condition = (BinaryNode)node.condition;
-        var block = (ContextNode)node.Block;
+        var declaration = (DeclarationNode)node.Declaration;
+        var condition = (BinaryNode)node.Condition;
+        var block = (ContextNode)node.Context;
 
         ExecuteDeclaration(declaration);
         while(ExecuteBinary(condition))

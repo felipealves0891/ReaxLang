@@ -46,7 +46,7 @@ public class ReaxForParse : INodeParser
         
         source.Advance();
 
-        var block = source.NextBlock();
+        var block = (ContextNode)source.NextBlock();
 
         var node = new ForNode(declaration, condition, block, declaration.Location);
         Logger.LogParse(node.ToString());

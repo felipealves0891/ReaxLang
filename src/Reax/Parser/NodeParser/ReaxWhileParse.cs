@@ -20,7 +20,7 @@ public class ReaxWhileParse : INodeParser
         var helper = new ComparisonHelper(statement);
         var condition = helper.Parse();
 
-        var block = source.NextBlock();
+        var block = (ContextNode)source.NextBlock();
 
         var node = new WhileNode(condition, block, condition.Location);
         Logger.LogParse(node.ToString());

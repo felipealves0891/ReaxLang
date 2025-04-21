@@ -4,11 +4,13 @@ namespace Reax.Parser.Node;
 
 public record FunctionNode(
     ReaxNode Identifier, 
-    ReaxNode Block, 
+    ContextNode Context, 
     ReaxNode[] Parameters, 
     DataTypeNode DataType,
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
+    public ReaxNode[] Branchs => Context.Branchs;
+
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));

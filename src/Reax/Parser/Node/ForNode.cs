@@ -3,13 +3,15 @@ using Reax.Parser.Node.Interfaces;
 namespace Reax.Parser.Node;
 
 public record ForNode(
-    ReaxNode declaration, 
-    ReaxNode condition, 
-    ReaxNode Block, 
-    SourceLocation Location) : ReaxNode(Location)
+    ReaxNode Declaration, 
+    ReaxNode Condition, 
+    ContextNode Context, 
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
+    public ReaxNode[] Branchs => Context.Branchs;
+
     public override string ToString()
     {
-        return $"for {declaration} to {condition} {{}}";
+        return $"for {Declaration} to {Condition} {{...}}";
     }
 }

@@ -21,7 +21,7 @@ public class ReaxFunctionDeclarationParse : INodeParser
         source.Advance();
         var typeReturn = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
         source.Advance();
-        var block = source.NextBlock();
+        var block = (ContextNode)source.NextBlock();
 
         var node = new FunctionNode(identifier, block, parameters, typeReturn, identifier.Location);
         Logger.LogParse(node.ToString());

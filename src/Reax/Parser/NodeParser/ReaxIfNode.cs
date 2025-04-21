@@ -19,13 +19,13 @@ public class ReaxIfNodeParse : INodeParser
         var statement = source.NextStatement();
         var comparisonHelper = new ComparisonHelper(statement);
         var condition = comparisonHelper.Parse();
-        var @true = source.NextBlock();
-        ReaxNode? @else = null;
+        var @true = (ContextNode)source.NextBlock();
+        ContextNode? @else = null;
 
         if(source.CurrentToken.Type == TokenType.ELSE)
         {
             source.Advance();
-            @else = source.NextBlock();
+            @else = source.NextBlock() as ContextNode;
         }
 
         var node = new IfNode(condition, @true, @else, condition.Location);

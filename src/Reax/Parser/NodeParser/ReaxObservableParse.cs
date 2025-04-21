@@ -31,7 +31,7 @@ public class ReaxObservableParse : INodeParser
 
         if(source.CurrentToken.Type == TokenType.START_BLOCK)
         {
-            var node = new ObservableNode(variable, source.NextBlock(), condition, source.CurrentToken.Location);
+            var node = new ObservableNode(variable, (ContextNode)source.NextBlock(), condition, source.CurrentToken.Location);
             Logger.LogParse(node.ToString());
             return node;
         }
