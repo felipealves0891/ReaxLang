@@ -18,7 +18,7 @@ public class ReaxDeclarationParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         Token? identifier = null;
-        Token? value = null;
+        List<Token> values = new List<Token>();
         Token? dataType = null;
         
         var isAsync = source.CurrentToken.Type == TokenType.ASYNC;
@@ -26,6 +26,8 @@ public class ReaxDeclarationParse : INodeParser
 
         var immutable = source.CurrentToken.Type == TokenType.CONST;
         var isTyping = false;
+
+        var isAssignment = false;
 
         foreach (var statement in source.NextStatement())
         {
@@ -35,11 +37,13 @@ public class ReaxDeclarationParse : INodeParser
                 isTyping = true;
             else if(isTyping && !dataType.HasValue)
                 dataType = statement;    
-            else if (statement.IsReaxValue())
-                value = statement;
+            else if (statement.Type == TokenType.ASSIGNMENT)
+                isAssignment = true;
+            else if(isAssignment)
+                values.Add(statement);
         }
 
-        if(immutable && value is null)
+        if(immutable && !values.Any())
             throw new InvalidOperationException("A constante deve ser definida na declaração!");
 
         if(identifier is null)
@@ -50,8 +54,14 @@ public class ReaxDeclarationParse : INodeParser
 
         var textIdentifier = identifier.Value.Source;
         ReaxNode node;
-        if(value is not null)
-            node = new DeclarationNode(textIdentifier, immutable, isAsync, value.Value.ToReaxValue(), identifier.Value.Location);
+        if(values.Count == 1)
+            node = new DeclarationNode(textIdentifier, immutable, isAsync, values.First().ToReaxValue(), identifier.Value.Location);
+        else if(values.Any())
+        {
+            var parser = new ReaxParser(values);
+            var context = new ContextNode(parser.Parse().ToArray(), identifier.Value.Location);
+            node = new DeclarationNode(textIdentifier, immutable, isAsync, context, identifier.Value.Location);
+        }
         else 
             node = new DeclarationNode(textIdentifier, immutable,  isAsync, null, identifier.Value.Location);
 

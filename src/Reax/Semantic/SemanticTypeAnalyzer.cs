@@ -13,21 +13,26 @@ public class SemanticTypeAnalyzer
         foreach (var node in nodes)
         {
             if(node is DeclarationNode declaration)
-            {
-                if(declaration.Assignment is AssignmentNode assignment)
-                    TypeAnalyzer([assignment]);
-                else if(declaration.Assignment is IReaxResultType value)
-                    ValidateValueType(declaration.Identifier, value, declaration.Location);
-                else if(declaration.Assignment is null)
-                    continue;
-                else
-                    throw new InvalidOperationException($"{declaration.Location} - Declaração sem atribuição!");
-            }
+                ValidateDeclarationType(declaration);
             else if(node is AssignmentNode assignment)
-            {
                 ValidateAssignmentType(assignment);
-            }
+            else if(node is FunctionNode function)
+                ValidateDeclarationFunctionType(function);
+            else if(node is IReaxContext context)
+                TypeAnalyzer(context.Nodes);
         }
+    }
+
+    public void ValidateDeclarationType(DeclarationNode declaration) 
+    {
+        if(declaration.Assignment is AssignmentNode assignment)
+            TypeAnalyzer([assignment]);
+        else if(declaration.Assignment is IReaxResultType value)
+            ValidateValueType(declaration.Identifier, value, declaration.Location);
+        else if(declaration.Assignment is null)
+            return;
+        else
+            throw new InvalidOperationException($"{declaration.Location} - Declaração sem atribuição!");        
     }
     
     public void ValidateAssignmentType(AssignmentNode assignment)
@@ -40,11 +45,25 @@ public class SemanticTypeAnalyzer
             if(!resultType.GetDataType().IsCompatible(symbol.Type))    
                 throw new InvalidOperationException($"{assignment.Location.File}({assignment.Location.Line}) Atribuição de tipo invalido: Esperado {symbol.Type}, mas passado {resultType.GetDataType()}!");
         }
+        else if(assignment.Assigned is IReaxContext context)
+        {
+            var type = GeReturnOfContext(context);
+            if(!type.IsCompatible(symbol.Type))    
+                throw new InvalidOperationException($"{assignment.Location.File}({assignment.Location.Line}) Atribuição de tipo invalido: Esperado {symbol.Type}, mas passado {type}!");
+        }
         else
         {
-            throw new InvalidOperationException($"{assignment.Location.File}({assignment.Location.Line}) Atribuição de tipo invalido: Esperado {symbol.Type}, mas passado não returna um tipo!");
+            throw new InvalidOperationException($"{assignment.Location.File}({assignment.Location.Line}) Atribuição de tipo invalido: Esperado {symbol.Type}, mas valor passado não returna um tipo: {assignment.Assigned.GetType().Name}");
         }
+    }
 
+    public void ValidateDeclarationFunctionType(FunctionNode function)
+    {
+        var identifier = function.Identifier.ToString();
+        var symbol = ReaxEnvironment.Symbols[identifier];
+        var resultType = GeReturnOfContext((IReaxContext)function.Block);
+        if(!resultType.IsCompatible(symbol.Type))    
+            throw new InvalidOperationException($"{function.Location} função {identifier} deve retornar um tipo {symbol.Type}, mas retorna {resultType}!");
     }
 
     public void ValidateValueType(string identifier, IReaxResultType value, SourceLocation location)
@@ -52,6 +71,19 @@ public class SemanticTypeAnalyzer
         var symbol = ReaxEnvironment.Symbols[identifier];
         if(!value.GetDataType().IsCompatible(symbol.Type))    
                 throw new InvalidOperationException($"{location} - Atribuição de tipo invalido: Esperado {symbol.Type}, mas passado {value.GetDataType()}!");
+    }
+
+    public SymbolType GeReturnOfContext(IReaxContext context)
+    {
+        foreach (var node in context.Nodes)
+        {
+            if(node is IReaxResultType resultType)
+                return resultType.GetDataType();
+            else if(node is IReaxContext subContext)
+                return GeReturnOfContext(subContext);
+        }
+
+        return SymbolType.NONE;
     }
 
 }

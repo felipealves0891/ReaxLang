@@ -5,14 +5,17 @@ namespace Reax.Parser.Node;
 
 public record ReturnNode(
     ReaxNode Expression, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResultType
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
-    public SymbolType GetDataType()
+    public ReaxNode[] Nodes
     {
-        if(Expression is IReaxResultType type)
-            return type.GetDataType();
-        else
-            return SymbolType.NONE;
+        get
+        {
+            if(Expression is IReaxContext context)
+                return context.Nodes;
+            else 
+                return [Expression];
+        }
     }
 
     public override string ToString()

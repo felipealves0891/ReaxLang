@@ -14,16 +14,23 @@ public class ReaxReturnParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
+        var location = source.CurrentToken.Location;
         source.Advance();
         var statement = source.NextStatement().ToArray();
         if(statement.Length == 1)
-            return statement[0].ToReaxValue();
+        {
+            var result = new ReturnNode(statement[0].ToReaxValue(), statement[0].Location);
+            Logger.LogParse(result.ToString());
+            return result;
+        }
         
         var parser = new ReaxParser(statement);
         var context = parser.Parse();
 
         var node = new ContextNode(context.ToArray(), statement[0].Location);
-        Logger.LogParse(node.ToString());
-        return node;
+        var returnNode = new ReturnNode(node, location);
+        Logger.LogParse(returnNode.ToString());
+
+        return returnNode;
     }
 }

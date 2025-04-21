@@ -95,6 +95,8 @@ public class ReaxInterpreter
 
     public void Interpret() 
     {
+        Initialize();
+        
         foreach (var node in _nodes)
         {
             StackTrace.Push(node);
@@ -124,7 +126,7 @@ public class ReaxInterpreter
 
     private void ExecuteDeclareBind(BindNode bind) 
     {
-        var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", bind.Node, _context);
+        var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node], _context);
         _context.Declare(bind.Identifier);
         _context.SetBind(bind.Identifier, interpreter);
     }

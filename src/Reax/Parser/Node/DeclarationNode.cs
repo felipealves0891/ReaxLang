@@ -1,3 +1,5 @@
+using Reax.Parser.Node.Interfaces;
+
 namespace Reax.Parser.Node;
 
 public record DeclarationNode(
@@ -5,8 +7,21 @@ public record DeclarationNode(
     bool Immutable, 
     bool Async, 
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
+    public ReaxNode[] Nodes
+    {
+        get
+        {
+            if(Assignment is IReaxContext context)
+                return context.Nodes;
+            else if (Assignment is not null)
+                return [Assignment];
+            else
+                return [];
+        }
+    }
+
     public override string ToString()
     {
         var asc = Async ? "async " : "";

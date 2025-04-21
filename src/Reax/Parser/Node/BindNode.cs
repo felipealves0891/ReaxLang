@@ -5,10 +5,19 @@ namespace Reax.Parser.Node;
 
 public record BindNode(
     string Identifier, 
-    ReaxNode[] Node, 
-    SourceLocation Location) : ReaxNode(Location)
+    ReaxNode Node, 
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
-    public ReaxNode[] Context => Node;
+    public ReaxNode[] Nodes
+    {
+        get
+        {
+            if(Node is IReaxContext context)
+                return context.Nodes;
+            else 
+                return [Node];
+        }
+    }
 
     public override string ToString()
     {

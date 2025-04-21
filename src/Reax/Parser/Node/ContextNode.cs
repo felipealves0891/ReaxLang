@@ -5,20 +5,9 @@ namespace Reax.Parser.Node;
 
 public record ContextNode(
     ReaxNode[] Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResultType
+    SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
-    public ReaxNode[] Context => Block;
-
-    public SymbolType GetDataType()
-    {
-        foreach (var block in Block)
-        {
-            if(block is IReaxResultType resultType)
-                return resultType.GetDataType();
-        }
-
-        return SymbolType.NONE;
-    }
+    public ReaxNode[] Nodes => Block;
 
     public override string ToString()
     {
