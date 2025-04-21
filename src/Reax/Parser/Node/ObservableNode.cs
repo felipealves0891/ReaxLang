@@ -6,10 +6,8 @@ public record ObservableNode(
     ReaxNode Var, 
     ContextNode Context, 
     BinaryNode? Condition, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Branchs => Context.Branchs;
-
     public override string ToString()
     {
         var when = Condition is null ? "" : $"whe {Condition.ToString()} "; 

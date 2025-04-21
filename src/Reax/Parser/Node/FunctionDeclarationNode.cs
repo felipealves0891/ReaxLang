@@ -7,10 +7,8 @@ public record FunctionDeclarationNode(
     ContextNode Context, 
     ReaxNode[] Parameters, 
     DataTypeNode DataType,
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Branchs => Context.Branchs;
-
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));

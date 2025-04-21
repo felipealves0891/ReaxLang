@@ -6,9 +6,8 @@ public record ForNode(
     ReaxNode Declaration, 
     ReaxNode Condition, 
     ContextNode Context, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Branchs => Context.Branchs;
 
     public override string ToString()
     {

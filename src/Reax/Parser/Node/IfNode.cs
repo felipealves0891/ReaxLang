@@ -6,10 +6,8 @@ public record IfNode(
     BinaryNode Condition, 
     ContextNode True, 
     ContextNode? False, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public ReaxNode[] Branchs => False is null ? True.Branchs : [True, False];
-
     public override string ToString()
     {
         var elseText = False is null ? "" : "else {}";
