@@ -23,7 +23,7 @@ public class ReaxFunctionDeclarationParse : INodeParser
         source.Advance();
         var block = (ContextNode)source.NextBlock();
 
-        var node = new FunctionNode(identifier, block, parameters, typeReturn, identifier.Location);
+        var node = new FunctionDeclarationNode(identifier, block, parameters, typeReturn, identifier.Location);
         Logger.LogParse(node.ToString());
         return node;
     }

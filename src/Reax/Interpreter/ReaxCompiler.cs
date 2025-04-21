@@ -5,6 +5,7 @@ using Reax.Lexer;
 using Reax.Lexer.Reader;
 using Reax.Parser;
 using Reax.Parser.Node;
+using Reax.Semantic;
 
 namespace Reax.Interpreter;
 
@@ -32,6 +33,9 @@ public class ReaxCompiler
 
         var parser = new ReaxParser(tokens);
         var ast = parser.Parse().ToArray();
+
+        var analyzer = new SemanticAnalyzer();
+        analyzer.Analyze(ast);
 
         return ast;
     }

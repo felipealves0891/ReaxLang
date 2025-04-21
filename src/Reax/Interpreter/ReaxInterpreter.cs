@@ -70,7 +70,7 @@ public class ReaxInterpreter
                 ExecuteDeclaration(declaration);
             else if (node is ObservableNode observable)
                 ExecuteDeclarationOn(observable);
-            else if(node is FunctionNode function)
+            else if(node is FunctionDeclarationNode function)
                 ExecuteDeclarationFunction(function);
         }
 
@@ -255,7 +255,7 @@ public class ReaxInterpreter
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
     }
 
-    private void ExecuteDeclarationFunction(FunctionNode node) 
+    private void ExecuteDeclarationFunction(FunctionDeclarationNode node) 
     {
         var block = (ContextNode)node.Context;
         var identifier = node.Identifier.ToString();

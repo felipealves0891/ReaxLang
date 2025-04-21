@@ -2,7 +2,7 @@ using Reax.Parser.Node.Interfaces;
 
 namespace Reax.Parser.Node;
 
-public record FunctionNode(
+public record FunctionDeclarationNode(
     ReaxNode Identifier, 
     ContextNode Context, 
     ReaxNode[] Parameters, 
