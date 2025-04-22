@@ -128,8 +128,8 @@ public class ReaxInterpreter
     private void ExecuteDeclareBind(BindNode bind) 
     {
         var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node], _context);
-        _context.Declare(bind.Identifier);
-        _context.SetBind(bind.Identifier, interpreter);
+        _context.Declare(bind.Identifier.Identifier);
+        _context.SetBind(bind.Identifier.Identifier, interpreter);
     }
 
     private void ExecuteDeclarationScript(ScriptNode script) 
@@ -158,14 +158,14 @@ public class ReaxInterpreter
         {
             _context.DeclareVariable(declaration.Identifier, declaration.Async);
             if(declaration.Assignment is not null)
-                ExecuteAssignment(new AssignmentNode(declaration.Identifier, declaration.Assignment, declaration.Location));    
+                ExecuteAssignment(new AssignmentNode(new VarNode(declaration.Identifier, declaration.DataType, declaration.Location), declaration.Assignment, declaration.Location));    
         }
         else 
         {
             if(declaration.Assignment is null)
                 throw new InvalidOperationException("A constante deve ser definida na declaração!");
 
-            _context.DeclareImmutable(declaration.Identifier, new AssignmentNode(declaration.Identifier, declaration.Assignment, declaration.Location));
+            _context.DeclareImmutable(declaration.Identifier, new AssignmentNode(new VarNode(declaration.Identifier, declaration.DataType, declaration.Location), declaration.Assignment, declaration.Location));
         }
         
     }
@@ -173,11 +173,11 @@ public class ReaxInterpreter
     public void ExecuteAssignment(AssignmentNode assignment)
     {
         if(assignment.Assigned is ContextNode node)
-            _context.SetVariable(assignment.Identifier, ExecuteContextAndReturnValue(node));
+            _context.SetVariable(assignment.Identifier.Identifier, ExecuteContextAndReturnValue(node));
         else if (assignment.Assigned is VarNode variable)
-            _context.SetVariable(assignment.Identifier, _context.GetVariable(variable.Identifier));
+            _context.SetVariable(assignment.Identifier.Identifier, _context.GetVariable(variable.Identifier));
         else
-            _context.SetVariable(assignment.Identifier, assignment.Assigned);
+            _context.SetVariable(assignment.Identifier.Identifier, assignment.Assigned);
     }
 
     public ReaxNode Calculate(CalculateNode node)

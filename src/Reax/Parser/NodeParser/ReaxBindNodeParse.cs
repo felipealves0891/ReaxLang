@@ -30,7 +30,7 @@ public class ReaxBindNodeParse : INodeParser
             throw new InvalidOperationException($"Era esperado o inicio de uma expressão. Posição: {source.CurrentToken.Position}. Linha: {source.CurrentToken.Row}");
 
         var bind = new BindNode(
-            identifier.Source.ToString(), 
+            new IdentifierNode(identifier.Source.ToString(), identifier.Location), 
             new ContextNode([node], identifier.Location), 
             new DataTypeNode(dataType.Source, dataType.Location), 
             identifier.Location);

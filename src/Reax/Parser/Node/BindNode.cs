@@ -6,7 +6,7 @@ using Reax.Semantic.Symbols;
 namespace Reax.Parser.Node;
 
 public record BindNode(
-    string Identifier, 
+    IdentifierNode Identifier, 
     ContextNode Node,
     DataTypeNode DataType, 
     SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment, IReaxBinder, IReaxChildren
@@ -16,10 +16,14 @@ public record BindNode(
 
     public ReaxNode[] Children => [Node, Node];
 
+    string IReaxAssignment.Identifier => Identifier.Identifier;
+
+    string IReaxBinder.Identifier => Identifier.Identifier;
+
     public Symbol GetSymbol(Guid scope)
     {
         return new Symbol(
-            Identifier,
+            Identifier.Identifier,
             DataType.TypeName,
             SymbolCategoty.BIND,
             scope);

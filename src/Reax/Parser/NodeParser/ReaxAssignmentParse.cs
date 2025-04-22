@@ -44,7 +44,8 @@ public class ReaxAssignmentParse : INodeParser
             value = new ContextNode(expressionNodes.ToArray(), identifier.Value.Location);
         }
 
-        var node = new AssignmentNode(identifier.Value.Source, value, identifier.Value.Location);
+        var var = new VarNode(identifier.Value.Source, new DataTypeNode("NONE", identifier.Value.Location), identifier.Value.Location);
+        var node = new AssignmentNode(var, value, identifier.Value.Location);
         Logger.LogParse(node.ToString());
         return node;
     }

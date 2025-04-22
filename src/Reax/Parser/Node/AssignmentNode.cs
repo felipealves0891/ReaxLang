@@ -5,14 +5,15 @@ using Reax.Semantic.Symbols;
 namespace Reax.Parser.Node;
 
 public record AssignmentNode(
-    string Identifier, 
+    VarNode Identifier, 
     ReaxNode Assigned, 
     SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxAssignment, IReaxChildren
 {
     public ReaxNode[] Context => Assigned is ContextNode block ? block.Context : [Assigned];
     public IReaxType TypeAssignedValue => (IReaxType)Assigned;
 
-    public ReaxNode[] Children => [Assigned];
+    public ReaxNode[] Children => [Assigned, Identifier];
+    string IReaxAssignment.Identifier => Identifier.Identifier;
 
     public Symbol[] GetParameters(Guid scope)
         => Assigned is IReaxContext context ? context.GetParameters(scope) : [];
