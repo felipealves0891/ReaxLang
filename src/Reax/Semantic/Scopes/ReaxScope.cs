@@ -44,6 +44,7 @@ public class ReaxScope : IReaxScope
         else
             return _parent.Exists(identifier);
     }
+    
     public void Declaration(Symbol symbol)
     {
         if(Exists(symbol.Identifier))
@@ -82,5 +83,16 @@ public class ReaxScope : IReaxScope
         else
             throw new InvalidOperationException($"O simbulo {identifier} não foi declarado!");
     }
-    
+
+    public void MarkAsAssigned(string identifier)
+    {
+        if(_internal.TryGetValue(identifier, out var symbol))
+        {
+            symbol.Assigned = true;
+            _internal[identifier] = symbol;
+        }
+        else
+            if(_parent is not null)
+                _parent.MarkAsAssigned(identifier);
+    }
 }

@@ -9,8 +9,10 @@ public record BindNode(
     string Identifier, 
     ReaxNode Node,
     DataTypeNode DataType, 
-    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration
+    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment
 {
+    public IReaxType TypeAssignedValue => (IReaxType)Node;
+
     public Symbol GetSymbol(Guid scope)
     {
         return new Symbol(

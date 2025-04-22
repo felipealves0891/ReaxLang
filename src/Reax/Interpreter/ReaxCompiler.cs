@@ -14,6 +14,10 @@ public class ReaxCompiler
     public static ReaxInterpreter Compile(string filename) 
     {
         var ast = GetNodes(filename);   
+
+        var analyzer = new SemanticAnalyzer();
+        analyzer.Analyze(ast.ToArray());
+
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast.ToArray());
     }
@@ -33,9 +37,6 @@ public class ReaxCompiler
 
         var parser = new ReaxParser(tokens);
         var ast = parser.Parse().ToArray();
-
-        var analyzer = new SemanticAnalyzer();
-        analyzer.Analyze(ast);
 
         return ast;
     }

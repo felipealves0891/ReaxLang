@@ -1,3 +1,4 @@
+using Reax.Parser.Helper;
 using Reax.Parser.Node.Interfaces;
 using Reax.Semantic.Interfaces;
 using Reax.Semantic.Symbols;
@@ -9,7 +10,7 @@ public record WhileNode(
     ContextNode Block, 
     SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
-    public ReaxNode[] Context => Block.Context;
+    public ReaxNode[] Context => Block.Context.ArrayConcat(condition);
 
     public Symbol[] GetParameters(Guid scope)
         => [];

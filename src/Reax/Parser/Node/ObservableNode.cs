@@ -10,10 +10,18 @@ public record ObservableNode(
     BinaryNode? Condition, 
     SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
-    public ReaxNode[] Context => Block.Context;
+    public ReaxNode[] Context => Block.Context.Concat(GetItems()).ToArray();
 
     public Symbol[] GetParameters(Guid scope)
         => [];
+
+    private ReaxNode[] GetItems() 
+    {
+        if(Condition is null)
+            return [Var];
+        else 
+            return [Var, Condition];
+    }
 
     public override string ToString()
     {

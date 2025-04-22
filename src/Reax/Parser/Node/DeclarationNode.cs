@@ -10,8 +10,15 @@ public record DeclarationNode(
     bool Async, 
     DataTypeNode DataType,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration
+    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment, IReaxContext
 {
+    public IReaxType TypeAssignedValue => Assignment is null ? new NullNode(Location) : (IReaxType)Assignment;
+
+    public ReaxNode[] Context => Assignment is IReaxContext context ? context.Context : [Assignment ?? new NullNode(Location)];
+
+    public Symbol[] GetParameters(Guid scope)
+        => Assignment is IReaxContext context ? context.GetParameters(scope) : [];
+
     public Symbol GetSymbol(Guid scope)
     {
         return new Symbol(
@@ -29,8 +36,8 @@ public record DeclarationNode(
         var asc = Async ? "async " : "";
         var mut = Immutable ? "const" : "let";
         if(Assignment is not null)
-            return $"{asc}{mut} {Identifier}: {DataType} = {Assignment};";
+            return $"{asc}{mut} {Identifier}{DataType} = {Assignment};";
         else 
-            return $"{asc}{mut} {Identifier}: {DataType};";
+            return $"{asc}{mut} {Identifier}{DataType};";
     }
 }

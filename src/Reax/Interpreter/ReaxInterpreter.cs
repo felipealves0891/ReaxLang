@@ -44,6 +44,7 @@ public class ReaxInterpreter
 
     public ReaxNode? Output { get; private set; }
     public string Name { get; private set; } = "Main";
+    public ReaxNode[] Nodes => _nodes;
 
     public void DeclareAndSetFunction(string identifier, Function function) 
     {

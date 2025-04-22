@@ -7,12 +7,13 @@ namespace Reax.Parser.Node;
 public record AssignmentNode(
     string Identifier, 
     ReaxNode Assigned, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxAssignment
 {
     public ReaxNode[] Context => Assigned is ContextNode block ? block.Context : [Assigned];
+    public IReaxType TypeAssignedValue => (IReaxType)Assigned;
 
     public Symbol[] GetParameters(Guid scope)
-        => [];
+        => Assigned is IReaxContext context ? context.GetParameters(scope) : [];
 
     public override string ToString()
     {

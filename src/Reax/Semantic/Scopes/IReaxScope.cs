@@ -21,4 +21,6 @@ public interface IReaxScope
     void Declaration(IReaxMultipleDeclaration declaration);
 
     Symbol Get(string identifier);
+
+    void MarkAsAssigned(string identifier);
 }

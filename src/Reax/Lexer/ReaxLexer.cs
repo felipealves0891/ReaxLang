@@ -13,7 +13,7 @@ public class ReaxLexer
     public ReaxLexer(IReader source)
     {
         _source = source;
-        _numberOfRows = 0;
+        _numberOfRows = 1;
     }
 
     public IEnumerable<Token> Tokenize() 

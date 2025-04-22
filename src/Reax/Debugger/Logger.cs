@@ -32,6 +32,14 @@ public static class Logger
         var done = string.Format("DEB [{0}] | Parse.{2} | {1}", formateDate, message, caller.PadRight(25, ' '));
         Log(done, LoggerLevel.DEBUG);
     }
+
+    public static void LogAnalize(string message, [CallerMemberName] string caller = "") 
+    {
+        if(!Enabled) return;
+        var formateDate = DateTime.UtcNow.ToString(FormatDate);
+        var done = string.Format("DEB [{0}] | Analizer.{2} | {1}", formateDate, message, caller.PadRight(22, ' '));
+        Log(done, LoggerLevel.DEBUG);
+    }
     
     public static void LogCompile(string message, [CallerMemberName] string caller = "") 
     {

@@ -1,3 +1,4 @@
+using Reax.Parser.Helper;
 using Reax.Parser.Node.Interfaces;
 using Reax.Semantic.Interfaces;
 using Reax.Semantic.Symbols;
@@ -10,17 +11,15 @@ public record ForNode(
     ContextNode Block, 
     SourceLocation Location) : ReaxNode(Location), IReaxContext
 {
-    public ReaxNode[] Context => Block.Context;
+    public ReaxNode[] Context 
+        => Block.Context.ArrayConcat(Condition, Declaration);
 
     public Symbol[] GetParameters(Guid scope)
+        => [];
+
+    public Symbol GetSymbol(Guid scope)
     {
-        return [
-            new Symbol(
-                Declaration.Identifier,
-                Declaration.DataType.TypeName,
-                SymbolCategoty.PARAMETER,
-                scope)
-        ];
+        return Declaration.GetSymbol(scope);
     }
 
     public override string ToString()

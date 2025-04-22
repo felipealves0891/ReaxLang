@@ -59,5 +59,7 @@ public struct Symbol
 
     public bool? Async { get; private set; }
 
+    public bool? Assigned { get; set; }
+
     public Guid ScopeId { get; private set; }
 }
