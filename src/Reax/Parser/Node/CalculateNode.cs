@@ -10,8 +10,10 @@ public record CalculateNode(
     ReaxNode Left, 
     ReaxNode Operator, 
     ReaxNode Right, 
-    SourceLocation Location) : ReaxNode(Location), IReaxType
+    SourceLocation Location) : ReaxNode(Location), IReaxType, IReaxChildren
 {
+    public ReaxNode[] Children => [Left, Operator, Right];
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         var leftType = ((IReaxType)Left).GetReaxType(scope);

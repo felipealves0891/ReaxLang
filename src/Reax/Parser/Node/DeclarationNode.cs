@@ -10,11 +10,13 @@ public record DeclarationNode(
     bool Async, 
     DataTypeNode DataType,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment, IReaxContext
+    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment, IReaxContext, IReaxChildren
 {
     public IReaxType TypeAssignedValue => Assignment is null ? new NullNode(Location) : (IReaxType)Assignment;
 
     public ReaxNode[] Context => Assignment is IReaxContext context ? context.Context : [Assignment ?? new NullNode(Location)];
+
+    public ReaxNode[] Children => Assignment is null ? [DataType] : [DataType, Assignment];
 
     public Symbol[] GetParameters(Guid scope)
         => Assignment is IReaxContext context ? context.GetParameters(scope) : [];

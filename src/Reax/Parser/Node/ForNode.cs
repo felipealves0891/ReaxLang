@@ -9,10 +9,12 @@ public record ForNode(
     DeclarationNode Declaration, 
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context 
         => Block.Context.ArrayConcat(Condition, Declaration);
+
+    public ReaxNode[] Children => [Declaration, Condition, Block];
 
     public Symbol[] GetParameters(Guid scope)
         => [];

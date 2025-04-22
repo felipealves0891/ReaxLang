@@ -9,9 +9,11 @@ public record FunctionDeclarationNode(
     ContextNode Block, 
     VarNode[] Parameters, 
     DataTypeNode DataType,
-    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxContext
+    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context => Block.Context;
+
+    public ReaxNode[] Children => Block.Block;
 
     public Symbol GetSymbol(Guid scope)
     {

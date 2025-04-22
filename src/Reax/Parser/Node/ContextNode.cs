@@ -8,9 +8,11 @@ namespace Reax.Parser.Node;
 
 public record ContextNode(
     ReaxNode[] Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxType
+    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxType, IReaxChildren
 {
     public ReaxNode[] Context => Block;
+
+    public ReaxNode[] Children => Block;
 
     public Symbol[] GetParameters(Guid scope)
         => [];

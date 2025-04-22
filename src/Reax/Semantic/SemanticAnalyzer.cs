@@ -44,12 +44,19 @@ public class SemanticAnalyzer
             if(node is IReaxAssignment assignment)
                 ValidateAssigment(assignment);
 
+            if(node is IReaxBinder binder)
+                ValidateCircularReferences(binder.Identifier, binder.Bound);
+
+
             if(node is IReaxContext reaxContext)
                 Analyze(reaxContext.Context, _symbols, reaxContext);
         }    
 
         if(_symbols.IsChild())
             _symbols = _symbols.GetParent();
+        else
+            if(_symbols.HasDependencyCycle())
+                throw new InvalidOperationException("Existe referencias cinculares!");
     }
 
     private void ValidateAssigment(IReaxAssignment assignment) 
@@ -66,7 +73,6 @@ public class SemanticAnalyzer
             throw new Exception($"{((ReaxNode)assignment).Location} - Tentativa de atribuir o valor do tipo {assignedType} em uma variavel do tipo {receivedSymbol.Type}!");
 
         _symbols.MarkAsAssigned(assignment.Identifier);
-
     }
 
     private void AddExtensionContext(IReaxExtensionContext extensions)
@@ -96,6 +102,18 @@ public class SemanticAnalyzer
 
             if(node is IReaxContext reaxContext)
                 Analyze(reaxContext.Context, _symbols, reaxContext);
+        }
+    }
+
+    private void ValidateCircularReferences(string identifier, IReaxChildren bound)
+    {
+        foreach (var child in bound.Children)
+        {
+            if(child is VarNode var)
+                _symbols.AddDependency(identifier, var.Identifier);
+
+            if(child is IReaxChildren children)
+                ValidateCircularReferences(identifier, children);
         }
     }
 }

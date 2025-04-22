@@ -8,9 +8,12 @@ public record IfNode(
     BinaryNode Condition, 
     ContextNode True, 
     ContextNode? False, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context => False is null ? [Condition, True] : [Condition, True, False];
+
+    public ReaxNode[] Children => False is null ? [Condition, True] : [Condition, True, False];
+
     public Symbol[] GetParameters(Guid scope)
         => [];
 

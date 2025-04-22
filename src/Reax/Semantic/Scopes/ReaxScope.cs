@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-using Reax.Parser.Node;
 using Reax.Semantic.Interfaces;
 using Reax.Semantic.Symbols;
 
@@ -9,11 +7,11 @@ public class ReaxScope : IReaxScope
 {
     private readonly static Dictionary<Guid, Dictionary<string, Symbol>> _symbols 
         = new Dictionary<Guid, Dictionary<string, Symbol>>();
-
     public static IEnumerable<Symbol> Table => _symbols.Values.SelectMany(x => x.Values);
 
     private readonly Guid _scopeId = Guid.NewGuid();
     private readonly Dictionary<string, Symbol> _internal = new Dictionary<string, Symbol>();
+    private readonly ReferenceVisitor _dependencies = new ReferenceVisitor();
     private readonly IReaxScope? _parent;
 
     public ReaxScope()
@@ -94,5 +92,26 @@ public class ReaxScope : IReaxScope
         else
             if(_parent is not null)
                 _parent.MarkAsAssigned(identifier);
+    }
+
+    public void AddDependency(string from, string to)
+    {
+        if(_parent is not null)
+        {
+            _parent.AddDependency(from, to);
+            return;
+        }
+
+        _dependencies.AddDependency(from, to);
+    }
+
+    public bool HasDependencyCycle()
+    {
+        return _dependencies.HasDependencyCycle();
+    }
+
+    public string GetPathDependencyCycle()
+    {
+        return string.Empty;
     }
 }

@@ -7,11 +7,14 @@ namespace Reax.Parser.Node;
 
 public record BindNode(
     string Identifier, 
-    ReaxNode Node,
+    ContextNode Node,
     DataTypeNode DataType, 
-    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment
+    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxAssignment, IReaxBinder, IReaxChildren
 {
     public IReaxType TypeAssignedValue => (IReaxType)Node;
+    public IReaxChildren Bound => (IReaxChildren)Node;
+
+    public ReaxNode[] Children => [Node, Node];
 
     public Symbol GetSymbol(Guid scope)
     {

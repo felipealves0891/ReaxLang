@@ -8,9 +8,11 @@ namespace Reax.Parser.Node;
 public record WhileNode(
     ReaxNode condition, 
     ContextNode Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext
+    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context => Block.Context.ArrayConcat(condition);
+
+    public ReaxNode[] Children => Block.Context.ArrayConcat(condition);
 
     public Symbol[] GetParameters(Guid scope)
         => [];

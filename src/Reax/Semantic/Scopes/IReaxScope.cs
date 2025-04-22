@@ -23,4 +23,10 @@ public interface IReaxScope
     Symbol Get(string identifier);
 
     void MarkAsAssigned(string identifier);
+
+    void AddDependency(string from, string to);
+
+    bool HasDependencyCycle();
+
+    string GetPathDependencyCycle();
 }
