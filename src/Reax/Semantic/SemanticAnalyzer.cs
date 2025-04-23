@@ -45,8 +45,10 @@ public class SemanticAnalyzer
                 ValidateAssigment(assignment);
 
             if(node is IReaxBinder binder)
-                ValidateCircularReferences(binder.Identifier, binder.Bound);
+                ValidateBindCircularReferences(binder.Identifier, binder.Bound);
 
+            if(node is IReaxObservable observable)
+                ValidateObservableCircularReferences(observable.Identifier, (IReaxChildren)observable);
 
             if(node is IReaxContext reaxContext)
                 Analyze(reaxContext.Context, _symbols, reaxContext);
@@ -105,7 +107,7 @@ public class SemanticAnalyzer
         }
     }
 
-    private void ValidateCircularReferences(string identifier, IReaxChildren bound)
+    private void ValidateBindCircularReferences(string identifier, IReaxChildren bound)
     {
         foreach (var child in bound.Children)
         {
@@ -113,7 +115,20 @@ public class SemanticAnalyzer
                 _symbols.AddDependency(identifier, var.Identifier);
 
             if(child is IReaxChildren children)
-                ValidateCircularReferences(identifier, children);
+                ValidateBindCircularReferences(identifier, children);
         }
     }
+
+    private void ValidateObservableCircularReferences(string identifier, IReaxChildren observable)
+    {
+        foreach (var child in observable.Children)
+        {
+            if(child is IReaxAssignment assignment)
+                _symbols.AddDependency(identifier, assignment.Identifier);
+
+            if(child is IReaxChildren children)
+                ValidateObservableCircularReferences(identifier, children);
+        }
+    }
+    
 }

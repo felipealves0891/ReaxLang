@@ -59,6 +59,8 @@ public class ReaxInterpreter
 
         foreach (var node in _nodes)
         {
+            StackTrace.Push(node);
+
             if(node is ScriptDeclarationNode scriptDeclaration)
                 Name = scriptDeclaration.Identifier;
             else if(node is ScriptNode script)
@@ -73,6 +75,8 @@ public class ReaxInterpreter
                 ExecuteDeclarationOn(observable);
             else if(node is FunctionDeclarationNode function)
                 ExecuteDeclarationFunction(function);
+
+            StackTrace.Pop();
         }
 
         _isInitialized = true;
@@ -165,7 +169,10 @@ public class ReaxInterpreter
             if(declaration.Assignment is null)
                 throw new InvalidOperationException("A constante deve ser definida na declaração!");
 
-            _context.DeclareImmutable(declaration.Identifier, new AssignmentNode(new VarNode(declaration.Identifier, declaration.DataType, declaration.Location), declaration.Assignment, declaration.Location));
+            if(declaration.Assignment is AssignmentNode assignment)
+                _context.DeclareImmutable(declaration.Identifier, GetValue(assignment.Assigned));
+            else
+                _context.DeclareImmutable(declaration.Identifier, GetValue(declaration.Assignment));
         }
         
     }
@@ -267,9 +274,9 @@ public class ReaxInterpreter
 
     private void ExecuteFor(ForNode node) 
     {
-        var declaration = (DeclarationNode)node.Declaration;
+        var declaration = node.Declaration;
         var condition = (BinaryNode)node.Condition;
-        var block = (ContextNode)node.Block;
+        var block = node.Block;
 
         ExecuteDeclaration(declaration);
         while(ExecuteBinary(condition))

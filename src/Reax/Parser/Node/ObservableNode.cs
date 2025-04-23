@@ -8,15 +8,13 @@ public record ObservableNode(
     VarNode Var, 
     ContextNode Block, 
     BinaryNode? Condition, 
-    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren, IReaxBinder
+    SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren, IReaxObservable
 {
     public ReaxNode[] Context => Block.Context.Concat(GetItems()).ToArray();
 
     public ReaxNode[] Children => Block.Context.Concat(GetItems()).ToArray();
 
     public string Identifier => Var.Identifier;
-
-    public IReaxChildren Bound => (IReaxChildren)Block;
 
     public Symbol[] GetParameters(Guid scope)
         => [];
