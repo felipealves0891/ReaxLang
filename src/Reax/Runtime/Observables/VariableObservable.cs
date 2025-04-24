@@ -17,7 +17,7 @@ public class VariableObservable
         _condition = condition;
     }
 
-    public bool CanRun(ReaxExecutionContext context) 
+    public virtual bool CanRun(ReaxExecutionContext context) 
     {
         if(_condition is null)
             return true;
@@ -28,7 +28,7 @@ public class VariableObservable
         return logical.Compare(left, right);
     }
 
-    public void Run() 
+    public virtual void Run() 
     {
         _interpreter.Interpret();
     }
