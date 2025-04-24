@@ -14,16 +14,12 @@ public class ReaxBindNodeParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        source.Advance();
+        source.Advance(expectedType: TokenType.IDENTIFIER);
         var identifier = source.CurrentToken;
-        source.Advance();
+        source.Advance(expectedType: TokenType.TYPING);
         source.Advance();
         var dataType = source.CurrentToken;
-        source.Advance();
-        
-        if(source.CurrentToken.Type != TokenType.ARROW)
-            throw new InvalidOperationException($"Token invalido na linha {source.CurrentToken.Row}, era esperado o inicio de uma expressão. Posição: {source.CurrentToken.Position}.");
-            
+        source.Advance(expectedType: TokenType.ARROW);
         source.Advance();
         var node = source.NextNode();
         if(node is null)

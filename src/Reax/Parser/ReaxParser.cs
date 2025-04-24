@@ -109,4 +109,11 @@ public class ReaxParser : ITokenSource
 
         _position++;
     }
+
+    public void Advance(TokenType type)
+    {
+        Advance();
+        if(CurrentToken.Type != type)
+            throw new InvalidOperationException($"{CurrentToken.Source} - Token invalido! Era esperado o token {type}, mas o atual é {CurrentToken.Type}!");
+    }
 }

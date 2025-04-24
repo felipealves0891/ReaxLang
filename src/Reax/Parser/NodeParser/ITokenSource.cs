@@ -14,4 +14,5 @@ public interface ITokenSource
     IEnumerable<Token> NextStatement();
     ReaxNode NextBlock();
     void Advance();
+    void Advance(TokenType expectedType);
 }
