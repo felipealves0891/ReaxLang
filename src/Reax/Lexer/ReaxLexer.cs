@@ -1,7 +1,5 @@
-using System;
 using Reax.Debugger;
 using Reax.Lexer.Reader;
-using Reax.Runtime;
 
 namespace Reax.Lexer;
 
@@ -147,19 +145,6 @@ public class ReaxLexer
         _source.Advance();
         var token = new Token(TokenType.ARROW, new byte[] {(byte)'-', (byte)'>'}, _source.FileName, start, _numberOfRows);
         Logger.LogLexer(token.ToString());
-        return token;
-    }
-
-    private Token GetTyping() 
-    {
-        _source.Advance();
-        var start = _source.Position;
-        while(!_source.EndOfFile && IsIdentifier(_source.CurrentChar))
-            _source.Advance();
-
-        var identifier = _source.GetString(start,_source.Position);
-        var token = new Token(TokenType.TYPING, identifier, _source.FileName, start, _numberOfRows);
-        Logger.LogLexer(token.ToString());        
         return token;
     }
 

@@ -1,10 +1,11 @@
 using System;
 using Reax.Parser.Node;
 using Reax.Runtime.Functions.Attributes;
+using Reax.Semantic.Symbols;
 
 namespace Reax.Runtime.Functions.ConsoleFunctions;
 
-[FunctionBuiltIn("console", "writer", 1, 10)]
+[FunctionBuiltIn("console", "writer", 1, 10, SymbolType.VOID, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING)]
 public class WriterFunction : Function
 {
     public override ReaxNode? Invoke(params ReaxNode[] parameters)
@@ -19,4 +20,6 @@ public class WriterFunction : Function
 
         return null;
     }   
+
+    
 }

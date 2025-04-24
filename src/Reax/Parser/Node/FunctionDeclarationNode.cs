@@ -5,11 +5,11 @@ using Reax.Semantic.Symbols;
 namespace Reax.Parser.Node;
 
 public record FunctionDeclarationNode(
-    ReaxNode Identifier, 
+    IdentifierNode Identifier, 
     ContextNode Block, 
     VarNode[] Parameters, 
     DataTypeNode DataType,
-    SourceLocation Location) : ReaxNode(Location), IReaxDeclaration, IReaxContext, IReaxChildren
+    SourceLocation Location) : ReaxNode(Location), IReaxMultipleDeclaration, IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context => Block.Context;
 
@@ -18,7 +18,7 @@ public record FunctionDeclarationNode(
     public Symbol GetSymbol(Guid scope)
     {
         return new Symbol(
-            Identifier.ToString(),
+            Identifier.Identifier,
             DataType.TypeName,
             SymbolCategoty.FUNCTION,
             scope
@@ -26,25 +26,28 @@ public record FunctionDeclarationNode(
     }
 
     public Symbol[] GetParameters(Guid scope)
+        => [];
+
+    public override string ToString()
+    {
+        var param = string.Join(',', Parameters.Select(x => x.ToString()));
+        return $"fun {Identifier.Identifier} ({param}){DataType} {{...}}";
+    }
+
+    public Symbol[] GetSymbols(Guid scope)
     {
         var symbols = new Symbol[Parameters.Length];
         for (int i = 0; i < Parameters.Length; i++)
         {
             symbols[i] = new Symbol(
-                Parameters[i].Identifier,
+                $"{Identifier.Identifier}_{Parameters[i].Identifier}",
                 Parameters[i].DataType.TypeName,
                 SymbolCategoty.PARAMETER,
-                scope
+                scope,
+                parentName: Identifier.Identifier
             );
         }
 
         return symbols;
-    }
-
-    public override string ToString()
-    {
-
-        var param = string.Join(',', Parameters.Select(x => x.ToString()));
-        return $"fun {Identifier} ({param}){DataType} {{...}}";
     }
 }

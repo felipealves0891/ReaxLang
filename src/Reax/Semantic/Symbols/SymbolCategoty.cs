@@ -10,6 +10,7 @@ public enum SymbolCategoty
     CONST,
     LET,
     PARAMETER,
+    PARAMETER_OPTIONAL,
     BIND,
     MODULE,
     SCRIPT

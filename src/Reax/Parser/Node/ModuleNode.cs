@@ -22,12 +22,22 @@ public record ModuleNode(string identifier, Dictionary<string, Function> functio
         List<Symbol> symbols = new List<Symbol>();
         foreach (var key in functions.Keys)
         {
-            symbols.Add(new Symbol(
-                key,
-                SymbolType.NONE,
-                SymbolCategoty.FUNCTION,
-                scope
-            ));
+            var function = functions[key];
+            if(function is IReaxMultipleDeclaration multipleDeclaration)
+            {
+                symbols.Add(multipleDeclaration.GetSymbol(scope));
+                symbols.AddRange(multipleDeclaration.GetSymbols(scope));
+            }
+            else
+            {
+                symbols.Add(new Symbol(
+                    key,
+                    SymbolType.NONE,
+                    SymbolCategoty.FUNCTION,
+                    scope
+                ));
+            }
+            
         }
         
         return symbols.ToArray();

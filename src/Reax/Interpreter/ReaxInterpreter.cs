@@ -266,7 +266,7 @@ public class ReaxInterpreter
     private void ExecuteDeclarationFunction(FunctionDeclarationNode node) 
     {
         var block = (ContextNode)node.Block;
-        var identifier = node.Identifier.ToString();
+        var identifier = node.Identifier.Identifier;
         var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context, node.Parameters);
         _context.Declare(identifier);
         _context.SetFunction(identifier, interpreter);

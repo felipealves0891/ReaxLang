@@ -12,7 +12,7 @@ public record ForNode(
     SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context 
-        => Block.Context.ArrayConcat(Condition, Declaration);
+        => Block.Context.ArrayConcat(Condition, Declaration).Reverse().ToArray();
 
     public ReaxNode[] Children => [Declaration, Condition, Block];
 

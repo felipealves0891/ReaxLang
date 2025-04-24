@@ -9,9 +9,12 @@ namespace Reax.Parser.Node;
 public record ExternalFunctionCallNode(
     string scriptName, 
     FunctionCallNode functionCall, 
-    SourceLocation Location) : ReaxNode(Location), IReaxType, IReaxChildren
+    SourceLocation Location) : ReaxNode(Location), IReaxType, IReaxChildren, IReaxFunctionCall
 {
     public ReaxNode[] Children => [functionCall];
+
+    public string Identifier => functionCall.Identifier;
+    public IReaxType[] Parameters => functionCall.Parameters;
 
     public SymbolType GetReaxType(IReaxScope scope)
     {

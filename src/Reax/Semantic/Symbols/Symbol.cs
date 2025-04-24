@@ -11,7 +11,8 @@ public struct Symbol
         Guid scopeId,
         bool? observable = null, 
         bool? immutable = null, 
-        bool? async = null) : this()
+        bool? async = null,
+        string? parentName = null) : this()
     {
         Id = Guid.NewGuid();
         Identifier = identifier;
@@ -21,6 +22,7 @@ public struct Symbol
         Immutable = immutable;
         Async = async;
         ScopeId = scopeId;
+        ParentName = parentName;
     }
 
     public Symbol(
@@ -30,7 +32,8 @@ public struct Symbol
         Guid scopeId,
         bool? observable = null, 
         bool? immutable = null, 
-        bool? async = null) : this()
+        bool? async = null,
+        string? parentName = null) : this()
     {
         Id = Guid.NewGuid();
         Identifier = identifier;
@@ -39,6 +42,7 @@ public struct Symbol
         Immutable = immutable;
         Async = async;
         ScopeId = scopeId;
+        ParentName = parentName;
         Type = Enum.TryParse<SymbolType>(type, true, out var result) 
              ? result 
              : throw new InvalidDataException($"Tipo {type} não localizado!");
@@ -60,6 +64,8 @@ public struct Symbol
     public bool? Async { get; private set; }
 
     public bool? Assigned { get; set; }
+
+    public string? ParentName { get; set; }
 
     public Guid ScopeId { get; private set; }
 }

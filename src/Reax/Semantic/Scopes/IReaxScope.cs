@@ -22,6 +22,8 @@ public interface IReaxScope
 
     Symbol Get(string identifier);
 
+    Symbol[] GetParameters(string identifier);
+
     void MarkAsAssigned(string identifier);
 
     void AddDependency(string from, string to);

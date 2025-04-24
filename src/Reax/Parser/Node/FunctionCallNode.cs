@@ -9,8 +9,10 @@ namespace Reax.Parser.Node;
 public record FunctionCallNode(
     string Identifier, 
     ReaxNode[] Parameter, 
-    SourceLocation Location) : ReaxNode(Location), IReaxType
+    SourceLocation Location) : ReaxNode(Location), IReaxType, IReaxFunctionCall
 {
+    public IReaxType[] Parameters => Parameter.Cast<IReaxType>().ToArray();
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return scope.Get(Identifier).Type;

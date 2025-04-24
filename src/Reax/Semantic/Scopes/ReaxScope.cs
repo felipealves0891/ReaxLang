@@ -10,6 +10,7 @@ public class ReaxScope : IReaxScope
     public static IEnumerable<Symbol> Table => _symbols.Values.SelectMany(x => x.Values);
 
     private readonly Guid _scopeId = Guid.NewGuid();
+    private readonly Dictionary<string, List<Symbol>> _parameters = new Dictionary<string, List<Symbol>>();
     private readonly Dictionary<string, Symbol> _internal = new Dictionary<string, Symbol>();
     private readonly ReferenceVisitor _dependencies = new ReferenceVisitor();
     private readonly IReaxScope? _parent;
@@ -49,6 +50,14 @@ public class ReaxScope : IReaxScope
             throw new InvalidOperationException($"O simbulo {symbol.Identifier} já foi declarado!");
         
         _internal[symbol.Identifier] = symbol;
+
+        if(!string.IsNullOrEmpty(symbol.ParentName) 
+        && (symbol.Categoty == SymbolCategoty.PARAMETER || symbol.Categoty == SymbolCategoty.PARAMETER_OPTIONAL))
+        {
+            if(!_parameters.ContainsKey(symbol.ParentName))  _parameters[symbol.ParentName] = new List<Symbol>();
+                 _parameters[symbol.ParentName].Add(symbol);
+        }
+            
     }
 
     public void Declaration(IReaxDeclaration declaration)
@@ -58,6 +67,13 @@ public class ReaxScope : IReaxScope
             throw new InvalidOperationException($"O simbulo {symbol.Identifier} já foi declarado!");
         
         _internal[symbol.Identifier] = symbol;
+        
+        if(!string.IsNullOrEmpty(symbol.ParentName) 
+        && (symbol.Categoty == SymbolCategoty.PARAMETER || symbol.Categoty == SymbolCategoty.PARAMETER_OPTIONAL))
+        {
+            if(!_parameters.ContainsKey(symbol.ParentName))  _parameters[symbol.ParentName] = new List<Symbol>();
+                 _parameters[symbol.ParentName].Add(symbol);
+        }
     }
 
     public void Declaration(IReaxMultipleDeclaration declaration)
@@ -68,6 +84,12 @@ public class ReaxScope : IReaxScope
                 throw new InvalidOperationException($"O simbulo {symbol.Identifier} já foi declarado!");
         
             _internal[symbol.Identifier] = symbol;    
+            if(!string.IsNullOrEmpty(symbol.ParentName) 
+            && (symbol.Categoty == SymbolCategoty.PARAMETER || symbol.Categoty == SymbolCategoty.PARAMETER_OPTIONAL))
+            {
+                if(!_parameters.ContainsKey(symbol.ParentName))  _parameters[symbol.ParentName] = new List<Symbol>();
+                    _parameters[symbol.ParentName].Add(symbol);
+            }
         }
     }
 
@@ -113,5 +135,16 @@ public class ReaxScope : IReaxScope
     public string GetPathDependencyCycle()
     {
         return string.Empty;
+    }
+
+    public Symbol[] GetParameters(string identifier)
+    {
+        if(_parameters.TryGetValue(identifier, out var symbols))
+            return symbols.ToArray();
+
+        if(_parent is not null)
+            return _parent.GetParameters(identifier);
+
+        return [];
     }
 }

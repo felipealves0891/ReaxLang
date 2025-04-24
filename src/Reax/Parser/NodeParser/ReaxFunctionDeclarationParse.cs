@@ -15,14 +15,14 @@ public class ReaxFunctionDeclarationParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         source.Advance();
-        var identifier = source.CurrentToken.ToReaxValue();
+        var identifier = new IdentifierNode(source.CurrentToken.Source, source.CurrentToken.Location);
         source.Advance();
         var parameters = GetParameters(source).ToArray();
         source.Advance();
         var typeReturn = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
         source.Advance();
         var block = (ContextNode)source.NextBlock();
-
+        
         var node = new FunctionDeclarationNode(identifier, block, parameters, typeReturn, identifier.Location);
         Logger.LogParse(node.ToString());
         return node;

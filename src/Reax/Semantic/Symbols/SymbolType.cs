@@ -7,14 +7,17 @@ public enum SymbolType
     FLOAT,
     INT,
     LONG,
-    STRING
+    STRING,
+    VOID
 }
 
 public static class SymbolTypeExtensions
 {
     public static bool IsCompatible(this SymbolType a, SymbolType b) 
     {
-        return a == b || (a.IsNumber() && b.IsNumber());
+        return (a == b || (a.IsNumber() && b.IsNumber()))
+            || (a == SymbolType.STRING || b == SymbolType.STRING) 
+            && (a != SymbolType.VOID && b != SymbolType.VOID);
 
     }
 
