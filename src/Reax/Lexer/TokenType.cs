@@ -47,4 +47,5 @@ public enum TokenType
     INT_TYPE,
     LONG_TYPE,
     STRING_TYPE,
+    VOID_TYPE,
 } 

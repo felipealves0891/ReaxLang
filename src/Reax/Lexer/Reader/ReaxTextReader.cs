@@ -8,10 +8,10 @@ public class ReaxTextReader : IReader
     private readonly string _filename;
     private int _position;
 
-    public ReaxTextReader(string source)
+    public ReaxTextReader(string source, string filename)
     {
         _source = source;
-        _filename = source;
+        _filename = filename;
         _position = 0;
     }
 
