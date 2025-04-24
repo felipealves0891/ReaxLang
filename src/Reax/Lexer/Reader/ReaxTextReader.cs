@@ -10,7 +10,7 @@ public class ReaxTextReader : IReader
 
     public ReaxTextReader(string source)
     {
-        _source = File.ReadAllText(source);
+        _source = source;
         _filename = source;
         _position = 0;
     }

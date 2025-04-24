@@ -9,6 +9,14 @@ public struct Token
     private readonly SourceLocation _location;
     private readonly byte[] _source;
 
+    public Token(TokenType type, string source, string file, int position, int row)
+    {
+        _source = Encoding.UTF8.GetBytes(source);
+        _location = new SourceLocation(file, row, position);
+        Type = type;
+    }
+
+
     public Token(TokenType type, byte[] source, string file, int position, int row)
     {
         _source = source;
