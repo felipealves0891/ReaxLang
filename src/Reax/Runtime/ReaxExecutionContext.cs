@@ -111,7 +111,7 @@ public class ReaxExecutionContext
 
         if(_asyncKeys.Contains(key))
         {
-            Parallel.ForEach(observables, observable => {
+            var result = Parallel.ForEach(observables, observable => {
                 if(observable.CanRun(this)) observable.Run();
             });
         }

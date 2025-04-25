@@ -1,4 +1,5 @@
 using System;
+using Reax.Debugger;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
@@ -59,7 +60,9 @@ public class ReaxInterpreter
 
         foreach (var node in _nodes)
         {
+            Logger.LogInterpreter($"Adicionando {node} a stack!");
             StackTrace.Push(node);
+            Logger.LogInterpreter($"Adicionado {node} a stack!");
 
             if(node is ScriptDeclarationNode scriptDeclaration)
                 Name = scriptDeclaration.Identifier;
@@ -76,7 +79,9 @@ public class ReaxInterpreter
             else if(node is FunctionDeclarationNode function)
                 ExecuteDeclarationFunction(function);
 
+            Logger.LogInterpreter($"Removendo {node} a stack!");
             StackTrace.Pop();
+            Logger.LogInterpreter($"Removido {node} a stack!");
         }
 
         _isInitialized = true;
@@ -104,7 +109,9 @@ public class ReaxInterpreter
         
         foreach (var node in _nodes)
         {
+            Logger.LogInterpreter($"Adicionando {node} a stack!");
             StackTrace.Push(node);
+            Logger.LogInterpreter($"Adicionando {node} a stack!");
 
             if(node is FunctionCallNode functionCall)
                 Output = ExecuteFunctionCall(functionCall);
@@ -127,7 +134,9 @@ public class ReaxInterpreter
             else if(node is BinaryNode binary)
                 Output = new BooleanNode(ExecuteBinary(binary).ToString(), binary.Location);
 
+            Logger.LogInterpreter($"Removendo {node} a stack!");
             StackTrace.Pop();
+            Logger.LogInterpreter($"Removido {node} a stack!");
         }
     }
 
@@ -340,7 +349,7 @@ public class ReaxInterpreter
         var logical = (ILogicOperator)condition.Operator;
         return logical.Compare(left, right);
     }
-    
+
     public void PrintStackTrace() {
         foreach (var node in StackTrace.Reverse()) {
             Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");

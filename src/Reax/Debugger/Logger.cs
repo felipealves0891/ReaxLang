@@ -41,6 +41,14 @@ public static class Logger
         Log(done, LoggerLevel.DEBUG);
     }
     
+    public static void LogInterpreter(string message, [CallerMemberName] string caller = "") 
+    {
+        if(!Enabled) return;
+        var formateDate = DateTime.UtcNow.ToString(FormatDate);
+        var done = string.Format("INF [{0}] | Interpreter.{2} | {1}", formateDate, message, caller.PadRight(20, ' '));
+        Log(done, LoggerLevel.INFO);
+    }
+    
     public static void LogCompile(string message, [CallerMemberName] string caller = "") 
     {
         if(!Enabled) return;

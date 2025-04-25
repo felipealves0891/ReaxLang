@@ -17,8 +17,7 @@ public class ReaxArithmeticOperationParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         var statement = source.NextStatement();
-        var helper = new CalculationHelper(statement);
-        var node = helper.ParseExpression();
+        var node = ExpressionHelper.Parser(statement.ToArray());
         
         if(node is null)
             throw new InvalidOperationException("Valores faltando para a operação");
