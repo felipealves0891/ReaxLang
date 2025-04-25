@@ -40,7 +40,7 @@ const limite: int = 10;
 ```
 
 >Não é possivel utilizar um bind em outro que dependa dele exemplo:
->bind contador -> contador + 1;
+>**bind contador -> contador + 1;**
 >Isso ira gerar um erro em tempo de analise, devido a referencias circulares.
   
 
@@ -48,11 +48,10 @@ const limite: int = 10;
 ```
 on contador -> console.writer('Contando: {0}', contador);
 ```
-
 >Não é possivel alterar o valor da variavel observavel em um evento dispara
->on contador {
+>**on contador {
 >&nbsp;&nbsp;&nbsp;&nbsp;contador = contador + 1;
->};
+>};**
 >Isso ira gerar um erro em tempo de analise, devido a referencias circulares.
   
 ### Filtros de execuções de observadores
@@ -87,6 +86,7 @@ while controle < 100 and controle > 0) {
 }
 ```
 
+---
 ### Observadores assíncronos, os observadores são chamados de forma assíncrona
 ```
 async let minha_variavel = 'Meu Texto';
