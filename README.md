@@ -86,6 +86,7 @@ while controle < 100 and controle > 0) {
 }
 ```
 
+---
 ### Observadores assíncronos, os observadores são chamados de forma assíncrona
 ```
 async let minha_variavel = 'Meu Texto';
@@ -103,7 +104,7 @@ import module 'console';
 
 ### Funções
 ```
-fun sum(num, den) {
+fun sum(num: int, den: int) {
 	return num + den;
 }
 ```
