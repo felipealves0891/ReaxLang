@@ -86,7 +86,6 @@ while controle < 100 and controle > 0) {
 }
 ```
 
----
 ### Observadores assíncronos, os observadores são chamados de forma assíncrona
 ```
 async let minha_variavel = 'Meu Texto';
