@@ -108,3 +108,7 @@ fun sum(num: int, den: int) {
 	return num + den;
 }
 ```
+
+### Comentário
+
+> Para usar comentários você só precisa de um # antes e apartir da li toda a linha sera comentada

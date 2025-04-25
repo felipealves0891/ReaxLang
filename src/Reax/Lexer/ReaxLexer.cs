@@ -70,10 +70,22 @@ public class ReaxLexer
             return AdvanceAndReturn(new Token(TokenType.ACCESS, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows));
         if(_source.CurrentChar == ':')
             return AdvanceAndReturn(new Token(TokenType.TYPING, _source.CurrentChar, _source.FileName, _source.Position, _numberOfRows));
+        if(_source.CurrentChar == '#')
+            return Comment();
         if(_source.CurrentChar == '\n')
             _numberOfRows++;
-        
+
         _source.Advance();
+        return NextToken();
+    }
+
+    private Token Comment() 
+    {
+        _source.Advance();
+        while (_source.CurrentChar != '\n')
+            _source.Advance();
+        
+         _source.Advance();
         return NextToken();
     }
 
