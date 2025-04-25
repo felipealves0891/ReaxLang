@@ -12,6 +12,7 @@ public class ReaxScope : IReaxScope
     private readonly Guid _scopeId = Guid.NewGuid();
     private readonly Dictionary<string, List<Symbol>> _parameters = new Dictionary<string, List<Symbol>>();
     private readonly Dictionary<string, Symbol> _internal = new Dictionary<string, Symbol>();
+    private readonly Dictionary<string, IReaxScope> _modules = new Dictionary<string, IReaxScope>();
     private readonly ReferenceVisitor _dependencies = new ReferenceVisitor();
     private readonly IReaxScope? _parent;
 
@@ -60,9 +61,9 @@ public class ReaxScope : IReaxScope
             
     }
 
-    public void Declaration(IReaxDeclaration declaration)
+    public void Declaration(IReaxDeclaration declaration, string? module = null)
     {
-        var symbol = declaration.GetSymbol(_scopeId);
+        var symbol = declaration.GetSymbol(_scopeId, module);
         if(Exists(symbol.Identifier))
             throw new InvalidOperationException($"O simbulo {symbol.Identifier} já foi declarado!");
         
@@ -93,13 +94,21 @@ public class ReaxScope : IReaxScope
         }
     }
 
-    public Symbol Get(string identifier)
+    public Symbol Get(string identifier, string? module = null)
     {
-        if(_internal.TryGetValue(identifier, out var local))
-            return local;
+        if(!string.IsNullOrEmpty(module))
+        {
+            if(_modules.TryGetValue(module, out var scope))
+                return scope.Get(identifier);
+        }
+        else
+        {
+            if(_internal.TryGetValue(identifier, out var local))
+                return local;
+        }
 
         if(_parent is not null)
-            return _parent.Get(identifier);
+            return _parent.Get(identifier, module);
         else
             throw new InvalidOperationException($"O simbulo {identifier} não foi declarado!");
     }
@@ -137,14 +146,30 @@ public class ReaxScope : IReaxScope
         return string.Empty;
     }
 
-    public Symbol[] GetParameters(string identifier)
+    public Symbol[] GetParameters(string identifier, string? module = null)
     {
-        if(_parameters.TryGetValue(identifier, out var symbols))
-            return symbols.ToArray();
+        if(!string.IsNullOrEmpty(module))
+        {
+            if(_modules.TryGetValue(module, out var scope))
+                return scope.GetParameters(identifier);
+        }
+        else
+        {
+            if(_parameters.TryGetValue(identifier, out var symbols))
+                return symbols.ToArray();
+        }
 
         if(_parent is not null)
-            return _parent.GetParameters(identifier);
+            return _parent.GetParameters(identifier, module);
 
         return [];
+    }
+
+    public void AddExtensionContext(string identifier, IReaxScope scope)
+    {
+        if(_modules.ContainsKey(identifier))
+            throw new InvalidOperationException($"O modulo '{identifier}' já foi declarado!");
+
+        _modules[identifier] = scope;
     }
 }

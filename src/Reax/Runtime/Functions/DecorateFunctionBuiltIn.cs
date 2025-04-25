@@ -17,7 +17,7 @@ public class DecorateFunctionBuiltIn : Function, IReaxMultipleDeclaration
         this.function = function;
     }
 
-    public Symbol GetSymbol(Guid scope)
+    public Symbol GetSymbol(Guid scope, string? module = null)
     {
         return new Symbol(
             attribute.Name,

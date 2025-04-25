@@ -59,10 +59,10 @@ public static class Printer
                 int length = props[propKey];
                 var propValue = value?.GetType()?.GetProperty(propKey)?.GetValue(value)?.ToString() ?? "";
                 if(propValue.Length > props[propKey])
-                    props[propKey] = propValue.Length + 2;
+                    props[propKey] = propValue.Length + 3;
 
                 if(propKey.ToString().Length >= props[propKey])
-                    props[propKey] = propKey.ToString().Length + 2;
+                    props[propKey] = propKey.ToString().Length + 3;
             }            
         }
 

@@ -5,5 +5,6 @@ namespace Reax.Semantic.Interfaces;
 
 public interface IReaxExtensionContext
 {
+    string Identifier { get; }
     ReaxNode[] Context { get; }
 }

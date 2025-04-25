@@ -15,10 +15,11 @@ public record ExternalFunctionCallNode(
 
     public string Identifier => functionCall.Identifier;
     public IReaxType[] Parameters => functionCall.Parameters;
+    public string? Module => scriptName;
 
     public SymbolType GetReaxType(IReaxScope scope)
     {
-        return scope.Get(functionCall.Identifier).Type;
+        return scope.Get(functionCall.Identifier, scriptName).Type;
     }
 
     public override string ToString()

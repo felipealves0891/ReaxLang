@@ -21,7 +21,7 @@ public record DeclarationNode(
     public Symbol[] GetParameters(Guid scope)
         => Assignment is IReaxContext context ? context.GetParameters(scope) : [];
 
-    public Symbol GetSymbol(Guid scope)
+    public Symbol GetSymbol(Guid scope, string? module = null)
     {
         return new Symbol(
             Identifier, 
@@ -30,7 +30,8 @@ public record DeclarationNode(
             scope,
             !Immutable,
             Immutable,
-            Async);
+            Async,
+            parentName: module);
     }
 
     public override string ToString()

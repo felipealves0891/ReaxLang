@@ -16,13 +16,13 @@ public interface IReaxScope
 
     void Declaration(Symbol symbol);
 
-    void Declaration(IReaxDeclaration declaration);
+    void Declaration(IReaxDeclaration declaration, string? module = null);
 
     void Declaration(IReaxMultipleDeclaration declaration);
 
-    Symbol Get(string identifier);
+    Symbol Get(string identifier, string? module = null);
 
-    Symbol[] GetParameters(string identifier);
+    Symbol[] GetParameters(string identifier, string? module = null);
 
     void MarkAsAssigned(string identifier);
 
@@ -31,4 +31,6 @@ public interface IReaxScope
     bool HasDependencyCycle();
 
     string GetPathDependencyCycle();
+
+    void AddExtensionContext(string identifier, IReaxScope scope);
 }

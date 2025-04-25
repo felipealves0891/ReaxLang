@@ -12,6 +12,7 @@ public record FunctionCallNode(
     SourceLocation Location) : ReaxNode(Location), IReaxType, IReaxFunctionCall
 {
     public IReaxType[] Parameters => Parameter.Cast<IReaxType>().ToArray();
+    public string? Module => null;
 
     public SymbolType GetReaxType(IReaxScope scope)
     {

@@ -15,13 +15,14 @@ public record FunctionDeclarationNode(
 
     public ReaxNode[] Children => Block.Block;
 
-    public Symbol GetSymbol(Guid scope)
+    public Symbol GetSymbol(Guid scope, string? module = null)
     {
         return new Symbol(
             Identifier.Identifier,
             DataType.TypeName,
             SymbolCategoty.FUNCTION,
-            scope
+            scope,
+            parentName: module
         );
     }
 

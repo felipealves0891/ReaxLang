@@ -5,15 +5,18 @@ using Reax.Semantic.Symbols;
 namespace Reax.Parser.Node;
 
 public record ModuleNode(string identifier, Dictionary<string, Function> functions, 
-    SourceLocation Location) : ReaxNode(Location), IReaxMultipleDeclaration
+    SourceLocation Location) : ReaxNode(Location), IReaxBuiltIn
 {
-    public Symbol GetSymbol(Guid scope)
+    public string Identifier => identifier;
+
+    public Symbol GetSymbol(Guid scope, string? module = null)
     {
         return new Symbol(
             identifier,
             SymbolType.NONE,
             SymbolCategoty.MODULE,
-            scope
+            scope,
+            parentName: module
         );
     }
 

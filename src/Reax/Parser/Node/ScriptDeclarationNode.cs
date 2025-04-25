@@ -7,13 +7,14 @@ namespace Reax.Parser.Node;
 public record ScriptDeclarationNode(string Identifier, SourceLocation Location) 
     : ReaxNode(Location), IReaxDeclaration
 {
-    public Symbol GetSymbol(Guid scope)
+    public Symbol GetSymbol(Guid scope, string? module = null)
     {
         return new Symbol(
             Identifier,
             SymbolType.NONE,
             SymbolCategoty.SCRIPT,
-            scope
+            scope,
+            parentName: module
         );
     }
 

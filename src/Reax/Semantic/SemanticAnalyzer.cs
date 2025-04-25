@@ -9,12 +9,16 @@ namespace Reax.Semantic;
 
 public class SemanticAnalyzer
 {
+    private readonly string? _moduleName;
     private IReaxScope _symbols;
-
-    public SemanticAnalyzer()
+    
+    public SemanticAnalyzer(string? module = null)
     {
         _symbols = new ReaxScope();
+        _moduleName = module;
     }
+    
+    public IReaxScope Scope => _symbols;
 
     public void Analyze(ReaxNode[] nodes, IReaxScope? parent = null, IReaxContext? context = null) 
     {
@@ -37,6 +41,49 @@ public class SemanticAnalyzer
                 throw new InvalidOperationException("Existe referencias cinculares!");
     }
 
+    private void Process(ReaxNode[] nodes)
+    {
+        foreach (var node in nodes)
+        {
+            Logger.LogAnalize(node.ToString());
+
+            if(node is IReaxBuiltIn builtIn)
+            {
+                AddBuiltInContext(builtIn);
+                continue;
+            }
+            
+            if(node is IReaxExtensionContext extension)
+            {
+                AddExtensionContext(extension);
+                continue;
+            }
+            
+            if(node is IReaxDeclaration declaration) _symbols.Declaration(declaration, _moduleName);
+            if(node is IReaxMultipleDeclaration moduleDeclaration) _symbols.Declaration(moduleDeclaration);
+            if(node is IReaxAssignment assignment) ValidateAssigment(assignment);
+            if(node is IReaxBinder binder) ValidateBindCircularReferences(binder.Identifier, binder.Bound);
+            if(node is IReaxObservable observable) ValidateObservableCircularReferences(observable.Identifier, (IReaxChildren)observable);
+            if(node is IReaxFunctionCall functionCall) ValidateFunctionCall(functionCall);
+            if(node is IReaxContext reaxContext) Analyze(reaxContext.Context, _symbols, reaxContext);
+        }
+    }
+
+    private void AddBuiltInContext(IReaxBuiltIn builtIn)
+    {
+        var context = new ReaxScope();
+        context.Declaration((IReaxDeclaration)builtIn, builtIn.Identifier);
+        context.Declaration((IReaxMultipleDeclaration)builtIn);
+        _symbols.AddExtensionContext(builtIn.Identifier, context);
+    }
+
+    private void AddExtensionContext(IReaxExtensionContext extensions)
+    {
+        var analyzer = new SemanticAnalyzer(extensions.Identifier);
+        analyzer.Process(extensions.Context);
+        _symbols.AddExtensionContext(extensions.Identifier, analyzer.Scope);
+    }
+
     private void ValidateAssigment(IReaxAssignment assignment) 
     {
         var receivedSymbol = _symbols.Get(assignment.Identifier);
@@ -52,51 +99,7 @@ public class SemanticAnalyzer
 
         _symbols.MarkAsAssigned(assignment.Identifier);
     }
-
-    private void AddExtensionContext(IReaxExtensionContext extensions)
-    {
-        IReaxScope current = _symbols;
         
-        while(_symbols.IsChild())
-            _symbols = _symbols.GetParent();
-        
-        Process(extensions.Context);
-
-        _symbols = current;
-    }
-    
-    private void Process(ReaxNode[] nodes)
-    {
-        foreach (var node in nodes)
-        {
-            Logger.LogAnalize(node.ToString());
-
-            if(node is IReaxExtensionContext extension)
-                AddExtensionContext(extension);
-
-            if(node is IReaxDeclaration declaration)
-                _symbols.Declaration(declaration);
-
-            if(node is IReaxMultipleDeclaration moduleDeclaration)
-                _symbols.Declaration(moduleDeclaration);
-
-            if(node is IReaxAssignment assignment)
-                ValidateAssigment(assignment);
-
-            if(node is IReaxBinder binder)
-                ValidateBindCircularReferences(binder.Identifier, binder.Bound);
-
-            if(node is IReaxObservable observable)
-                ValidateObservableCircularReferences(observable.Identifier, (IReaxChildren)observable);
-
-            if(node is IReaxFunctionCall functionCall)
-                ValidateFunctionCall(functionCall);
-
-            if(node is IReaxContext reaxContext)
-                Analyze(reaxContext.Context, _symbols, reaxContext);
-        }
-    }
-
     private void ValidateBindCircularReferences(string identifier, IReaxChildren bound)
     {
         foreach (var child in bound.Children)
@@ -123,11 +126,11 @@ public class SemanticAnalyzer
 
     private void ValidateFunctionCall(IReaxFunctionCall functionCall)
     {
-        var function = _symbols.Get(functionCall.Identifier);
+        var function = _symbols.Get(functionCall.Identifier, functionCall.Module);
         if(function.Categoty != SymbolCategoty.FUNCTION)
             throw new InvalidOperationException($"Chamada de função não localizada: {function.Identifier}");
 
-        var declaredParameters = _symbols.GetParameters(functionCall.Identifier);
+        var declaredParameters = _symbols.GetParameters(functionCall.Identifier, functionCall.Module);
         var parameters = functionCall.Parameters;
 
         var requiredParameters = declaredParameters.Where(x => x.Categoty == SymbolCategoty.PARAMETER).Count();

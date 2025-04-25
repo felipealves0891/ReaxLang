@@ -5,5 +5,5 @@ namespace Reax.Semantic.Interfaces;
 
 public interface IReaxDeclaration
 {
-    Symbol GetSymbol(Guid scope);
+    Symbol GetSymbol(Guid scope, string? module = null);
 }

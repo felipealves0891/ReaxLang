@@ -20,13 +20,14 @@ public record BindNode(
 
     string IReaxBinder.Identifier => Identifier.Identifier;
 
-    public Symbol GetSymbol(Guid scope)
+    public Symbol GetSymbol(Guid scope, string? module = null)
     {
         return new Symbol(
             Identifier.Identifier,
             DataType.TypeName,
             SymbolCategoty.BIND,
-            scope);
+            scope,
+            parentName: module);
     }
 
     public override string ToString()
