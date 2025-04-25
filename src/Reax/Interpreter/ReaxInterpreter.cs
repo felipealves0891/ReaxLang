@@ -124,6 +124,8 @@ public class ReaxInterpreter
                 ExecuteWhile(@while);
             else if(node is ExternalFunctionCallNode scriptFunctionCallNode)
                 Output = ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
+            else if(node is BinaryNode binary)
+                Output = new BooleanNode(ExecuteBinary(binary).ToString(), binary.Location);
 
             StackTrace.Pop();
         }
@@ -152,7 +154,7 @@ public class ReaxInterpreter
     private ReaxNode? ExecuteFunctionCall(FunctionCallNode functionCall) 
     {
         var function = _context.GetFunction(functionCall.Identifier);
-        var parameters = functionCall.Parameter.Select(x => GetValue(x)).ToArray();
+        var parameters = functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
         return function.Invoke(parameters);
     }
 
@@ -170,9 +172,9 @@ public class ReaxInterpreter
                 throw new InvalidOperationException("A constante deve ser definida na declaração!");
 
             if(declaration.Assignment is AssignmentNode assignment)
-                _context.DeclareImmutable(declaration.Identifier, GetValue(assignment.Assigned));
+                _context.DeclareImmutable(declaration.Identifier, assignment.Assigned.GetValue(_context));
             else
-                _context.DeclareImmutable(declaration.Identifier, GetValue(declaration.Assignment));
+                _context.DeclareImmutable(declaration.Identifier, declaration.Assignment.GetValue(_context));
         }
         
     }
@@ -190,8 +192,8 @@ public class ReaxInterpreter
     public ReaxNode Calculate(CalculateNode node)
     {
         var op = (IArithmeticOperator)node.Operator;
-        var left = GetValue(CalculateChild(node.Left)) as NumberNode;
-        var right = GetValue(CalculateChild(node.Right)) as NumberNode;
+        var left = CalculateChild(node.Left).GetValue(_context) as NumberNode;
+        var right = CalculateChild(node.Right).GetValue(_context) as NumberNode;
 
         if(left is null)
             throw new InvalidOperationException($"Valor invalido para calculo '{left}'");
@@ -206,7 +208,7 @@ public class ReaxInterpreter
     {
         if(node is CalculateNode calculate)
             return Calculate(calculate);
-        else if (node is IReaxValue value)
+        else if (node is IReaxValue)
             return node;
         else 
             throw new InvalidOperationException("Não é possivel tratar o nó da operação!");
@@ -214,11 +216,11 @@ public class ReaxInterpreter
 
     private void ExecuteIf(IfNode node) 
     {
-        var left = GetValue(node.Condition.Left);
-        var right = GetValue(node.Condition.Right);
+        var left = node.Condition.Left.GetValue(_context);
+        var right = node.Condition.Right.GetValue(_context);
         var logical = (ILogicOperator)node.Condition.Operator;
-
-        if(logical.Compare(left, right))
+        var result = logical.Compare(left, right);
+        if(result)
         {
             var contextNode = (ContextNode)node.True;
             var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
@@ -254,7 +256,7 @@ public class ReaxInterpreter
     private ReaxNode ExecuteReturn(ReturnNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
-            return GetValue(returnNode.Expression);
+            return returnNode.Expression.GetValue(_context);
         
         var block = (ContextNode)returnNode.Expression;
         var interpreter = new ReaxInterpreter(returnNode.ToString(), block.Block, _context);
@@ -288,7 +290,7 @@ public class ReaxInterpreter
             if(value is null)
                 throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
 
-            var newValue = new NumberNode((value.ValueConverted + 1).ToString(), declaration.Location);
+            var newValue = new NumberNode(((decimal)value.ValueConverted + 1).ToString(), declaration.Location);
             _context.SetVariable(declaration.Identifier, newValue);
         }
     }
@@ -310,14 +312,14 @@ public class ReaxInterpreter
         if(_context.ScriptExists(node.scriptName))
         {
             var interpreter = _context.GetScript(node.scriptName);
-            var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
+            var parameters = node.functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
             var identifier = node.functionCall.Identifier;
             return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters, node.Location));
         }
         else if(_context.ModuleExists(node.scriptName)) 
         {
             var function = _context.GetModule(node.scriptName, node.functionCall.Identifier);
-            var parameters = node.functionCall.Parameter.Select(GetValue).ToArray();
+            var parameters = node.functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
             var identifier = node.functionCall.Identifier;
             return function.Invoke(parameters);
         }
@@ -329,36 +331,16 @@ public class ReaxInterpreter
     {
         var left = condition.Left is BinaryNode 
                  ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Left).ToString(), condition.Location) 
-                 : GetValue(condition.Left);
+                 : condition.Left.GetValue(_context);
 
         var right = condition.Right is BinaryNode 
                  ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Right).ToString(), condition.Location) 
-                 : GetValue(condition.Right);
+                 : condition.Right.GetValue(_context);
 
         var logical = (ILogicOperator)condition.Operator;
         return logical.Compare(left, right);
     }
-
-    private ReaxNode GetValue(ReaxNode node) 
-    {
-        if(node is NumberNode number)
-            return number;
-        else if(node is StringNode text)
-            return text;
-        else if(node is VarNode variable)
-            return _context.GetVariable(variable.Identifier);
-        else if(node is FunctionCallNode functionCall)
-        {
-            var function = _context.GetFunction(functionCall.Identifier);
-            var parameters = functionCall.Parameter.Select(x => GetValue(x)).ToArray();
-            return function.Invoke(parameters) 
-                ?? throw new InvalidOperationException($"{functionCall.Location} - função {functionCall.Identifier} não retornou um valor");
-        }
-        else
-            throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
-            
-    }
-
+    
     public void PrintStackTrace() {
         foreach (var node in StackTrace.Reverse()) {
             Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");

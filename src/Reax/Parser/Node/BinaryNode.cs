@@ -16,7 +16,7 @@ public record BinaryNode(
 
     public SymbolType GetReaxType(IReaxScope scope)
     {
-        return SymbolType.BOOLEAN;
+        return SymbolType.BOOL;
     }
 
     public override string ToString()

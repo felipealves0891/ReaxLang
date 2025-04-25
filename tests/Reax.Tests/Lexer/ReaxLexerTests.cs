@@ -86,6 +86,14 @@ public class ReaxLexerTests
                 [
                     "script calculate;", 
                     new TokenType[] {TokenType.SCRIPT, TokenType.IDENTIFIER, TokenType.END_STATEMENT, TokenType.EOF}
+                ],
+                [
+                    "fun eMenorQueZero(num: int):bool { return num < 0; }", 
+                    new TokenType[] {TokenType.FUNCTION, TokenType.IDENTIFIER, TokenType.START_PARAMETER, TokenType.IDENTIFIER, TokenType.TYPING, TokenType.INT_TYPE, TokenType.END_PARAMETER, TokenType.TYPING, TokenType.BOOLEAN_TYPE, TokenType.START_BLOCK, TokenType.RETURN, TokenType.IDENTIFIER, TokenType.COMPARISON, TokenType.NUMBER_LITERAL, TokenType.END_STATEMENT, TokenType.END_BLOCK, TokenType.EOF}
+                ],
+                [
+                    "eMenorQueZero(-1);", 
+                    new TokenType[] {TokenType.IDENTIFIER, TokenType.START_PARAMETER, TokenType.TERM, TokenType.NUMBER_LITERAL, TokenType.END_PARAMETER, TokenType.END_STATEMENT, TokenType.EOF}
                 ]
             ];
         }

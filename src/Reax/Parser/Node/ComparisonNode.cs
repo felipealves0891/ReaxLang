@@ -11,13 +11,13 @@ public record ComparisonNode(string Operator,
         var rigth = (NumberNode)y;
 
         if(Operator == "<")
-            return left.ValueConverted < rigth.ValueConverted;
+            return (decimal)left.ValueConverted < (decimal)rigth.ValueConverted;
         else if(Operator == ">")
-            return left.ValueConverted > rigth.ValueConverted;
+            return (decimal)left.ValueConverted > (decimal)rigth.ValueConverted;
         else if(Operator == "<=")
-            return left.ValueConverted <= rigth.ValueConverted;
+            return (decimal)left.ValueConverted <= (decimal)rigth.ValueConverted;
         else if(Operator == ">=")
-            return left.ValueConverted > rigth.ValueConverted;
+            return (decimal)left.ValueConverted > (decimal)rigth.ValueConverted;
         else
             throw new InvalidOperationException($"Operador de comparação invalido: {Operator}");
     }

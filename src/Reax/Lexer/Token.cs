@@ -38,6 +38,28 @@ public struct Token
     public ReadOnlySpan<byte> ReadOnlySource => new ReadOnlySpan<byte>(_source);
     public string Source => Encoding.GetEncoding("utf-8").GetString(_source);
     public SourceLocation Location => _location;
+
+    public Token AppendAtBeginning(Token token) 
+    {
+        var newSource = new byte[_source.Length + token.ReadOnlySource.Length];
+        var position = 0;
+
+        for (int i = 0; i < token.ReadOnlySource.Length; i++)
+        {
+            newSource[position] = token.ReadOnlySource[i];
+            position++;
+        }
+
+        for (int i = 0; i < _source.Length; i++)
+        {
+            newSource[position] = _source[i];
+            position++;
+        }
+
+        return new Token(Type, newSource, token.Location.File, token.Location.Position, token.Location.Line);
+
+    }
+
     public override string ToString()
     {
         return $"{File}#{Row} {Source} is {Type} at {Position}";

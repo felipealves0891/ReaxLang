@@ -9,15 +9,15 @@ namespace Reax.Parser.Node;
 public record BooleanNode(string Value, 
     SourceLocation Location) : ReaxNode(Location), IReaxValue, IReaxType
 {
-    public bool ValueConverted => bool.Parse(Value);
+    public object ValueConverted => bool.Parse(Value.ToLower());
 
     public SymbolType GetReaxType(IReaxScope scope)
     {
-        return SymbolType.BOOLEAN;
+        return SymbolType.BOOL;
     }
 
     public override string ToString()
     {
-        return $"{Value}";
+        return $"{Value.ToLower()}";
     }
 }

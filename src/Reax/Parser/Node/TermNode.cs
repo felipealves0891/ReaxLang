@@ -10,8 +10,8 @@ public record TermNode(
     {
         return Operator switch 
         {
-            "+" => new NumberNode((x.ValueConverted + y.ValueConverted).ToString(), x.Location),
-            "-" => new NumberNode((x.ValueConverted - y.ValueConverted).ToString(), x.Location),
+            "+" => new NumberNode(((decimal)x.ValueConverted + (decimal)y.ValueConverted).ToString(), x.Location),
+            "-" => new NumberNode(((decimal)x.ValueConverted - (decimal)y.ValueConverted).ToString(), x.Location),
             _ => throw new InvalidOperationException("Operador invalido!")
         };
     }

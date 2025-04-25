@@ -11,6 +11,8 @@ public record VarNode(
     DataTypeNode DataType,
     SourceLocation Location) : ReaxNode(Location), IReaxValue, IReaxType
 {
+    public object ValueConverted => Identifier;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return scope.Get(Identifier).Type;

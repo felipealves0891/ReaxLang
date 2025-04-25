@@ -9,6 +9,8 @@ namespace Reax.Parser.Node;
 public record StringNode(string Value, 
     SourceLocation Location) : ReaxNode(Location), IReaxValue, IReaxType
 {
+    public object ValueConverted => Value;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return SymbolType.STRING;

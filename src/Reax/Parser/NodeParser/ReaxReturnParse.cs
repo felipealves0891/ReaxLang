@@ -1,6 +1,8 @@
 using System;
+using System.Linq.Expressions;
 using Reax.Debugger;
 using Reax.Lexer;
+using Reax.Parser.Helper;
 using Reax.Parser.Node;
 
 namespace Reax.Parser.NodeParser;
@@ -24,10 +26,7 @@ public class ReaxReturnParse : INodeParser
             return result;
         }
         
-        var parser = new ReaxParser(statement);
-        var context = parser.Parse();
-
-        var node = new ContextNode(context.ToArray(), statement[0].Location);
+        var node = new ContextNode([ExpressionHelper.Parser(statement)], statement[0].Location);
         var returnNode = new ReturnNode(node, location);
         Logger.LogParse(returnNode.ToString());
 

@@ -12,8 +12,8 @@ public record LogicNode(string Operator,
 
         return Operator switch 
         {
-            "and" => left.ValueConverted && right.ValueConverted,
-            "or" => left.ValueConverted || right.ValueConverted,
+            "and" => (bool)left.ValueConverted && (bool)right.ValueConverted,
+            "or" => (bool)left.ValueConverted || (bool)right.ValueConverted,
             _ => throw new InvalidOperationException($"Operador invalido para operação logica {Operator}!")
         };
     }

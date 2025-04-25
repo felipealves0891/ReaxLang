@@ -3,7 +3,7 @@ namespace Reax.Semantic.Symbols;
 public enum SymbolType
 {
     NONE,
-    BOOLEAN,
+    BOOL,
     FLOAT,
     INT,
     LONG,

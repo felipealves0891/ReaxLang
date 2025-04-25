@@ -10,8 +10,8 @@ public record FactorNode(
     {
         return Operator switch 
         {
-            "*" => new NumberNode((x.ValueConverted * y.ValueConverted).ToString(), Location),
-            "/" => new NumberNode((x.ValueConverted / y.ValueConverted).ToString(), Location),
+            "*" => new NumberNode(((decimal)x.ValueConverted * (decimal)y.ValueConverted).ToString(), Location),
+            "/" => new NumberNode(((decimal)x.ValueConverted / (decimal)y.ValueConverted).ToString(), Location),
             _ => throw new InvalidOperationException("Operador invalido!")
         };
     }

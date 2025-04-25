@@ -1,3 +1,4 @@
+using System.Text;
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
 using Reax.Semantic.Interfaces;
@@ -10,7 +11,7 @@ public record NumberNode(
     string Value, 
     SourceLocation Location) : ReaxNode(Location), IReaxValue, IReaxType
 {
-    public decimal ValueConverted => decimal.Parse(Value);
+    public object ValueConverted => decimal.Parse(Value);
 
     public SymbolType GetReaxType(IReaxScope scope)
     {
