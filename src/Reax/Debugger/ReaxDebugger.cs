@@ -6,8 +6,15 @@ namespace Reax.Debugger;
 
 public class ReaxDebugger
 {
-    public static bool ToNextLine { get; private set; }
+    public static Table<DebuggerModel> Table { get; private set; } = new();
+    public static bool ToNextLine { get; private set; } = false;
     
+    static ReaxDebugger() 
+    {
+        Table.AddItemMenu("Seta para baixo", "Linha a linha");
+        Table.AddItemMenu("Enter", "Continuar");
+    }
+
     public static void Debugger(DebuggerArgs args)
     {
         var source = args.Location;
@@ -20,10 +27,10 @@ public class ReaxDebugger
         }
     
         Console.Clear();
-        var table = new Table<DebuggerModel>();
-        table.SetData(args.Models);
-        table.Print();
+        Table.SetData(args.Models);
+        Table.Print();
         Console.WriteLine("|");
+        Console.WriteLine();
         Console.WriteLine(source);
         PrintStackTrace(args.StackTrace);
 

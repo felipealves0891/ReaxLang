@@ -7,13 +7,20 @@ public class Table<TData>
     where TData : class
 {
     private readonly IDictionary<PropertyInfo, int> _columns = new Dictionary<PropertyInfo, int>();
+    private readonly Menu _menu;
     private IList<TData> Data = new List<TData>();
 
     public Table()
     {
+        _menu = new Menu();
         var columns = typeof(TData).GetProperties();       
         foreach (var column in columns)
             _columns.Add(column, column.Name.Length + 3);
+    }
+
+    public void AddItemMenu(string name, string action)
+    {
+        _menu.SetAction(name, action);
     }
 
     public void SetData(IEnumerable<TData> data)
@@ -33,6 +40,9 @@ public class Table<TData>
 
     public void Print()
     {
+        var width = _columns.Values.Sum();
+        _menu.Print(width);
+        
         DrawHeader();
         DrawData();
     }
