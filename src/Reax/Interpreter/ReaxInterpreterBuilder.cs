@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Reax.Debugger;
 using Reax.Parser.Node;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Functions.Attributes;
@@ -21,10 +22,16 @@ public class ReaxInterpreterBuilder
             return ReaxEnvironment.MainInterpreter;
 
         ReaxEnvironment.MainInterpreter = new ReaxInterpreter(nodes);
+        ReaxEnvironment.MainInterpreter.Debug += ReaxDebugger.Debugger;
         return ReaxEnvironment.MainInterpreter;
     }
 
     public ReaxInterpreter BuildScript(ReaxNode[] nodes) 
-        =>  new ReaxInterpreter(Name, nodes);
+    {
+        var interpreter = new ReaxInterpreter(Name, nodes);
+        interpreter.Debug += ReaxDebugger.Debugger;
+        return interpreter;
+    }
+        
     
 }

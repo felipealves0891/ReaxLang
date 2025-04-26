@@ -1,4 +1,5 @@
 using System;
+using Reax.ConsoleDisplay.ConsoleTable;
 using Reax.Debugger;
 using Reax.Parser;
 using Reax.Parser.Node;
@@ -17,6 +18,7 @@ public class ReaxInterpreter
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
     private bool _isInitialized = false;
+
 
     public ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
         : this(name, nodes, context)
@@ -45,9 +47,11 @@ public class ReaxInterpreter
         _parameters = new Dictionary<int, ReaxNode>();
     }
 
+    public Action<DebuggerArgs>? Debug { get; set; }
     public ReaxNode? Output { get; private set; }
     public string Name { get; private set; } = "Main";
     public ReaxNode[] Nodes => _nodes;
+
 
     public void DeclareAndSetFunction(string identifier, Function function) 
     {
@@ -143,15 +147,14 @@ public class ReaxInterpreter
             Logger.LogInterpreter($"Removido {node} a stack!");
 
             if(ReaxEnvironment.Debug)
-                PrintDebug(node.Location);
-            
-                
+                OnDebug(node.Location);
         }
     }
 
     private void ExecuteDeclareBind(BindNode bind) 
     {
         var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node], _context);
+        interpreter.Debug += ReaxDebugger.Debugger;
         _context.Declare(bind.Identifier.Identifier);
         _context.SetBind(bind.Identifier.Identifier, interpreter);
     }
@@ -242,12 +245,14 @@ public class ReaxInterpreter
         {
             var contextNode = (ContextNode)node.True;
             var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
+            interpreter.Debug += ReaxDebugger.Debugger;
             interpreter.Interpret();
         }
         else if(node.False is not null)
         {
             var contextNode = (ContextNode)node.False;
             var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
+            interpreter.Debug += ReaxDebugger.Debugger;
             interpreter.Interpret();
         }
     }
@@ -257,12 +262,14 @@ public class ReaxInterpreter
         var identifier = node.Var.ToString();
         var contextNode = (ContextNode)node.Block;
         var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
+        interpreter.Debug += ReaxDebugger.Debugger;
         _context.SetObservable(identifier, interpreter, node.Condition);
     }
 
     private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 
     {
         var interpreter = new ReaxInterpreter(node.ToString(), node.Block, _context);
+        interpreter.Debug += ReaxDebugger.Debugger;
         interpreter.Interpret();
 
         if(interpreter.Output is null)
@@ -278,6 +285,7 @@ public class ReaxInterpreter
         
         var block = (ContextNode)returnNode.Expression;
         var interpreter = new ReaxInterpreter(returnNode.ToString(), block.Block, _context);
+        interpreter.Debug += ReaxDebugger.Debugger;
         interpreter.Interpret();
 
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
@@ -288,6 +296,7 @@ public class ReaxInterpreter
         var block = (ContextNode)node.Block;
         var identifier = node.Identifier.Identifier;
         var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context, node.Parameters);
+        interpreter.Debug += ReaxDebugger.Debugger;
         _context.Declare(identifier);
         _context.SetFunction(identifier, interpreter);
     }
@@ -302,6 +311,7 @@ public class ReaxInterpreter
         while(ExecuteBinary(condition))
         {
             var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context);
+            interpreter.Debug += ReaxDebugger.Debugger;
             interpreter.Interpret();
 
             var value = _context.GetVariable(declaration.Identifier) as NumberNode;
@@ -321,6 +331,7 @@ public class ReaxInterpreter
         while(ExecuteBinary(condition))
         {
             var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context);
+            interpreter.Debug += ReaxDebugger.Debugger;
             interpreter.Interpret();
         }
     }
@@ -359,32 +370,10 @@ public class ReaxInterpreter
         return logical.Compare(left, right);
     }
 
-    public void PrintDebug(SourceLocation source) 
+    private void OnDebug(SourceLocation location) 
     {
-        if(!ToNextLine)
-        {
-            if(!ReaxEnvironment.BreakPoints.TryGetValue(source.File, out var lines) || !lines.Contains(source.Line))
-            {
-                return;
-            }
-        }
-            
-
-        Console.Clear();
-
-        if(ToNextLine)
-            Console.WriteLine("################################ Line to Line ################################");
-        
-        Console.WriteLine(source);
-        PrintStackTrace();
-        var header = _context.Debug().PrintTableHeader();
-        _context.Debug().PrintTable(header);
-
-        ToNextLine = false;
-        if(Console.ReadKey().Key == ConsoleKey.DownArrow)
-            ToNextLine = true;
-    
-    } 
+        Debug?.Invoke(new DebuggerArgs(_context.Debug(), StackTrace, location));
+    }
 
     public void PrintStackTrace() {
         if(!StackTrace.Any()) return;

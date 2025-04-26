@@ -7,7 +7,6 @@ ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
 ReaxEnvironment.Debug = true;
 ReaxEnvironment.BreakPoints[@"D:\Source\scripts\simple.reax"] = new HashSet<int>([60]);
 
-
 var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
 
 try
@@ -20,4 +19,3 @@ catch (System.Exception ex)
     Console.WriteLine("Reax Error:");
     interpreter.PrintStackTrace();
 }
-

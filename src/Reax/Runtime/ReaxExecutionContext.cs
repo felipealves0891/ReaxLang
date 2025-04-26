@@ -369,7 +369,6 @@ public class ReaxExecutionContext
             yield return new DebuggerModel
             {
                 Name = name,
-                Identifier = identifier.ToString(),
                 Async = _asyncKeys.Contains(identifier).ToString(),
                 Immutable = _immutableKeys.Contains(identifier).ToString(),
                 Bind = _bindContext.ContainsKey(identifier).ToString(),
