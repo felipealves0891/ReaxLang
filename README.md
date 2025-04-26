@@ -20,8 +20,7 @@ Reax é uma linguagem de programação reativa e estática com sintaxe simples, 
   
 
 ## Referencias
-
-  
+ 
 
 ### Variáveis podem ser observadas e sempre que alterada gera um evento
 
@@ -110,5 +109,7 @@ fun sum(num: int, den: int) {
 ```
 
 ### Comentário
-
 > Para usar comentários você só precisa de um # antes e apartir da li toda a linha sera comentada
+
+### Debug
+O debug é bem inicial e simplificado, mas já é possível identificar as alterações de variáveis, contexto e stack trace  
