@@ -9,6 +9,7 @@ public interface IReader
     public byte CurrentChar { get; }
     public byte NextChar { get; }
     public int Position { get; }
+    public int Line { get; }
     public void Advance();
     public byte[] GetString(int start, int end);
     public string FileName { get; }

@@ -21,12 +21,14 @@ public class ReaxTextReader : IReader
     public byte NextChar => (byte)_source[Position+1];
     public int Position => _position;
     public string FileName => _filename;
+    public int Line { get; private set; } = 1;
 
     public void Advance() 
     {
         if(EndOfFile)
             throw new InvalidOperationException("Não é possivel avançar após o fim do arquivo!");
 
+        if(CurrentChar == '\n') Line++;
         _position++;
     }
 

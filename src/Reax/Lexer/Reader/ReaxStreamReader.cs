@@ -52,11 +52,14 @@ public class ReaxStreamReader : IReader
 
     public string FileName => _filename;
 
+    public int Line { get; private set; } = 1;
+
     public void Advance()
     {
         if(EndOfFile)
             throw new InvalidOperationException("Não é possivel avançar após o fim do arquivo");
 
+        if(CurrentChar == '\n') Line++;
         _stream.Position++;
     }
 

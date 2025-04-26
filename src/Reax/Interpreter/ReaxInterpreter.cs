@@ -1,5 +1,6 @@
 using System;
 using Reax.Debugger;
+using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
@@ -10,6 +11,7 @@ namespace Reax.Interpreter;
 public class ReaxInterpreter
 {
     public static Stack<ReaxNode> StackTrace = new Stack<ReaxNode>();
+    public static bool ToNextLine = false;
 
     private readonly ReaxNode[] _nodes;
     private readonly ReaxExecutionContext _context;
@@ -141,13 +143,8 @@ public class ReaxInterpreter
             Logger.LogInterpreter($"Removido {node} a stack!");
 
             if(ReaxEnvironment.Debug)
-            {                
-                Console.Clear();
-                Console.WriteLine(node.Location);
-                var header = _context.Debug().PrintTableHeader();
-                _context.Debug().PrintTable(header);
-                Console.Read();
-            }
+                PrintDebug(node.Location);
+            
                 
         }
     }
@@ -362,7 +359,36 @@ public class ReaxInterpreter
         return logical.Compare(left, right);
     }
 
+    public void PrintDebug(SourceLocation source) 
+    {
+        if(!ToNextLine)
+        {
+            if(!ReaxEnvironment.BreakPoints.TryGetValue(source.File, out var lines) || !lines.Contains(source.Line))
+            {
+                return;
+            }
+        }
+            
+
+        Console.Clear();
+
+        if(ToNextLine)
+            Console.WriteLine("################################ Line to Line ################################");
+        
+        Console.WriteLine(source);
+        PrintStackTrace();
+        var header = _context.Debug().PrintTableHeader();
+        _context.Debug().PrintTable(header);
+
+        ToNextLine = false;
+        if(Console.ReadKey().Key == ConsoleKey.DownArrow)
+            ToNextLine = true;
+    
+    } 
+
     public void PrintStackTrace() {
+        if(!StackTrace.Any()) return;
+        
         foreach (var node in StackTrace.Reverse()) {
             Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");
         }
