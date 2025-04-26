@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Reax.ConsoleDisplay.ConsoleTable;
 using Reax.Parser.Node;
 
@@ -31,7 +32,7 @@ public class ReaxDebugger
             ToNextLine = true;
     }
 
-    public static void PrintStackTrace(Stack<ReaxNode> StackTrace) {
+    public static void PrintStackTrace(ConcurrentStack<ReaxNode> StackTrace) {
         if(!StackTrace.Any()) return;
         foreach (var node in StackTrace.Reverse()) {
             Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");

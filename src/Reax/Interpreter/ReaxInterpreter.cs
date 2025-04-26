@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using Reax.ConsoleDisplay.ConsoleTable;
 using Reax.Debugger;
 using Reax.Parser;
@@ -11,7 +12,7 @@ namespace Reax.Interpreter;
 
 public class ReaxInterpreter
 {
-    public static Stack<ReaxNode> StackTrace = new Stack<ReaxNode>();
+    public static ConcurrentStack<ReaxNode> StackTrace = new ConcurrentStack<ReaxNode>();
     public static bool ToNextLine = false;
 
     private readonly ReaxNode[] _nodes;
@@ -87,7 +88,7 @@ public class ReaxInterpreter
                 ExecuteDeclarationFunction(function);
 
             Logger.LogInterpreter($"Removendo {node} a stack!");
-            StackTrace.Pop();
+            StackTrace.TryPop(out var _);
             Logger.LogInterpreter($"Removido {node} a stack!");
         }
 
@@ -143,7 +144,7 @@ public class ReaxInterpreter
                 Output = new BooleanNode(ExecuteBinary(binary).ToString(), binary.Location);
 
             Logger.LogInterpreter($"Removendo {node} a stack!");
-            StackTrace.Pop();
+            StackTrace.TryPop(out var _);
             Logger.LogInterpreter($"Removido {node} a stack!");
 
             if(ReaxEnvironment.Debug)

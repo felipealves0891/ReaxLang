@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using Reax.Parser;
 using Reax.Parser.Node;
 
@@ -8,7 +9,7 @@ public class DebuggerArgs
 {
     public DebuggerArgs(
         IEnumerable<DebuggerModel> models, 
-        Stack<ReaxNode> stackTrace, 
+        ConcurrentStack<ReaxNode> stackTrace, 
         SourceLocation location)
     {
         Models = models;
@@ -17,6 +18,6 @@ public class DebuggerArgs
     }
 
     public IEnumerable<DebuggerModel> Models { get; private set; }
-    public Stack<ReaxNode> StackTrace { get; private set; }
+    public ConcurrentStack<ReaxNode> StackTrace { get; private set; }
     public SourceLocation Location { get; private set; }
 }
