@@ -56,7 +56,6 @@ public static class Printer
         {
             foreach (var propKey in props.Keys)
             {
-                int length = props[propKey];
                 var propValue = value?.GetType()?.GetProperty(propKey)?.GetValue(value)?.ToString() ?? "";
                 if(propValue.Length > props[propKey])
                     props[propKey] = propValue.Length + 3;
