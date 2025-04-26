@@ -104,7 +104,10 @@ public class Table<TData>
             length--;
         }
 
-        Console.Write(value.PadRight(length, fillment));
+        if(value.Length <= length)
+            Console.Write(value.PadRight(length, fillment));
+        else
+            Console.Write(value.Substring(0, length));
     }
 
 

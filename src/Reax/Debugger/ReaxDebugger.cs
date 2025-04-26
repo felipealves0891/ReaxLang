@@ -1,4 +1,3 @@
-using System;
 using Reax.ConsoleDisplay.ConsoleTable;
 using Reax.Parser.Node;
 
@@ -20,7 +19,6 @@ public class ReaxDebugger
         }
     
         Console.Clear();
-        
         var table = new Table<DebuggerModel>();
         table.SetData(args.Models);
         table.Print();
