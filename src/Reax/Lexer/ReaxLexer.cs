@@ -85,6 +85,7 @@ public class ReaxLexer
         while (_source.CurrentChar != '\n')
             _source.Advance();
         
+        _numberOfRows++;
          _source.Advance();
         return NextToken();
     }

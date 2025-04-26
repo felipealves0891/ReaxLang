@@ -57,11 +57,11 @@ public static class Printer
             foreach (var propKey in props.Keys)
             {
                 var propValue = value?.GetType()?.GetProperty(propKey)?.GetValue(value)?.ToString() ?? "";
-                if(propValue.Length > props[propKey])
+                if(propValue.Length >= props[propKey])
                     props[propKey] = propValue.Length + 3;
 
-                if(propKey.ToString().Length >= props[propKey])
-                    props[propKey] = propKey.ToString().Length + 3;
+                if(propKey.Length >= props[propKey])
+                    props[propKey] = propKey.Length + 3;
             }            
         }
 
@@ -100,6 +100,7 @@ public static class Printer
             Console.Write("|");
             length--;
         }
+
         Console.Write(value.PadRight(length, fillment));
     }
     

@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
+using Reax.Debugger;
 using Reax.Interpreter;
 using Reax.Parser.Node;
+using Reax.Parser.Node.Interfaces;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Observables;
 
@@ -350,5 +352,61 @@ public class ReaxExecutionContext
             return null;
         }
     }
+
+    public IEnumerable<DebuggerModel> Debug() 
+    {
+        if(_parentContext is not null)
+        {
+            foreach (var item in _parentContext.Debug())
+            {
+                yield return item;
+            }
+        }
+
+        foreach (var name in _symbols.Keys)
+        {
+            var identifier = _symbols[name];
+            yield return new DebuggerModel
+            {
+                Name = name,
+                Identifier = identifier.ToString(),
+                Async = _asyncKeys.Contains(identifier).ToString(),
+                Immutable = _immutableKeys.Contains(identifier).ToString(),
+                Bind = _bindContext.ContainsKey(identifier).ToString(),
+                Context = _name,
+                Type = GetIdentifierType(identifier),
+                Value = GetIdentifierType(identifier) switch 
+                {
+                   "variable" =>  _variableContext[identifier].GetValue(this).ToString(),
+                   "bind" => _bindContext[identifier].Output?.ToString() ?? "",
+                   "function" => "function",
+                   "module" => "module",
+                   "observable" => "observable",
+                   "script" => "script",
+                   _ => "undefined" 
+                }
+            };
+        }
+    }
+
+    private string GetIdentifierType(Guid guid)
+    {
+        if(_variableContext.ContainsKey(guid))
+            return "variable";
+        else if(_bindContext.ContainsKey(guid))
+            return "bind";
+        else if(_functionContext.ContainsKey(guid))
+            return "function";
+        else if(_moduleContext.ContainsKey(guid))
+            return "module";
+        else if(_observableContext.ContainsKey(guid))
+            return "observable";
+        else if(_scriptContext.ContainsKey(guid))
+            return "script";
+        else
+            return "none";
+    }
+
+    
 
 }

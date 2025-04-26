@@ -60,6 +60,7 @@ public class ReaxInterpreter
 
         foreach (var node in _nodes)
         {
+            Logger.LogInterpreter(node.Location.ToString());
             Logger.LogInterpreter($"Adicionando {node} a stack!");
             StackTrace.Push(node);
             Logger.LogInterpreter($"Adicionado {node} a stack!");
@@ -109,6 +110,7 @@ public class ReaxInterpreter
         
         foreach (var node in _nodes)
         {
+            Logger.LogInterpreter(node.Location.ToString());
             Logger.LogInterpreter($"Adicionando {node} a stack!");
             StackTrace.Push(node);
             Logger.LogInterpreter($"Adicionando {node} a stack!");
@@ -137,6 +139,16 @@ public class ReaxInterpreter
             Logger.LogInterpreter($"Removendo {node} a stack!");
             StackTrace.Pop();
             Logger.LogInterpreter($"Removido {node} a stack!");
+
+            if(ReaxEnvironment.Debug)
+            {                
+                Console.Clear();
+                Console.WriteLine(node.Location);
+                var header = _context.Debug().PrintTableHeader();
+                _context.Debug().PrintTable(header);
+                Console.Read();
+            }
+                
         }
     }
 
