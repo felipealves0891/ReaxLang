@@ -1,4 +1,5 @@
 using System;
+using Reax.Semantic.Symbols;
 
 namespace Reax.Parser.Node.Interfaces;
 
@@ -10,4 +11,7 @@ public interface IValidateResult
 }
 
 public interface ISemanticContext
-{}
+{
+    IValidateResult SetSymbol(Symbol symbol);
+    Symbol? SetSymbol(string Identifier);
+}

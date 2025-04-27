@@ -16,7 +16,7 @@ public record FunctionDeclarationNode(
         return $"fun {Identifier.Identifier} ({param}):{SuccessType} | {ErrorType} {{...}}";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

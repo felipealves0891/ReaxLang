@@ -14,7 +14,7 @@ public record ForNode(
         return $"for {Declaration} to {Condition} {{...}}";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

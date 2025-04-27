@@ -20,7 +20,7 @@ public record DeclarationNode(
             return $"{asc}{mut} {Identifier}: {Type};";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

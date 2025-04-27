@@ -13,7 +13,7 @@ public record ModuleNode(
         return $"import module {identifier};";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

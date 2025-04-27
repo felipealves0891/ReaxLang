@@ -13,7 +13,7 @@ public record FunctionCallNode(
         return $"{Identifier}({string.Join(',', Parameter.Select(x => x.ToString()))});";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

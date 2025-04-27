@@ -14,7 +14,7 @@ public record ExternalFunctionCallNode(
         return $"{scriptName}.{functionCall.Identifier}({string.Join(',', parameters)})";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

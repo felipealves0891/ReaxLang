@@ -15,7 +15,7 @@ public record MatchNode(
         return $"match {Expression} {{ success, error }}";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

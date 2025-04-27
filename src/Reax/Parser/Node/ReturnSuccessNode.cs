@@ -12,7 +12,7 @@ public record ReturnSuccessNode(
         return $"return success {Expression}";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }

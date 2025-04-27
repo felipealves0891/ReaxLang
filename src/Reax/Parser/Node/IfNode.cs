@@ -14,7 +14,7 @@ public record IfNode(
         return $"if {Condition} {{}} {elseText}";
     }
 
-    public IValidateResult Validate(ISemanticContext context)
+    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
         throw new NotImplementedException();
     }
