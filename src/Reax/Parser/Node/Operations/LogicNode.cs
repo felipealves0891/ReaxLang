@@ -1,7 +1,7 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Operations;
 
 public record LogicNode(string Operator, 
     SourceLocation Location) : ReaxNode(Location), ILogicOperator

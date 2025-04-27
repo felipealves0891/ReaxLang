@@ -2,6 +2,7 @@ using System;
 using Reax.Lexer;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Literals;
+using Reax.Parser.Node.Operations;
 
 namespace Reax.Parser.Helper;
 

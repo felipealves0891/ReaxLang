@@ -1,9 +1,10 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Operations;
 
-public record ComparisonNode(string Operator, 
+public record ComparisonNode(
+    string Operator, 
     SourceLocation Location) : ReaxNode(Location), ILogicOperator
 {
     public bool Compare(ReaxNode x, ReaxNode y)
