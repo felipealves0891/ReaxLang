@@ -28,7 +28,7 @@ public class ReaxBindNodeParse : INodeParser
         var bind = new BindNode(
             new IdentifierNode(identifier.Source.ToString(), identifier.Location), 
             new ContextNode([node], identifier.Location), 
-            new DataTypeNode(dataType.Source, dataType.Location), 
+            dataType.Type.ToDataType(),
             identifier.Location);
             
         Logger.LogParse(bind.ToString());

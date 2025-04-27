@@ -30,7 +30,7 @@ public class ReaxForParse : INodeParser
             identifierControl.Source, 
             false, 
             false, 
-            new DataTypeNode(dataType.Source, dataType.Location), 
+            dataType.Type.ToDataType(),
             initialValue.ToReaxValue(), 
             identifierControl.Location);
             

@@ -135,11 +135,11 @@ public static class TokenExtensions
 
     private static ReaxNode CreateVar(Token token, Token? type = null) 
     {
-        DataTypeNode dataType;
+        DataType dataType;
         if(type is null)
-            dataType = new DataTypeNode("NONE", token.Location);
+            dataType = DataType.NONE;
         else
-            dataType = new DataTypeNode(type.Value.Source, type.Value.Location);
+            dataType = type.Value.Type.ToDataType();
 
         return new VarNode(
             token.Source, 

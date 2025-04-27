@@ -5,7 +5,7 @@ namespace Reax.Parser.Node;
 public record ActionNode(
     VarNode[] Parameters,
     ReaxNode Context,
-    DataTypeNode DataType,
+    DataType Type,
     SourceLocation Location) : ReaxNode(Location)
 {
     public ReaxNode[] Children => [Context];
@@ -13,6 +13,6 @@ public record ActionNode(
     public override string ToString()
     {
         var parameters = string.Join(',', Parameters.Select(x => x.ToString()));
-        return $"({parameters}){DataType} -> {{...}}";
+        return $"({parameters}){Type} -> {{...}}";
     }
 }

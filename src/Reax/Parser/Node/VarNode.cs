@@ -5,11 +5,10 @@ namespace Reax.Parser.Node;
 
 public record VarNode(
     string Identifier, 
-    DataTypeNode DataType,
+    DataType Type,
     SourceLocation Location) : ReaxNode(Location), IReaxValue
 {
     public object Value => Identifier;
-    public DataType Type => Enum.Parse<DataType>(DataType.TypeName);
 
     public override string ToString()
     {

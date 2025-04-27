@@ -6,5 +6,6 @@ public enum DataType
     NUMBER,
     BOOLEAN,
     NULL,
-    VOID
+    VOID,
+    NONE
 }

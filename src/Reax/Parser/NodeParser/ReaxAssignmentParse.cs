@@ -16,7 +16,7 @@ public class ReaxAssignmentParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         var identifier = source.CurrentToken;
-        var var = new VarNode(identifier.Source, new DataTypeNode("NONE", identifier.Location), identifier.Location);
+        var var = new VarNode(identifier.Source, DataType.NONE, identifier.Location);
 
         source.Advance(TokenType.ASSIGNMENT);
         source.Advance();

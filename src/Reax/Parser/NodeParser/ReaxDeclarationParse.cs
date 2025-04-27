@@ -27,7 +27,7 @@ public class ReaxDeclarationParse : INodeParser
         source.Advance([TokenType.TYPING]);
         source.Advance(Token.DataTypes);
 
-        var dataType = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);  
+        var dataType = source.CurrentToken.Type.ToDataType();
         source.Advance([TokenType.ASSIGNMENT, TokenType.END_STATEMENT]);
         
         if(source.CurrentToken.Type == TokenType.END_STATEMENT)

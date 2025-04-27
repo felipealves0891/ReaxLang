@@ -198,7 +198,7 @@ public class ReaxInterpreter
         {
             _context.DeclareVariable(declaration.Identifier, declaration.Async);
             if(declaration.Assignment is not null)
-                ExecuteAssignment(new AssignmentNode(new VarNode(declaration.Identifier, declaration.DataType, declaration.Location), declaration.Assignment, declaration.Location));    
+                ExecuteAssignment(new AssignmentNode(new VarNode(declaration.Identifier, declaration.Type, declaration.Location), declaration.Assignment, declaration.Location));    
         }
         else 
         {

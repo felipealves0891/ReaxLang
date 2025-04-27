@@ -19,14 +19,14 @@ public class ReaxFunctionDeclarationParse : INodeParser
         source.Advance(TokenType.START_PARAMETER);
         var parameters = GetParameters(source).ToArray();
         source.Advance(Token.DataTypes);
-        var successType = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
+        var successType = source.CurrentToken.Type.ToDataType();
         source.Advance([TokenType.PIPE, TokenType.START_BLOCK]);
 
-        DataTypeNode errorType = new DataTypeNode("void", successType.Location);
+        var errorType = DataType.VOID;
         if(source.CurrentToken.Type == TokenType.PIPE)
         {
             source.Advance(Token.DataTypes);
-            errorType = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
+            errorType = source.CurrentToken.Type.ToDataType();
             source.Advance(TokenType.START_BLOCK);
         }
 

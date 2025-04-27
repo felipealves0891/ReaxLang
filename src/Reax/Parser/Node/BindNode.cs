@@ -6,11 +6,11 @@ namespace Reax.Parser.Node;
 public record BindNode(
     IdentifierNode Identifier, 
     ContextNode Node,
-    DataTypeNode DataType, 
+    DataType Type, 
     SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
-        return $"bind {Identifier}: {DataType} -> {{...}}";
+        return $"bind {Identifier}: {Type} -> {{...}}";
     }
 }
