@@ -10,6 +10,8 @@ public record StringNode(
 {
     public override object Value => Source;
 
+    public override DataType Type => DataType.STRING;
+
     public override string ToString()
     {
         return $"'{Source}'";

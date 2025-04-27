@@ -10,6 +10,8 @@ public record BooleanNode(
 {
     public override object Value => bool.Parse(Source.ToLower());
 
+    public override DataType Type => DataType.BOOLEAN;
+
     public override string ToString()
     {
         return $"{Source.ToLower()}";

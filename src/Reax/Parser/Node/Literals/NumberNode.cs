@@ -11,6 +11,8 @@ public record NumberNode(
 {
     public override object Value => decimal.Parse(Source);
 
+    public override DataType Type => DataType.NUMBER;
+
     public override string ToString()
     {
         return $"{Source}";

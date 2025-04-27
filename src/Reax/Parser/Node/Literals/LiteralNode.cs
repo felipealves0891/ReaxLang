@@ -8,4 +8,5 @@ public abstract record LiteralNode(
     SourceLocation Location) : ReaxNode(Location), IReaxValue
 {
     public abstract object Value { get; }
+    public abstract DataType Type { get; }
 }
