@@ -8,11 +8,16 @@ public record FunctionDeclarationNode(
     VarNode[] Parameters, 
     DataType SuccessType,
     DataType ErrorType,
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxResult
 {
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));
         return $"fun {Identifier.Identifier} ({param}):{SuccessType} | {ErrorType} {{...}}";
+    }
+
+    public IValidateResult Validate(ISemanticContext context)
+    {
+        throw new NotImplementedException();
     }
 }

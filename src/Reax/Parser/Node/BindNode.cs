@@ -7,10 +7,15 @@ public record BindNode(
     IdentifierNode Identifier, 
     ContextNode Node,
     DataType Type, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxResult
 {
     public override string ToString()
     {
         return $"bind {Identifier}: {Type} -> {{...}}";
+    }
+
+    public IValidateResult Validate(ISemanticContext context)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -8,15 +8,20 @@ public record DeclarationNode(
     bool Async, 
     DataType Type,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), IReaxResult
 {
     public override string ToString()
     {
         var asc = Async ? "async " : "";
         var mut = Immutable ? "const" : "let";
         if(Assignment is not null)
-            return $"{asc}{mut} {Identifier}{Type} = {Assignment};";
+            return $"{asc}{mut} {Identifier}: {Type} = {Assignment};";
         else 
-            return $"{asc}{mut} {Identifier}{Type};";
+            return $"{asc}{mut} {Identifier}: {Type};";
+    }
+
+    public IValidateResult Validate(ISemanticContext context)
+    {
+        throw new NotImplementedException();
     }
 }
