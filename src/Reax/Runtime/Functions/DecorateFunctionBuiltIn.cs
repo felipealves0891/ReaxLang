@@ -46,7 +46,7 @@ public class DecorateFunctionBuiltIn : Function, IReaxMultipleDeclaration
         return symbols;
     }
 
-    public override ReaxNode? Invoke(params ReaxNode[] parameters)
+    public override (ReaxNode? Success, ReaxNode? Error) Invoke(params ReaxNode[] parameters)
     {
         if(parameters.Length >= attribute.MinParametersCount && parameters.Length <= attribute.MaxParametersCount)
             return function.Invoke(parameters);

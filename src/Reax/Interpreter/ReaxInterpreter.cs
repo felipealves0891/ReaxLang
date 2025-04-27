@@ -123,7 +123,7 @@ public class ReaxInterpreter
             Logger.LogInterpreter($"Adicionando {node} a stack!");
 
             if(node is FunctionCallNode functionCall)
-                Output = ExecuteFunctionCall(functionCall);
+                ExecuteFunctionCall(functionCall);
             else if (node is AssignmentNode assignment)
                 ExecuteAssignment(assignment);
             else if (node is IfNode @if)
@@ -141,7 +141,7 @@ public class ReaxInterpreter
             else if(node is WhileNode @while)
                 ExecuteWhile(@while);
             else if(node is ExternalFunctionCallNode scriptFunctionCallNode)
-                Output = ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
+                ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
             else if(node is BinaryNode binary)
                 Output = new BooleanNode(ExecuteBinary(binary).ToString(), binary.Location);
             else if(node is MatchNode match)
@@ -182,11 +182,13 @@ public class ReaxInterpreter
         _context.SetModule(module.identifier, module.functions);   
     }
 
-    private ReaxNode? ExecuteFunctionCall(FunctionCallNode functionCall) 
+    private void ExecuteFunctionCall(FunctionCallNode functionCall) 
     {
         var function = _context.GetFunction(functionCall.Identifier);
         var parameters = functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
-        return function.Invoke(parameters);
+        var (success, error) = function.Invoke(parameters);
+        Output = success;
+        Error = error;
     }
 
     private void ExecuteDeclaration(DeclarationNode declaration) 
@@ -363,24 +365,30 @@ public class ReaxInterpreter
         }
     }
     
-    private ReaxNode? ExecuteExternalFunctionCallNode(ExternalFunctionCallNode node)
+    private void ExecuteExternalFunctionCallNode(ExternalFunctionCallNode node)
     {
         if(_context.ScriptExists(node.scriptName))
         {
             var interpreter = _context.GetScript(node.scriptName);
             var parameters = node.functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
             var identifier = node.functionCall.Identifier;
-            return interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters, node.Location));
+            interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters, node.Location));
+            Output = interpreter.Output;
+            Error = interpreter.Error;
         }
         else if(_context.ModuleExists(node.scriptName)) 
         {
             var function = _context.GetModule(node.scriptName, node.functionCall.Identifier);
             var parameters = node.functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
             var identifier = node.functionCall.Identifier;
-            return function.Invoke(parameters);
+            var (success, error) = function.Invoke(parameters);
+            Output = success;
+            Error = error;
         }
-
-        throw new InvalidOperationException($"Função externa não localizada: {node.scriptName}.{node.functionCall.Identifier}"); 
+        else 
+        {
+            throw new InvalidOperationException($"Função externa não localizada: {node.scriptName}.{node.functionCall.Identifier}"); 
+        }
     }
 
     private bool ExecuteBinary(BinaryNode condition) 

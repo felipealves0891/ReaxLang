@@ -164,7 +164,7 @@ public class ReaxExecutionContextTests
         context.SetModule("myModule", module);
 
         var result = context.GetModule("myModule", "length").Invoke(new NullNode(new SourceLocation()));
-        Assert.NotNull(result);
+        Assert.NotNull(result.Success);
         Assert.IsType<NullNode>(result);
     }
 
@@ -178,7 +178,7 @@ public class ReaxExecutionContextTests
         var child = new ReaxExecutionContext("child", parent);
 
         var result = child.GetFunction("sharedFunc").Invoke();
-        Assert.NotNull(result);
+        Assert.NotNull(result.Success);
     }
 
     [Fact]

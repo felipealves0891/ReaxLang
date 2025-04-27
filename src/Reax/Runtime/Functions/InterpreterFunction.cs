@@ -15,9 +15,9 @@ public class InterpreterFunction : Function
         _identifier = identifier;
     }
 
-    public override ReaxNode? Invoke(params ReaxNode[] parameters)
+    public override (ReaxNode? Success, ReaxNode? Error) Invoke(params ReaxNode[] parameters)
     {
         _interpreter.Interpret(_identifier, parameters);
-        return _interpreter.Output ?? _interpreter.Error;
+        return (_interpreter.Output, _interpreter.Error);
     }
 }

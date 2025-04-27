@@ -8,7 +8,7 @@ namespace Reax.Runtime.Functions.ConsoleFunctions;
 [FunctionBuiltIn("console", "writer", 1, 10, SymbolType.VOID, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING, SymbolType.STRING)]
 public class WriterFunction : Function
 {
-    public override ReaxNode? Invoke(params ReaxNode[] parameters)
+    public override (ReaxNode? Success, ReaxNode? Error) Invoke(params ReaxNode[] parameters)
     {
         if(parameters.Length == 1)
             Console.WriteLine(parameters[0].ToString());
@@ -18,8 +18,6 @@ public class WriterFunction : Function
             Console.WriteLine(string.Format(format, parameters[1..]));
         }   
 
-        return null;
-    }   
-
-    
+        return (null, null);
+    }
 }

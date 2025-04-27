@@ -13,11 +13,11 @@ public class FakeFunction : Function
         this.action = action;
     }
 
-    public override ReaxNode? Invoke(params ReaxNode[] parameters)
+    public override (ReaxNode? Success, ReaxNode? Error) Invoke(params ReaxNode[] parameters)
     {
         if(action is not null)
-            return action(parameters);
+            return (action(parameters), null);
 
-        return new NullNode(new Parser.SourceLocation());
+        return (new NullNode(new Parser.SourceLocation()), null);
     }
 }

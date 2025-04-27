@@ -5,5 +5,5 @@ namespace Reax.Runtime.Functions;
 
 public abstract class Function
 {
-    public abstract ReaxNode? Invoke(params ReaxNode[] parameters); 
+    public abstract (ReaxNode? Success, ReaxNode? Error) Invoke(params ReaxNode[] parameters); 
 }
