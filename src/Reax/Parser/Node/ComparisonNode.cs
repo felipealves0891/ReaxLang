@@ -1,4 +1,5 @@
 using Reax.Parser.Node.Interfaces;
+using Reax.Parser.Node.Literals;
 
 namespace Reax.Parser.Node;
 
@@ -11,13 +12,13 @@ public record ComparisonNode(string Operator,
         var rigth = (NumberNode)y;
 
         if(Operator == "<")
-            return (decimal)left.ValueConverted < (decimal)rigth.ValueConverted;
+            return (decimal)left.Value < (decimal)rigth.Value;
         else if(Operator == ">")
-            return (decimal)left.ValueConverted > (decimal)rigth.ValueConverted;
+            return (decimal)left.Value > (decimal)rigth.Value;
         else if(Operator == "<=")
-            return (decimal)left.ValueConverted <= (decimal)rigth.ValueConverted;
+            return (decimal)left.Value <= (decimal)rigth.Value;
         else if(Operator == ">=")
-            return (decimal)left.ValueConverted > (decimal)rigth.ValueConverted;
+            return (decimal)left.Value > (decimal)rigth.Value;
         else
             throw new InvalidOperationException($"Operador de comparação invalido: {Operator}");
     }

@@ -8,7 +8,7 @@ public record VarNode(
     DataTypeNode DataType,
     SourceLocation Location) : ReaxNode(Location), IReaxValue
 {
-    public object ValueConverted => Identifier;
+    public object Value => Identifier;
 
     public override string ToString()
     {

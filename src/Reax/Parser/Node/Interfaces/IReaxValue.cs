@@ -4,5 +4,5 @@ namespace Reax.Parser.Node.Interfaces;
 
 public interface IReaxValue 
 {
-    object ValueConverted { get; }
+    object Value { get; }
 }

@@ -5,6 +5,7 @@ using Reax.Debugger;
 using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Interfaces;
+using Reax.Parser.Node.Literals;
 using Reax.Runtime;
 using Reax.Runtime.Functions;
 
@@ -347,7 +348,7 @@ public class ReaxInterpreter
             if(value is null)
                 throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
 
-            var newValue = new NumberNode(((decimal)value.ValueConverted + 1).ToString(), declaration.Location);
+            var newValue = new NumberNode(((decimal)value.Value + 1).ToString(), declaration.Location);
             _context.SetVariable(declaration.Identifier, newValue);
         }
     }

@@ -17,9 +17,9 @@ public record EqualityNode(
     private bool Compare(IReaxValue x, IReaxValue y)
     {
         if(Operator == "==" )
-            return x.ValueConverted.Equals(y.ValueConverted);
+            return x.Value.Equals(y.Value);
         else
-            return !x.ValueConverted.Equals(y.ValueConverted);
+            return !x.Value.Equals(y.Value);
     }
 
     public override string ToString()

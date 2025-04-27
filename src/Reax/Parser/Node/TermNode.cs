@@ -1,4 +1,5 @@
 using Reax.Parser.Node.Interfaces;
+using Reax.Parser.Node.Literals;
 
 namespace Reax.Parser.Node;
 
@@ -10,8 +11,8 @@ public record TermNode(
     {
         return Operator switch 
         {
-            "+" => new NumberNode(((decimal)x.ValueConverted + (decimal)y.ValueConverted).ToString(), x.Location),
-            "-" => new NumberNode(((decimal)x.ValueConverted - (decimal)y.ValueConverted).ToString(), x.Location),
+            "+" => new NumberNode(((decimal)x.Value + (decimal)y.Value).ToString(), x.Location),
+            "-" => new NumberNode(((decimal)x.Value - (decimal)y.Value).ToString(), x.Location),
             _ => throw new InvalidOperationException("Operador invalido!")
         };
     }

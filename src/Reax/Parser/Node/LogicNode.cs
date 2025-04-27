@@ -1,4 +1,5 @@
 using Reax.Parser.Node.Interfaces;
+using Reax.Parser.Node.Literals;
 
 namespace Reax.Parser.Node;
 
@@ -12,8 +13,8 @@ public record LogicNode(string Operator,
 
         return Operator switch 
         {
-            "and" => (bool)left.ValueConverted && (bool)right.ValueConverted,
-            "or" => (bool)left.ValueConverted || (bool)right.ValueConverted,
+            "and" => (bool)left.Value && (bool)right.Value,
+            "or" => (bool)left.Value || (bool)right.Value,
             _ => throw new InvalidOperationException($"Operador invalido para operação logica {Operator}!")
         };
     }
