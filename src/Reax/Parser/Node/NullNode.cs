@@ -1,16 +1,11 @@
 using System;
-using Reax.Semantic.Interfaces;
-using Reax.Semantic.Scopes;
-using Reax.Semantic.Symbols;
 
 namespace Reax.Parser.Node;
 
-public record NullNode(SourceLocation Location) : ReaxNode(Location), IReaxType
+public record NullNode(SourceLocation Location) : ReaxNode(Location)
 {
-    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
-
-    public SymbolType GetReaxType(IReaxScope scope)
+    public override string ToString()
     {
-        return SymbolType.NONE;
+        return "NULL";
     }
 }
