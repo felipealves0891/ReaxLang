@@ -5,7 +5,6 @@ using Reax.Lexer;
 using Reax.Lexer.Reader;
 using Reax.Parser;
 using Reax.Parser.Node;
-using Reax.Semantic;
 
 namespace Reax.Interpreter;
 
@@ -14,10 +13,6 @@ public class ReaxCompiler
     public static ReaxInterpreter Compile(string filename) 
     {
         var ast = GetNodes(filename);   
-
-        var analyzer = new SemanticAnalyzer();
-        analyzer.Analyze(ast.ToArray());
-
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast.ToArray());
     }
