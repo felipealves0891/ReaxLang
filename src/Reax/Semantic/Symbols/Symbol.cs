@@ -12,17 +12,19 @@ public struct Symbol
         bool? observable = null, 
         bool? immutable = null, 
         bool? async = null,
-        string? parentName = null) : this()
+        string? parentName = null,
+        SymbolType? errorType = null) : this()
     {
         Id = Guid.NewGuid();
         Identifier = identifier;
-        Type = type;
+        SuccessType = type;
         Categoty = categoty;
         Observable = observable;
         Immutable = immutable;
         Async = async;
         ScopeId = scopeId;
         ParentName = parentName;
+        ErrorType = errorType;
     }
 
     public Symbol(
@@ -33,7 +35,8 @@ public struct Symbol
         bool? observable = null, 
         bool? immutable = null, 
         bool? async = null,
-        string? parentName = null) : this()
+        string? parentName = null,
+        string? errorType = null) : this()
     {
         Id = Guid.NewGuid();
         Identifier = identifier;
@@ -43,17 +46,26 @@ public struct Symbol
         Async = async;
         ScopeId = scopeId;
         ParentName = parentName;
-        Type = Enum.TryParse<SymbolType>(type, true, out var result) 
+
+        SuccessType = Enum.TryParse<SymbolType>(type, true, out var result) 
              ? result 
              : throw new InvalidDataException($"Tipo {type} não localizado!");
-             
+
+        if(errorType is not null )
+        {
+            ErrorType = Enum.TryParse<SymbolType>(errorType, true, out var resultError) 
+                ? resultError
+                : throw new InvalidDataException($"Tipo {errorType} não localizado!");
+        }
     }
 
     public Guid Id { get; private set; }
 
     public string Identifier { get; private set; }
 
-    public SymbolType Type { get; private set; }
+    public SymbolType SuccessType { get; private set; }
+
+    public SymbolType? ErrorType { get; private set; }
 
     public SymbolCategoty Categoty { get; private set; }
 

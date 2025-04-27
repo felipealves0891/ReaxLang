@@ -7,4 +7,6 @@ namespace Reax.Semantic.Interfaces;
 public interface IReaxType
 {
     SymbolType GetReaxType(IReaxScope scope);
+    SymbolType? GetReaxErrorType(IReaxScope scope);
+    
 }

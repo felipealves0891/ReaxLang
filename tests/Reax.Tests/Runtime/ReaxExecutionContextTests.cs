@@ -139,7 +139,7 @@ public class ReaxExecutionContextTests
         
         var source = new SourceLocation();
         var nullNode = new StringNode("teste", source);
-        var returnNode = new ReturnNode(nullNode, source);
+        var returnNode = new ReturnSuccessNode(nullNode, source);
 
         var interpreter = new ReaxInterpreter([returnNode]);
         context.SetBind("myBind", interpreter);

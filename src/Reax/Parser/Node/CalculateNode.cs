@@ -14,6 +14,8 @@ public record CalculateNode(
 {
     public ReaxNode[] Children => [Left, Operator, Right];
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         var leftType = ((IReaxType)Left).GetReaxType(scope);

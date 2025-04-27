@@ -5,7 +5,7 @@ using Reax.Semantic.Symbols;
 
 namespace Reax.Parser.Node;
 
-public record ReturnNode(
+public record ReturnErrorNode(
     ReaxNode Expression, 
     SourceLocation Location) : ReaxNode(Location), IReaxContext, IReaxChildren
 {
@@ -18,6 +18,6 @@ public record ReturnNode(
 
     public override string ToString()
     {
-        return $"return {Expression}";
+        return $"return error {Expression}";
     }
 }

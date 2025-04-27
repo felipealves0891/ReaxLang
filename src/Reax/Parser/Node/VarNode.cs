@@ -13,9 +13,11 @@ public record VarNode(
 {
     public object ValueConverted => Identifier;
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
-        return scope.Get(Identifier).Type;
+        return scope.Get(Identifier).SuccessType;
     }
 
     public override string ToString()

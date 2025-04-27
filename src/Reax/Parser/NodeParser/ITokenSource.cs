@@ -15,4 +15,5 @@ public interface ITokenSource
     ReaxNode NextBlock();
     void Advance();
     void Advance(TokenType expectedType);
+    void Advance(TokenType[] expectedTypes);
 }

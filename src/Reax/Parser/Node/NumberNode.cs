@@ -13,6 +13,8 @@ public record NumberNode(
 {
     public object ValueConverted => decimal.Parse(Value);
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         if(int.TryParse(Value, out var _))

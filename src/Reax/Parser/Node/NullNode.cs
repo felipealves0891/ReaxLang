@@ -7,6 +7,8 @@ namespace Reax.Parser.Node;
 
 public record NullNode(SourceLocation Location) : ReaxNode(Location), IReaxType
 {
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return SymbolType.NONE;

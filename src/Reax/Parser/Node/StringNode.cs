@@ -11,6 +11,8 @@ public record StringNode(string Value,
 {
     public object ValueConverted => Value;
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return SymbolType.STRING;

@@ -17,9 +17,14 @@ public record ExternalFunctionCallNode(
     public IReaxType[] Parameters => functionCall.Parameters;
     public string? Module => scriptName;
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope)
+    {
+        return scope.Get(functionCall.Identifier, scriptName).ErrorType;
+    }
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
-        return scope.Get(functionCall.Identifier, scriptName).Type;
+        return scope.Get(functionCall.Identifier, scriptName).SuccessType;
     }
 
     public override string ToString()

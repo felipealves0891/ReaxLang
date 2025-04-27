@@ -50,9 +50,9 @@ public class ReaxInterpreter
 
     public Action<DebuggerArgs>? Debug { get; set; }
     public ReaxNode? Output { get; private set; }
+    public ReaxNode? Error { get; private set; }
     public string Name { get; private set; } = "Main";
     public ReaxNode[] Nodes => _nodes;
-
 
     public void DeclareAndSetFunction(string identifier, Function function) 
     {
@@ -130,8 +130,10 @@ public class ReaxInterpreter
                 ExecuteIf(@if);
             else if(node is CalculateNode calculate)
                 Output = Calculate(calculate);
-            else if(node is ReturnNode returnNode)
-                Output = ExecuteReturn(returnNode);
+            else if(node is ReturnSuccessNode returnSuccessNode)
+                Output = ExecuteReturn(returnSuccessNode);
+            else if(node is ReturnErrorNode returnErrorNode)
+                Error = ExecuteReturn(returnErrorNode);
             else if(node is ContextNode contextNode)
                 Output = ExecuteContextAndReturnValue(contextNode);
             else if(node is ForNode @for)
@@ -142,6 +144,10 @@ public class ReaxInterpreter
                 Output = ExecuteExternalFunctionCallNode(scriptFunctionCallNode);
             else if(node is BinaryNode binary)
                 Output = new BooleanNode(ExecuteBinary(binary).ToString(), binary.Location);
+            else if(node is MatchNode match)
+                Output = ExecuteMatch(match);
+            else if(node is IReaxValue)
+                Output = node.GetValue(_context);
 
             Logger.LogInterpreter($"Removendo {node} a stack!");
             StackTrace.TryPop(out var _);
@@ -149,6 +155,9 @@ public class ReaxInterpreter
 
             if(ReaxEnvironment.Debug)
                 OnDebug(node.Location);
+
+            if(Output is not null || Error is not null)
+                break;
         }
     }
 
@@ -244,17 +253,21 @@ public class ReaxInterpreter
         var result = logical.Compare(left, right);
         if(result)
         {
-            var contextNode = (ContextNode)node.True;
+            var contextNode = node.True;
             var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
             interpreter.Debug += ReaxDebugger.Debugger;
             interpreter.Interpret();
+            Output = interpreter.Output;
+            Error = interpreter.Error;
         }
         else if(node.False is not null)
         {
-            var contextNode = (ContextNode)node.False;
+            var contextNode = node.False;
             var interpreter = new ReaxInterpreter(node.ToString(), contextNode.Block, _context);
             interpreter.Debug += ReaxDebugger.Debugger;
             interpreter.Interpret();
+            Output = interpreter.Output;
+            Error = interpreter.Error;
         }
     }
 
@@ -279,7 +292,20 @@ public class ReaxInterpreter
         return interpreter.Output;
     }
 
-    private ReaxNode ExecuteReturn(ReturnNode returnNode) 
+    private ReaxNode ExecuteReturn(ReturnSuccessNode returnNode) 
+    {
+        if(returnNode.Expression is IReaxValue)
+            return returnNode.Expression.GetValue(_context);
+        
+        var block = (ContextNode)returnNode.Expression;
+        var interpreter = new ReaxInterpreter(returnNode.ToString(), block.Block, _context);
+        interpreter.Debug += ReaxDebugger.Debugger;
+        interpreter.Interpret();
+
+        return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
+    }
+    
+    private ReaxNode ExecuteReturn(ReturnErrorNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -369,6 +395,29 @@ public class ReaxInterpreter
 
         var logical = (ILogicOperator)condition.Operator;
         return logical.Compare(left, right);
+    }
+
+    private ReaxNode? ExecuteMatch(MatchNode match) 
+    {
+        var expressionInterpreter = new ReaxInterpreter(match.Expression.ToString(), [match.Expression], _context);
+        expressionInterpreter.Interpret();
+
+        if(expressionInterpreter.Output is not null)
+        {
+            var successInterpreter = new ReaxInterpreter(match.Success.ToString(), [match.Success.Context], _context, match.Success.Parameters);
+            successInterpreter.Debug += ReaxDebugger.Debugger;
+            successInterpreter.Interpret("Success", [expressionInterpreter.Output]);
+            return successInterpreter.Output;
+        }
+        else if (expressionInterpreter.Error is not null)
+        {
+            var errorInterpreter = new ReaxInterpreter(match.Error.ToString(), [match.Error.Context], _context, match.Error.Parameters);
+            errorInterpreter.Interpret("Error", [expressionInterpreter.Error]);
+            errorInterpreter.Debug += ReaxDebugger.Debugger;
+            return errorInterpreter.Output;
+        }
+        else 
+            throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
     }
 
     private void OnDebug(SourceLocation location) 

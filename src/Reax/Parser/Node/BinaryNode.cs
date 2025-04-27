@@ -14,6 +14,8 @@ public record BinaryNode(
 {
     public ReaxNode[] Children => [Left, Operator, Right];
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return SymbolType.BOOL;

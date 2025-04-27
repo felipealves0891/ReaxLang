@@ -17,6 +17,17 @@ public record ContextNode(
     public Symbol[] GetParameters(Guid scope)
         => [];
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope)
+    {
+        foreach (var node in Block)
+        {
+            if(node is IReaxType type)
+                return type.GetReaxErrorType(scope);
+        }
+
+        return null;
+    }
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         foreach (var node in Block)

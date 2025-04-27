@@ -20,6 +20,12 @@ public class ExpressionHelper
         return helper.ParseExpression();
     }
 
+    public static ReaxNode Parser(IEnumerable<Token> tokens)
+    {
+        var helper = new ExpressionHelper(tokens.ToArray());
+        return helper.ParseExpression();
+    }
+
     public static BinaryNode ParserBinary(Token[] tokens)
     {
         var helper = new ExpressionHelper(tokens);
@@ -93,7 +99,15 @@ public class ExpressionHelper
     private ReaxNode Parse(Token token) 
     {
         Consume();
-        if(Peek().Type == TokenType.START_PARAMETER)
+
+        var peek = Peek();
+        if(peek.Type == TokenType.ACCESS)
+        {
+            Consume();
+            var functionCall = (FunctionCallNode)Parse(Peek()); 
+            return new ExternalFunctionCallNode(token.Source, functionCall, token.Location);
+        }
+        else if(peek.Type == TokenType.START_PARAMETER)
         {
             Consume();
             var identifier = token;

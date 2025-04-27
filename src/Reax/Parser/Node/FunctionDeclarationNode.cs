@@ -8,7 +8,8 @@ public record FunctionDeclarationNode(
     IdentifierNode Identifier, 
     ContextNode Block, 
     VarNode[] Parameters, 
-    DataTypeNode DataType,
+    DataTypeNode SuccessType,
+    DataTypeNode ErrorType,
     SourceLocation Location) : ReaxNode(Location), IReaxMultipleDeclaration, IReaxContext, IReaxChildren
 {
     public ReaxNode[] Context => Block.Context;
@@ -19,10 +20,11 @@ public record FunctionDeclarationNode(
     {
         return new Symbol(
             Identifier.Identifier,
-            DataType.TypeName,
+            SuccessType.TypeName,
             SymbolCategoty.FUNCTION,
             scope,
-            parentName: module
+            parentName: module,
+            errorType: ErrorType.TypeName
         );
     }
 
@@ -32,7 +34,7 @@ public record FunctionDeclarationNode(
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));
-        return $"fun {Identifier.Identifier} ({param}){DataType} {{...}}";
+        return $"fun {Identifier.Identifier} ({param}){SuccessType} {{...}}";
     }
 
     public Symbol[] GetSymbols(Guid scope)

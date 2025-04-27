@@ -68,6 +68,8 @@ public class ReaxLexer
             return AdvanceAndReturn(new Token(TokenType.ACCESS, _source.CurrentChar, _source.FileName, _source.Position, _source.Line));
         if(_source.CurrentChar == ':')
             return AdvanceAndReturn(new Token(TokenType.TYPING, _source.CurrentChar, _source.FileName, _source.Position, _source.Line));
+        if(_source.CurrentChar == '|')
+            return AdvanceAndReturn(new Token(TokenType.PIPE, _source.CurrentChar, _source.FileName, _source.Position, _source.Line));
         if(_source.CurrentChar == '#')
             return Comment();
         

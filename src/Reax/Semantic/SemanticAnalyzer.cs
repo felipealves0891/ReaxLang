@@ -93,9 +93,22 @@ public class SemanticAnalyzer
 
         var assignedSymbol = assignment.TypeAssignedValue;
         var assignedType = assignedSymbol.GetReaxType(_symbols);
+        var assignedError = assignedSymbol.GetReaxErrorType(_symbols);
 
-        if(!receivedSymbol.Type.IsCompatible(assignedType) && assignedSymbol is not NullNode)
-            throw new Exception($"{((ReaxNode)assignment).Location} - Tentativa de atribuir o valor do tipo {assignedType} em uma variavel do tipo {receivedSymbol.Type}!");
+        if(!receivedSymbol.SuccessType.IsCompatible(assignedType) && assignedSymbol is not NullNode)
+            throw new Exception($"{((ReaxNode)assignment).Location} - Tentativa de atribuir o valor do tipo {assignedType} em uma variavel do tipo {receivedSymbol.SuccessType}!");
+
+        if(receivedSymbol.ErrorType.HasValue || (assignedError.HasValue && assignedError != SymbolType.VOID))
+        {
+            if(receivedSymbol.ErrorType is not null && assignedError is null)
+                throw new Exception($"{((ReaxNode)assignment).Location} - Trata um erro, mas a atribuição não retorna uma tratativa de erro!");
+
+            if(receivedSymbol.ErrorType is null && assignedError is not null)
+                throw new Exception($"{((ReaxNode)assignment).Location} - Precisa de uma tratativa para um erro, não tratado!");
+
+            if(receivedSymbol.ErrorType is null || assignedError is null || receivedSymbol.ErrorType.Value.IsCompatible(assignedError.Value))
+                throw new Exception($"{((ReaxNode)assignment).Location} - Precisa de uma tratativa para um erro, não tratado!");
+        }
 
         _symbols.MarkAsAssigned(assignment.Identifier);
     }
@@ -141,8 +154,8 @@ public class SemanticAnalyzer
         {
             var declared = declaredParameters[i];
             var argument = parameters[i].GetReaxType(_symbols);
-            if(!declared.Type.IsCompatible(argument))
-                throw new InvalidOperationException($"O parametro {declared.Identifier} da função {function.Identifier} deve ser do tipo {declared.Type}, mas foi passado {argument}!");
+            if(!declared.SuccessType.IsCompatible(argument))
+                throw new InvalidOperationException($"O parametro {declared.Identifier} da função {function.Identifier} deve ser do tipo {declared.SuccessType}, mas foi passado {argument}!");
         }
     }
     

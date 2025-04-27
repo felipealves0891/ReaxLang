@@ -18,6 +18,6 @@ public class InterpreterFunction : Function
     public override ReaxNode? Invoke(params ReaxNode[] parameters)
     {
         _interpreter.Interpret(_identifier, parameters);
-        return _interpreter.Output;
+        return _interpreter.Output ?? _interpreter.Error;
     }
 }

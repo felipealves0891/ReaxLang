@@ -11,6 +11,8 @@ public record BooleanNode(string Value,
 {
     public object ValueConverted => bool.Parse(Value.ToLower());
 
+    public SymbolType? GetReaxErrorType(IReaxScope scope) => null;
+
     public SymbolType GetReaxType(IReaxScope scope)
     {
         return SymbolType.BOOL;

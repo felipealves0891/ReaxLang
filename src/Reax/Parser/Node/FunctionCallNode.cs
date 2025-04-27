@@ -16,7 +16,12 @@ public record FunctionCallNode(
 
     public SymbolType GetReaxType(IReaxScope scope)
     {
-        return scope.Get(Identifier).Type;
+        return scope.Get(Identifier).SuccessType;
+    }
+
+    SymbolType? IReaxType.GetReaxErrorType(IReaxScope scope)
+    {
+        return scope.Get(Identifier).ErrorType;
     }
 
     public override string ToString()

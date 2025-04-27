@@ -15,38 +15,27 @@ public class ReaxAssignmentParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        Token? identifier = null;
-        bool isExpression = false;
-        List<Token> expression = new List<Token>();
-        ReaxNode? value = null;
-        
-        foreach (var statement in source.NextStatement())
-        {
-            if(!isExpression && statement.Type == TokenType.IDENTIFIER)
-                identifier = statement;
-            else if (!isExpression && statement.Type == TokenType.ASSIGNMENT)
-                isExpression = true;
-            else if (isExpression)
-                expression.Add(statement);
-        }
+        var identifier = source.CurrentToken;
+        var var = new VarNode(identifier.Source, new DataTypeNode("NONE", identifier.Location), identifier.Location);
 
-        if(identifier is null || expression is null)
-            throw new Exception();
+        source.Advance(TokenType.ASSIGNMENT);
+        source.Advance();
         
-        if(expression.Count() == 1)
+        if(source.NextToken.Type == TokenType.END_STATEMENT)
         {
-            value = expression[0].ToReaxValue();
+            source.Advance(TokenType.END_STATEMENT);
+            var assignment = new AssignmentNode(var, source.BeforeToken.ToReaxValue(), identifier.Location);
+            source.Advance();
+            Logger.LogParse(assignment.ToString());
+            return assignment;
         }
         else 
         {
-            var parser = new ReaxParser(expression);
-            var expressionNodes = parser.Parse();
-            value = new ContextNode(expressionNodes.ToArray(), identifier.Value.Location);
+            var node = source.NextNode() ?? new NullNode(identifier.Location);
+            var assigned = new ContextNode([node], node.Location);
+            var assignment = new AssignmentNode(var, assigned, identifier.Location);
+            Logger.LogParse(assignment.ToString());
+            return assignment;
         }
-
-        var var = new VarNode(identifier.Value.Source, new DataTypeNode("NONE", identifier.Value.Location), identifier.Value.Location);
-        var node = new AssignmentNode(var, value, identifier.Value.Location);
-        Logger.LogParse(node.ToString());
-        return node;
     }
 }

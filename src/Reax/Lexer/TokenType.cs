@@ -42,10 +42,14 @@ public enum TokenType
     ASYNC,
     BIND,
     TYPING,
+    PIPE,
+    SUCCESS,
+    ERROR,
     BOOLEAN_TYPE,
     FLOAT_TYPE,
     INT_TYPE,
     LONG_TYPE,
     STRING_TYPE,
     VOID_TYPE,
+    MATCH
 } 

@@ -15,56 +15,46 @@ public class ReaxDeclarationParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        Token? identifier = null;
-        List<Token> values = new List<Token>();
-        Token? dataType = null;
-        
+        DeclarationNode? declaration = null;
+
         var isAsync = source.CurrentToken.Type == TokenType.ASYNC;
-        if(isAsync) source.Advance();
+        if(isAsync) source.Advance([TokenType.LET]);
 
         var immutable = source.CurrentToken.Type == TokenType.CONST;
-        var isTyping = false;
+        source.Advance([TokenType.IDENTIFIER]);
 
-        var isAssignment = false;
+        var identifier = source.CurrentToken;
+        source.Advance([TokenType.TYPING]);
+        source.Advance(Token.DataTypes);
 
-        foreach (var statement in source.NextStatement())
+        var dataType = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);  
+        source.Advance([TokenType.ASSIGNMENT, TokenType.END_STATEMENT]);
+        
+        if(source.CurrentToken.Type == TokenType.END_STATEMENT)
         {
-            if(statement.Type == TokenType.IDENTIFIER && !identifier.HasValue)
-                identifier = statement;
-            else if(statement.Type == TokenType.TYPING)
-                isTyping = true;
-            else if(isTyping && !dataType.HasValue)
-                dataType = statement;    
-            else if (statement.Type == TokenType.ASSIGNMENT)
-                isAssignment = true;
-            else if(isAssignment)
-                values.Add(statement);
+            declaration = new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
+            Logger.LogParse(declaration.ToString());
+            source.Advance();
+            return declaration;
         }
 
-        if(immutable && !values.Any())
-            throw new InvalidOperationException("A constante deve ser definida na declaração!");
-
-        if(identifier is null)
-            throw new InvalidOperationException("Era esperado um identificar!");
-
-        if(dataType is null)
-            throw new InvalidOperationException("Era esperado o tipo da variavel!");
-
-        var type = new DataTypeNode(dataType.Value.Source, dataType.Value.Location);
-        var textIdentifier = identifier.Value.Source;
-        ReaxNode node;
-        if(values.Count == 1)
-            node = new DeclarationNode(textIdentifier, immutable, isAsync, type, values.First().ToReaxValue(), identifier.Value.Location);
-        else if(values.Any())
+        source.Advance();
+        if(source.NextToken.Type == TokenType.END_STATEMENT)
         {
-            var parser = new ReaxParser(values);
-            var context = new ContextNode(parser.Parse().ToArray(), identifier.Value.Location);
-            node = new DeclarationNode(textIdentifier, immutable, isAsync, type, context, identifier.Value.Location);
+            var value = source.CurrentToken.ToReaxValue();
+            declaration = new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
+            source.Advance(TokenType.END_STATEMENT);
+            source.Advance();
         }
         else 
-            node = new DeclarationNode(textIdentifier, immutable,  isAsync, type, null, identifier.Value.Location);
-
-        Logger.LogParse(node.ToString());
-        return node;
+        {
+            var assigned = source.NextNode() ?? new NullNode(identifier.Location);
+            var value = new ContextNode([assigned], assigned.Location);
+            declaration = new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
+        }
+        
+        Logger.LogParse(declaration.ToString());
+        return declaration;
     }
+
 }

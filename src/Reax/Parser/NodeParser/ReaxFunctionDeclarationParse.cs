@@ -14,21 +14,29 @@ public class ReaxFunctionDeclarationParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        source.Advance();
+        source.Advance(TokenType.IDENTIFIER);
         var identifier = new IdentifierNode(source.CurrentToken.Source, source.CurrentToken.Location);
-        source.Advance();
+        source.Advance(TokenType.START_PARAMETER);
         var parameters = GetParameters(source).ToArray();
-        source.Advance();
-        var typeReturn = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
-        source.Advance();
+        source.Advance(Token.DataTypes);
+        var successType = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
+        source.Advance([TokenType.PIPE, TokenType.START_BLOCK]);
+
+        DataTypeNode errorType = new DataTypeNode("void", successType.Location);
+        if(source.CurrentToken.Type == TokenType.PIPE)
+        {
+            source.Advance(Token.DataTypes);
+            errorType = new DataTypeNode(source.CurrentToken.Source, source.CurrentToken.Location);
+            source.Advance(TokenType.START_BLOCK);
+        }
+
         var block = (ContextNode)source.NextBlock();
-        
-        var node = new FunctionDeclarationNode(identifier, block, parameters, typeReturn, identifier.Location);
+        var node = new FunctionDeclarationNode(identifier, block, parameters, successType, errorType, identifier.Location);
         Logger.LogParse(node.ToString());
         return node;
     }
     
-    private IEnumerable<VarNode> GetParameters(ITokenSource source) 
+    public static IEnumerable<VarNode> GetParameters(ITokenSource source) 
     {
         var parameters = new List<VarNode>();
         if(source.CurrentToken.Type != TokenType.START_PARAMETER)
