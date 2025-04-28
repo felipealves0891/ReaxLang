@@ -15,10 +15,10 @@ public interface ISemanticContext
     IValidateResult SetSymbol(Symbol symbol);
     Symbol? GetSymbol(string Identifier);
     
-    void EnterScope();
+    IDisposable EnterScope();
     void ExitScope();
 
-    void EnterFrom(string from);
+    IDisposable EnterFrom(string from);
     void ExitFrom();
 
     void SetDependency(string to);

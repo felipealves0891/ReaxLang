@@ -20,14 +20,33 @@ public class SemanticContext : ISemanticContext
     public ConcurrentDictionary<string, Symbol> CurrentScope 
         => _scopes.Peek();
 
-    public void EnterScope() 
+    public IDisposable EnterScope() 
     {
         _scopes.Push(new());
+        return new Disposable(ExitScope);
     }
 
     public void ExitScope() 
     {
         _scopes.Pop();
+    }
+    
+    public IDisposable EnterFrom(string from)
+    {
+        _from.Push(from);
+        return new Disposable(ExitFrom);
+    }
+
+    public void ExitFrom()
+    {
+        _from.Pop();
+    }
+
+    public void SetDependency(string to)
+    {
+        var from = _from.Peek();
+        if (!_referencies.ContainsKey(from)) _referencies[from] = new List<string>();
+        _referencies[from].Add(to);
     }
 
     public IValidateResult SetSymbol(Symbol symbol)
@@ -55,20 +74,18 @@ public class SemanticContext : ISemanticContext
         return null;
     }
 
-    public void EnterFrom(string from)
+    private sealed class Disposable : IDisposable
     {
-        _from.Push(from);
-    }
+        private readonly Action action;
 
-    public void ExitFrom()
-    {
-        _from.Pop();
-    }
+        public Disposable(Action action)
+        {
+            this.action = action;
+        }
 
-    public void SetDependency(string to)
-    {
-        var from = _from.Peek();
-        if (!_referencies.ContainsKey(from)) _referencies[from] = new List<string>();
-        _referencies[from].Add(to);
+        public void Dispose()
+        {
+            action();
+        }
     }
 }

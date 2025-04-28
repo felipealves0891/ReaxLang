@@ -17,10 +17,13 @@ public class SemanticAnalyzer
     {
         var results = new List<IValidateResult>();
 
-        foreach (var node in nodes)
+        using(_context.EnterScope())
         {
-            if(node is IReaxResult result)
-                results.Add(result.Validate(_context));
+            foreach (var node in nodes)
+            {
+                if(node is IReaxResult result)
+                    results.Add(result.Validate(_context));
+            }
         }
     }
 }
