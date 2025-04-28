@@ -15,9 +15,12 @@ public class ValidationResult : IValidateResult
             Status = Status && result.Status;
             if(!result.Status)
             {
+                if(builder.Length > 0)
+                    builder.AppendLine();
+
                 builder.Append(result.Source);
                 builder.Append(" - ");
-                builder.AppendLine(result.Message);
+                builder.Append(result.Message);
             }
         }
 
@@ -41,6 +44,16 @@ public class ValidationResult : IValidateResult
     public static IValidateResult Success(SourceLocation location) 
     {
         return new ValidationResult(true, "", location);        
+    }
+
+    public static IValidateResult ErrorInvalidType(string identifier, SourceLocation location) 
+    {
+        return new ValidationResult(false, $"Atribuição de tipo incompativel no identificador {identifier}!", location);        
+    }
+
+    public static IValidateResult ErrorUndeclared(string identifier, SourceLocation location) 
+    {
+        return new ValidationResult(false, $"O identificador {identifier} não foi declarado, mas esta sendo usado!", location);        
     }
 
     public static IValidateResult ErrorAlreadyDeclared(string identifier, SourceLocation location) 

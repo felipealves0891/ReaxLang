@@ -8,17 +8,8 @@ using Reax.Semantic.Symbols;
 
 namespace Reax.Tests.Semantic.ReaxResults;
 
-public class SemanticDeclarationNodeTests
+public class SemanticDeclarationNodeTests : ReaxResultTests
 {
-    private readonly Mock<ISemanticContext> _mockedContext;
-    private readonly Mock<IDisposable> _mockedDisposable;
-
-    public SemanticDeclarationNodeTests()
-    {
-        _mockedContext = new Mock<ISemanticContext>();
-        _mockedDisposable = new Mock<IDisposable>();
-    }
-
     [Theory]
     [InlineData(false, SymbolCategory.LET)]
     [InlineData(true, SymbolCategory.CONST)]
@@ -30,19 +21,19 @@ public class SemanticDeclarationNodeTests
         var type = DataType.STRING;
         var declaration = new DeclarationNode(identifier, immutable, async, type, null, new SourceLocation());
 
-        _mockedContext.Setup(x => x.SetSymbol(It.Is<Symbol>(symbol => symbol.Category == category && symbol.Immutable == immutable)))
+        MockedContext.Setup(x => x.SetSymbol(It.Is<Symbol>(symbol => symbol.Category == category && symbol.Immutable == immutable)))
                       .Returns(ValidationResult.Success(declaration.Location))
                       .Verifiable();
 
         //Act
-        var result = declaration.Validate(_mockedContext.Object);
+        var result = declaration.Validate(MockedContext.Object);
 
         //Assert
         Assert.True(result.Status);
         Assert.Empty(result.Message);
         Assert.Equal(declaration.Location, result.Source);
 
-        _mockedContext.Verify();
+        MockedContext.Verify();
     }
 
     [Theory]
@@ -56,18 +47,18 @@ public class SemanticDeclarationNodeTests
         var type = DataType.STRING;
         var declaration = new DeclarationNode(identifier, immutable, async, type, null, new SourceLocation());
 
-        _mockedContext.Setup(x => x.SetSymbol(It.Is<Symbol>(symbol => symbol.Category == category && symbol.Immutable == immutable)))
+        MockedContext.Setup(x => x.SetSymbol(It.Is<Symbol>(symbol => symbol.Category == category && symbol.Immutable == immutable)))
                       .Returns(ValidationResult.ErrorAlreadyDeclared(identifier, declaration.Location))
                       .Verifiable();
 
         //Act
-        var result = declaration.Validate(_mockedContext.Object);
+        var result = declaration.Validate(MockedContext.Object);
 
         //Assert
         Assert.False(result.Status);
         Assert.Contains("já foi declarado!", result.Message);
         Assert.Equal(declaration.Location, result.Source);
-        _mockedContext.Verify();
+        MockedContext.Verify();
     }
 
     [Theory]
@@ -87,24 +78,24 @@ public class SemanticDeclarationNodeTests
             return ValidationResult.Success(new SourceLocation());
         });
 
-        _mockedContext.Setup(x => x.EnterFrom(identifier))
-                      .Returns(_mockedDisposable.Object)
+        MockedContext.Setup(x => x.EnterFrom(identifier))
+                      .Returns(MockedDisposable.Object)
                       .Verifiable();
 
         var declaration = new DeclarationNode(identifier, immutable, async, type, assignment, new SourceLocation());
-        _mockedContext.Setup(x => x.SetSymbol(It.Is<Symbol>(symbol => symbol.Category == category && symbol.Immutable == immutable)))
+        MockedContext.Setup(x => x.SetSymbol(It.Is<Symbol>(symbol => symbol.Category == category && symbol.Immutable == immutable)))
                       .Returns(ValidationResult.Success(declaration.Location))
                       .Verifiable();
 
         //Act
-        var result = declaration.Validate(_mockedContext.Object);
+        var result = declaration.Validate(MockedContext.Object);
 
         //Assert
         Assert.True(callAssignmentValidate);
         Assert.True(result.Status);
         Assert.Empty(result.Message);
         Assert.Equal(declaration.Location, result.Source);
-        _mockedContext.Verify();
-        _mockedDisposable.Verify(x => x.Dispose());
+        MockedContext.Verify();
+        MockedDisposable.Verify(x => x.Dispose());
     }
 }
