@@ -26,6 +26,7 @@ public class ValidationResult : IValidateResult
 
         Message = builder.ToString();
         Source = results.First().Source;
+        TotalResults = results.Count();
     }
 
     private ValidationResult(bool status, string message, SourceLocation source)
@@ -33,6 +34,7 @@ public class ValidationResult : IValidateResult
         Status = status;
         Message = message;
         Source = source;
+        TotalResults = 1;
     }
 
     public bool Status { get; init; } =  true;
@@ -40,6 +42,8 @@ public class ValidationResult : IValidateResult
     public string Message { get; init; } = string.Empty;
 
     public SourceLocation Source { get; init; }
+
+    public int TotalResults { get; init; }
 
     public static IValidateResult Success(SourceLocation location) 
     {
@@ -59,6 +63,11 @@ public class ValidationResult : IValidateResult
     public static IValidateResult ErrorAlreadyDeclared(string identifier, SourceLocation location) 
     {
         return new ValidationResult(false, $"O identificador {identifier} já foi declarado!", location);        
+    }
+    
+    public static IValidateResult ErrorNoResultExpression(SourceLocation location) 
+    {
+        return new ValidationResult(false, $"Era esperado que a expressão retorna-se um resultado!", location);        
     }
 
     public static IValidateResult Join(IEnumerable<IValidateResult> results)

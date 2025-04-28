@@ -8,6 +8,7 @@ public interface IValidateResult
     bool Status { get; }
     string Message { get; }
     SourceLocation Source { get; }
+    int TotalResults { get; }
 }
 
 public interface ISemanticContext
