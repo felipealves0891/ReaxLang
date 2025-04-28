@@ -1,9 +1,18 @@
+using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Runtime.Functions.Attributes;
 
 namespace Reax.Runtime.Functions.ConsoleFunctions;
 
-[FunctionBuiltIn("console", "writer", 1, 10)]
+[FunctionBuiltIn(
+    "console", 
+    "writer", 
+    1, 
+    10, 
+    TypeSource = typeof(WriterFunction), 
+    ParametersProperty = nameof(Parameters),
+    ResultProperty = nameof(Result))
+]
 public class WriterFunction : Function
 {
     public override (ReaxNode? Success, ReaxNode? Error) Invoke(params ReaxNode[] parameters)
@@ -18,4 +27,18 @@ public class WriterFunction : Function
 
         return (null, null);
     }
+
+    public static DataType[] Parameters => [
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+        DataType.STRING,
+    ];
+
+    public static DataType Result => DataType.VOID;
 }

@@ -8,6 +8,8 @@ public enum SymbolCategory
     LET,
     CONST,
     FUNCTION,
+    PARAMETER,
+    PARAMETER_OPTIONAL,
     BIND,
     SCRIPT,
     MODULE

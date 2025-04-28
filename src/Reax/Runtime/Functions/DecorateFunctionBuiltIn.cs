@@ -1,4 +1,5 @@
 using System;
+using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Runtime.Functions.Attributes;
 
@@ -22,4 +23,10 @@ public class DecorateFunctionBuiltIn : Function
         
         throw new InvalidOperationException($"Função {attribute.Name} requer no minimo {attribute.MinParametersCount} parametros e no maximo {attribute.MaxParametersCount} e foi passado {parameters.Length}!");
     }
+
+    public DataType Result => attribute.GetResult() ?? DataType.NONE;
+    public DataType[] Parameters => attribute.GetParameters();
+    public int ParametersCount => attribute.MaxParametersCount;
+    public int RequiredParametersCount => attribute.MinParametersCount;
+
 }
