@@ -13,5 +13,13 @@ public interface IValidateResult
 public interface ISemanticContext
 {
     IValidateResult SetSymbol(Symbol symbol);
-    Symbol? SetSymbol(string Identifier);
+    Symbol? GetSymbol(string Identifier);
+    
+    void EnterScope();
+    void ExitScope();
+
+    void EnterFrom(string from);
+    void ExitFrom();
+
+    void SetDependency(string to);
 }
