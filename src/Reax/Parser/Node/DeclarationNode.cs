@@ -1,4 +1,6 @@
 using Reax.Parser.Node.Interfaces;
+using Reax.Semantic;
+using Reax.Semantic.Symbols;
 
 namespace Reax.Parser.Node;
 
@@ -22,6 +24,19 @@ public record DeclarationNode(
 
     public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
-        throw new NotImplementedException();
+        var category = Immutable ? SymbolCategory.CONST : SymbolCategory.LET;
+        var symbol = new Symbol(Identifier, Type, category, Location, null, Immutable, Async);
+        Results.Add(context.SetSymbol(symbol));
+
+        if(Assignment is IReaxResult result)
+        {
+            using(context.EnterFrom(Identifier))
+            {
+                Results.Add(result.Validate(context, Type));
+                symbol.MarkAsAssigned();
+            }
+        }
+
+        return ValidationResult.Join(Results);
     }
 }
