@@ -12,12 +12,14 @@ public class Symbol
         SourceLocation location,
         string? context = null, 
         bool? immutable = null, 
-        bool? async = null)
+        bool? async = null,
+        DataType? errorType = null)
     {
         Identifier = identifier;
         Type = type;
         Immutable = immutable;
         Async = async;
+        ErrorType = errorType;
         Category = category;
         Context = context;
         Location = location;        
@@ -31,6 +33,8 @@ public class Symbol
 
     public bool? Async { get; private set; }
 
+    public DataType? ErrorType { get; }
+    
     public bool? Assigned { get; private set; }
 
     public SymbolCategory Category { get; private set; }

@@ -16,6 +16,6 @@ public record ExternalFunctionCallNode(
 
     public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
-        throw new NotImplementedException();
+        return functionCall.Validate(context, expectedType);
     }
 }

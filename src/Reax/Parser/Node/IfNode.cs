@@ -1,4 +1,5 @@
 using Reax.Parser.Node.Interfaces;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node;
 
@@ -16,6 +17,22 @@ public record IfNode(
 
     public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
     {
-        throw new NotImplementedException();
+        if(Condition.Type == DataType.BOOLEAN)
+            Results.Add(ValidationResult.Success(Condition.Location));
+        else
+            Results.Add(ValidationResult.ErrorInvalidType("Era esperado uma expressão boleana", Condition.Location));
+            
+        using(context.EnterScope())
+        {
+            Results.Add(True.Validate(context, expectedType));
+        }
+
+        using(context.EnterScope())
+        {
+            if(False is not null)
+                Results.Add(True.Validate(context, expectedType));
+        }        
+        
+        return ValidationResult.Join(Results);
     }
 }

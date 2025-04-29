@@ -7,6 +7,7 @@ namespace Reax.Semantic;
 public class SemanticContext : ISemanticContext
 {
     private readonly Stack<ConcurrentDictionary<string, Symbol>> _scopes;
+    private readonly Stack<ConcurrentDictionary<string, List<Symbol>>> _parameters;
     private readonly ConcurrentDictionary<string, List<string>> _referencies;
     private readonly Stack<string> _from;
 
@@ -15,20 +16,26 @@ public class SemanticContext : ISemanticContext
         _scopes = new();
         _referencies = new();
         _from = new();
+        _parameters = new();
     }
 
     public ConcurrentDictionary<string, Symbol> CurrentScope 
         => _scopes.Peek();
 
+    public ConcurrentDictionary<string, List<Symbol>> CurrentParameters 
+        => _parameters.Peek();
+
     public IDisposable EnterScope() 
     {
         _scopes.Push(new());
+        _parameters.Push(new());
         return new Disposable(ExitScope);
     }
 
     public void ExitScope() 
     {
         _scopes.Pop();
+        _parameters.Pop();
     }
     
     public IDisposable EnterFrom(string from)
@@ -51,6 +58,15 @@ public class SemanticContext : ISemanticContext
 
     public IValidateResult SetSymbol(Symbol symbol)
     {
+        if(symbol.Category is SymbolCategory.PARAMETER or SymbolCategory.PARAMETER_OPTIONAL)
+        {
+            if(symbol.Context is null)
+                throw new InvalidOperationException("Parameteros devem possuir a referencia da função");
+
+            if(!CurrentParameters.ContainsKey(symbol.Context)) CurrentParameters[symbol.Context] = new List<Symbol>();
+            CurrentParameters[symbol.Context].Add(symbol);
+        }
+
         if(CurrentScope.ContainsKey(symbol.Identifier))
             return ValidationResult.ErrorAlreadyDeclared(symbol.Identifier, symbol.Location);
 
@@ -72,6 +88,20 @@ public class SemanticContext : ISemanticContext
         }
 
         return null;
+    }
+
+    public Symbol[] GetParameters(string Identifier)
+    {
+        if(CurrentParameters.TryGetValue(Identifier, out var parameters))
+            return parameters.ToArray();
+            
+        foreach (var parameter in _parameters)
+        {
+            if(parameter.TryGetValue(Identifier, out var parentSymbol))
+                return parentSymbol.ToArray();
+        }
+
+        return [];
     }
 
     private sealed class Disposable : IDisposable

@@ -7,15 +7,12 @@ public record BinaryNode(
     ReaxNode Left, 
     ReaxNode Operator, 
     ReaxNode Right, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResult
+    SourceLocation Location) : ReaxNode(Location), IReaxType
 {
+    public DataType Type => DataType.BOOLEAN;
+
     public override string ToString()
     {
         return $"{Left} {Operator} {Right}";
-    }
-
-    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
-    {
-        throw new NotImplementedException();
     }
 }

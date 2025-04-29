@@ -36,6 +36,13 @@ public record DeclarationNode(
                 symbol.MarkAsAssigned();
             }
         }
+        else if(Assignment is IReaxType reaxType)
+        {
+            if(Type == reaxType.Type)
+                Results.Add(ValidationResult.Success(Location));
+            else
+                Results.Add(ValidationResult.ErrorInvalidType(Identifier, Location));
+        }
 
         return ValidationResult.Join(Results);
     }

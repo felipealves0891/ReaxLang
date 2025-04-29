@@ -59,6 +59,11 @@ public class ValidationResult : IValidateResult
     {
         return new ValidationResult(false, $"O identificador {identifier} não foi declarado, mas esta sendo usado!", location);        
     }
+    
+    public static IValidateResult ErrorParameterCount(string identifier, int expectedParameters, int currentParameters, SourceLocation location) 
+    {
+        return new ValidationResult(false, $"A chamada de função {identifier} passa {currentParameters} parametros, mas é esperado {expectedParameters}!", location);        
+    }
 
     public static IValidateResult ErrorAlreadyDeclared(string identifier, SourceLocation location) 
     {

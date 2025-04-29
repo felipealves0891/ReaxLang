@@ -15,6 +15,7 @@ public interface ISemanticContext
 {
     IValidateResult SetSymbol(Symbol symbol);
     Symbol? GetSymbol(string Identifier);
+    Symbol[] GetParameters(string Identifier);
     
     IDisposable EnterScope();
     void ExitScope();
