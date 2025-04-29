@@ -7,15 +7,10 @@ public record ForNode(
     DeclarationNode Declaration, 
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResult
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
         return $"for {Declaration} to {Condition} {{...}}";
-    }
-
-    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
-    {
-        throw new NotImplementedException();
     }
 }

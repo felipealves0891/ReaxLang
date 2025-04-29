@@ -6,16 +6,11 @@ public record ObservableNode(
     VarNode Var, 
     ContextNode Block, 
     BinaryNode? Condition, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResult
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
         var when = Condition is null ? "" : $"whe {Condition} "; 
         return $"on {Var} {when}{{...}}";
-    }
-
-    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
-    {
-        throw new NotImplementedException();
     }
 }

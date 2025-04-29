@@ -2,7 +2,7 @@ using Reax.Runtime;
 
 namespace Reax.Parser.Node.Interfaces;
 
-public interface IReaxValue : IReaxType
+public interface IReaxValue
 {
     object Value { get; }
 }

@@ -6,8 +6,6 @@ namespace Reax.Parser.Node;
 
 public abstract record ReaxNode(SourceLocation Location)
 {
-    protected List<IValidateResult> Results { get; private set; } = new List<IValidateResult>();
-
     public ReaxNode GetValue(ReaxExecutionContext context) 
     {
         if(this is NumberNode number)

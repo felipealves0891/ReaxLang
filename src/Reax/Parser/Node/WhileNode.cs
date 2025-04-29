@@ -6,15 +6,10 @@ namespace Reax.Parser.Node;
 public record WhileNode(
     ReaxNode condition, 
     ContextNode Block, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResult
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
         return $"while {condition} {{...}}";
-    }
-
-    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
-    {
-        throw new NotImplementedException();
     }
 }
