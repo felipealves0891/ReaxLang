@@ -1,6 +1,4 @@
 using Reax.Parser.Node.Interfaces;
-using Reax.Semantic;
-using Reax.Semantic.Symbols;
 
 namespace Reax.Parser.Node;
 
@@ -10,7 +8,7 @@ public record DeclarationNode(
     bool Async, 
     DataType Type,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location), IReaxResult
+    SourceLocation Location) : ReaxNode(Location)
 {
     public override string ToString()
     {
@@ -20,30 +18,5 @@ public record DeclarationNode(
             return $"{asc}{mut} {Identifier}: {Type} = {Assignment};";
         else 
             return $"{asc}{mut} {Identifier}: {Type};";
-    }
-
-    public IValidateResult Validate(ISemanticContext context, DataType expectedType = DataType.NONE)
-    {
-        var category = Immutable ? SymbolCategory.CONST : SymbolCategory.LET;
-        var symbol = new Symbol(Identifier, Type, category, Location, null, Immutable, Async);
-        Results.Add(context.SetSymbol(symbol));
-
-        if(Assignment is IReaxResult result)
-        {
-            using(context.EnterFrom(Identifier))
-            {
-                Results.Add(result.Validate(context, Type));
-                symbol.MarkAsAssigned();
-            }
-        }
-        else if(Assignment is IReaxType reaxType)
-        {
-            if(Type == reaxType.Type)
-                Results.Add(ValidationResult.Success(Location));
-            else
-                Results.Add(ValidationResult.ErrorInvalidType(Identifier, Location));
-        }
-
-        return ValidationResult.Join(Results);
     }
 }
