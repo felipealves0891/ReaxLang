@@ -1,16 +1,12 @@
 using System;
 using Reax.Parser.Node.Interfaces;
-using Reax.Semantic.Nodes;
 
 namespace Reax.Parser.Node;
 
 public record IdentifierNode(
     string Identifier, 
-    SourceLocation Location) : ReaxNode(Location), INode
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public bool IsLeaf => true;
-    public INode[] Children => [];
-
     public override string ToString()
     {
         return Identifier;

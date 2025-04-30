@@ -1,6 +1,4 @@
 using Reax.Parser.Node.Interfaces;
-using Reax.Semantic.Analyzers.TypeChecking;
-using Reax.Semantic.Nodes;
 
 namespace Reax.Parser.Node;
 
@@ -10,12 +8,8 @@ public record DeclarationNode(
     bool Async, 
     DataType Type,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location), INodeExpectedType
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public MultiType ExpectedType => new MultiType(Type, Type);
-    public bool IsLeaf => Assignment is null;
-    public INode[] Children => Assignment is null ? [] : [(INode)Assignment];
-
     public override string ToString()
     {
         var asc = Async ? "async " : "";

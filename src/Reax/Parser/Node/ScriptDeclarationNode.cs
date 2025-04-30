@@ -1,16 +1,12 @@
 using System;
-using Reax.Semantic.Nodes;
 
 namespace Reax.Parser.Node;
 
 public record ScriptDeclarationNode(
     string Identifier, 
     SourceLocation Location) 
-    : ReaxNode(Location), INode
+    : ReaxNode(Location)
 {
-    public bool IsLeaf => false;
-    public INode[] Children => [];
-
     public override string ToString()
     {
         return $"script {Identifier};";

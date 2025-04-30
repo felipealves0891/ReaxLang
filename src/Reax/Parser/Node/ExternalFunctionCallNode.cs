@@ -1,19 +1,13 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
-using Reax.Semantic.Analyzers.TypeChecking;
-using Reax.Semantic.Nodes;
 
 namespace Reax.Parser.Node;
 
 public record ExternalFunctionCallNode(
     string scriptName, 
     FunctionCallNode functionCall, 
-    SourceLocation Location) : ReaxNode(Location), INodeExpectedType
+    SourceLocation Location) : ReaxNode(Location)
 {
-    public bool IsLeaf => false;
-    public INode[] Children => [(INode)functionCall];
-    public MultiType ExpectedType => ((INodeExpectedType)functionCall).ExpectedType;
-
     public override string ToString()
     {
         var parameters = functionCall.Parameter.Select(x => x.ToString());
