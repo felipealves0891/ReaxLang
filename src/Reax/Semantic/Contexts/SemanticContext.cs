@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using Reax.Parser;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 using Reax.Semantic.Results;
 using Reax.Semantic.Symbols;
 

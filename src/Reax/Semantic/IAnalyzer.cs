@@ -1,5 +1,5 @@
 using System;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 
 namespace Reax.Semantic;
 

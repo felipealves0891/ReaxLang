@@ -1,5 +1,5 @@
 using System;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 using Reax.Semantic.Results;
 
 namespace Reax.Semantic.Analyzers.TypeChecking;

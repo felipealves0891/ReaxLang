@@ -7,7 +7,7 @@ using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Semantic.Analyzers.TypeChecking;
 using Reax.Semantic.Contexts;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 
 namespace Reax.Interpreter;
 

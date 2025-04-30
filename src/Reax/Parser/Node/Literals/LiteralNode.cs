@@ -1,7 +1,7 @@
 using System;
 using Reax.Parser.Node.Interfaces;
 using Reax.Semantic.Analyzers.TypeChecking;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 
 namespace Reax.Parser.Node.Literals;
 

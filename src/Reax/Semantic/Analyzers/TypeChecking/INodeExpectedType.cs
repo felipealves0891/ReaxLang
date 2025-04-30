@@ -1,6 +1,6 @@
 using System;
 using Reax.Parser;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 
 namespace Reax.Semantic.Analyzers.TypeChecking;
 

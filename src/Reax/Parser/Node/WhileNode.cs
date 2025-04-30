@@ -1,6 +1,6 @@
 using Reax.Parser.Helper;
 using Reax.Parser.Node.Interfaces;
-using Reax.Semantic.Node;
+using Reax.Semantic.Nodes;
 
 namespace Reax.Parser.Node;
 

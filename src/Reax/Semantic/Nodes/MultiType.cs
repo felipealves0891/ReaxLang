@@ -1,7 +1,7 @@
 using System;
 using Reax.Parser;
 
-namespace Reax.Semantic.Node;
+namespace Reax.Semantic.Nodes;
 
 public struct MultiType
 {
