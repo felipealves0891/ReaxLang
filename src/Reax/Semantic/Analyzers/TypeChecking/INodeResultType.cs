@@ -6,5 +6,5 @@ namespace Reax.Semantic.Analyzers.TypeChecking;
 
 public interface INodeResultType : INode
 {
-    DataType Result { get; }
+    DataType ResultType { get; }
 }

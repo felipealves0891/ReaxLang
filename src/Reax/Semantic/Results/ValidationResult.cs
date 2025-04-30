@@ -29,10 +29,14 @@ public class ValidationResult : IValidationResult
         _results.Add(result);
         _isValid = _isValid && result.IsValid;
 
-        if(_message.Length > 0)
-            _message.AppendLine();
+        if(!result.IsValid)
+        {
+            if(_message.Length > 0)
+                _message.AppendLine();
 
-        _message.Append(result);
+            _message.Append(result.Message);
+        }
+        
         return this;
     }
 }

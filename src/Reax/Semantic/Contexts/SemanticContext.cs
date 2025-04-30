@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using Reax.Parser;
+using Reax.Semantic.Node;
 using Reax.Semantic.Results;
 using Reax.Semantic.Symbols;
 
@@ -7,10 +9,10 @@ namespace Reax.Semantic.Contexts;
 
 public class SemanticContext : ISemanticContext
 {
-    private readonly Stack<Dictionary<string, Symbol>> _scopes;
-    private readonly Dictionary<string, IList<string>> _dependencies;
-    private readonly Stack<string> _from;
-    private readonly Stack<(DataType Success, DataType Error)> _expectedTypes;
+    private readonly ConcurrentStack<ConcurrentDictionary<string, Symbol>> _scopes;
+    private readonly ConcurrentDictionary<string, IList<string>> _dependencies;
+    private readonly ConcurrentStack<string> _from;
+    private readonly ConcurrentStack<MultiType> _expectedTypes;
 
     public SemanticContext()
     {
@@ -20,9 +22,9 @@ public class SemanticContext : ISemanticContext
         _expectedTypes = new();
     }
 
-    public Dictionary<string, Symbol> CurrentScope => _scopes.Peek();
-    public string CurrentFrom => _from.Peek();
-    public (DataType Success, DataType Error) CurrentType => _expectedTypes.Peek();
+    public ConcurrentDictionary<string, Symbol> CurrentScope => _scopes.TryPeek(out var peek) ? peek : new();
+    public string CurrentFrom => _from.TryPeek(out var peek) ? peek : string.Empty;
+    public MultiType CurrentType => _expectedTypes.TryPeek(out var peek) ? peek : new MultiType(DataType.NONE, DataType.NONE);
 
     public IValidationResult Declare(Symbol symbol)
     {
@@ -49,18 +51,18 @@ public class SemanticContext : ISemanticContext
 
     public void ExitFrom()
     {
-        _from.Pop();
+        _from.TryPop(out var _);
     }
 
     public void ExitScope()
     {
-        _scopes.Pop();
+        _scopes.TryPop(out var _);
     }
 
-    public IDisposable ExpectedType(DataType success, DataType error)
+    public IDisposable ExpectedType(MultiType multiType)
     {
-        _expectedTypes.Push((success, error));
-        return new ExitDisposable(() => _expectedTypes.Pop());
+        _expectedTypes.Push(multiType);
+        return new ExitDisposable(() => _expectedTypes.TryPop(out var _));
     }
 
     public Symbol? Resolve(string identifier)

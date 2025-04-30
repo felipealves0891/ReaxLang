@@ -6,5 +6,5 @@ namespace Reax.Semantic.Analyzers.TypeChecking;
 
 public interface INodeExpectedType : INode
 {
-    (DataType Success, DataType Error) Type { get; }
+    MultiType ExpectedType { get; }
 }

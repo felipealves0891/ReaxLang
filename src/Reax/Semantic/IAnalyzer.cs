@@ -5,5 +5,5 @@ namespace Reax.Semantic;
 
 public interface IAnalyzer
 {
-    IValidationResult Analyze(INode[] Nodes, ISemanticContext context);
+    IValidationResult Analyze(IEnumerable<INode> Nodes, ISemanticContext context);
 }

@@ -1,5 +1,5 @@
-using System;
-using Reax.Parser.Node.Interfaces;
+using Reax.Semantic.Analyzers.TypeChecking;
+using Reax.Semantic.Node;
 
 namespace Reax.Parser.Node;
 
@@ -7,9 +7,12 @@ public record ActionNode(
     VarNode[] Parameters,
     ReaxNode Context,
     DataType Type,
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ReaxNode(Location), INodeResultType, INodeExpectedType
 {
-    private string _name = Guid.NewGuid().ToString();
+    public DataType ResultType => Type;
+    public bool IsLeaf => false;
+    public INode[] Children => [(INode)Context];
+    public MultiType ExpectedType => new MultiType(Type, Type);
 
     public override string ToString()
     {
