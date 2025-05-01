@@ -2,6 +2,7 @@ using System;
 using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
+using Reax.Parser.Node.Expressions;
 
 namespace Reax.Parser.NodeParser;
 

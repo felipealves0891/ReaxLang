@@ -1,12 +1,12 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Expressions;
 
 public record FunctionCallNode(
     string Identifier, 
     ReaxNode[] Parameter, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ExpressionNode(Location)
 {
     public override string ToString()
     {

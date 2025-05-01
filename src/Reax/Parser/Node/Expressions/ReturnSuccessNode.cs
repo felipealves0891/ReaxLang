@@ -1,10 +1,10 @@
 using Reax.Parser.Node.Interfaces;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Expressions;
 
 public record ReturnSuccessNode(
     ReaxNode Expression, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ExpressionNode(Location)
 {
     public override string ToString()
     {

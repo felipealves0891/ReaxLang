@@ -1,7 +1,7 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Expressions;
 
 public record ExternalFunctionCallNode(
     string scriptName, 

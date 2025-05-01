@@ -1,13 +1,10 @@
-using Reax.Parser.Node.Interfaces;
-using Reax.Runtime;
+namespace Reax.Parser.Node.Expressions;
 
-namespace Reax.Parser.Node;
-
-public record BinaryNode(
+public record CalculateNode(
     ReaxNode Left, 
     ReaxNode Operator, 
     ReaxNode Right, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ExpressionNode(Location)
 {
     public override string ToString()
     {
