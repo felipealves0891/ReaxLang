@@ -1,11 +1,11 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
 
-namespace Reax.Parser.Node.Expressions;
+namespace Reax.Parser.Node.Statements;
 
 public record ReturnErrorNode(
     ReaxNode Expression, 
-    SourceLocation Location) : ExpressionNode(Location)
+    SourceLocation Location) : StatementNode(Location)
 {
     public override string ToString()
     {
