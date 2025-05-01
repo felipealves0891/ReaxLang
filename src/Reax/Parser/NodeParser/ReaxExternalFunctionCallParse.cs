@@ -41,13 +41,10 @@ public class ReaxExternalFunctionCallParse : INodeParser
         if(!source.EndOfTokens)
             source.Advance();
 
-        var node = new ExternalFunctionCallNode(
+        return new ExternalFunctionCallNode(
             scriptName.Source, 
             new FunctionCallNode(identifier.Source, parameters.ToArray(), identifier.Location),
             identifier.Location);
-
-        Logger.LogParse(node.ToString());
-        return node;
     }
 
     private ReaxNode functionCall(ITokenSource source) 

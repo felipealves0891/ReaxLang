@@ -21,8 +21,6 @@ public class ReaxScriptDeclarationParse : INodeParser
         source.Advance();
         source.Advance();
 
-        var node = new ScriptDeclarationNode(identifier.Source, location);
-        Logger.LogParse(node.ToString());
-        return node;
+        return new ScriptDeclarationNode(identifier.Source, location);
     }
 }

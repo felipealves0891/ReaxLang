@@ -28,8 +28,6 @@ public class ReaxIfNodeParse : INodeParser
             @else = source.NextBlock() as ContextNode;
         }
 
-        var node = new IfNode(condition, @true, @else, condition.Location);
-        Logger.LogParse(node.ToString());
-        return node;
+        return new IfNode(condition, @true, @else, condition.Location);
     }
 }

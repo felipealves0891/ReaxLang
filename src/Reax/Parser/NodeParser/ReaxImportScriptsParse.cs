@@ -44,7 +44,6 @@ public class ReaxImportScriptsParse : INodeParser
         if(script is null)
             throw new InvalidOperationException($"ERRO: modulo não foi importado!");
 
-        Logger.LogParse(script.ToString());
         return script;
     }
 }

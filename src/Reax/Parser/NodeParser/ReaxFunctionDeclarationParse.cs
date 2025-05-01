@@ -1,6 +1,5 @@
-using System;
-using Reax.Debugger;
 using Reax.Lexer;
+using Reax.Parser.Helper;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Statements;
 
@@ -16,9 +15,10 @@ public class ReaxFunctionDeclarationParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         source.Advance(TokenType.IDENTIFIER);
+        var token = source.CurrentToken;
         var identifier = new IdentifierNode(source.CurrentToken.Source, source.CurrentToken.Location);
         source.Advance(TokenType.START_PARAMETER);
-        var parameters = GetParameters(source).ToArray();
+        var parameters = ParameterHelper.GetParameters(source).ToArray();
         source.Advance(Token.DataTypes);
         var successType = source.CurrentToken.Type.ToDataType();
         source.Advance([TokenType.PIPE, TokenType.START_BLOCK]);
@@ -31,34 +31,8 @@ public class ReaxFunctionDeclarationParse : INodeParser
             source.Advance(TokenType.START_BLOCK);
         }
 
+        SymbolHelper.FunctionDeclaration(token, successType | errorType, parameters, token.Location);
         var block = (ContextNode)source.NextBlock();
-        var node = new FunctionDeclarationNode(identifier, block, parameters, successType, errorType, identifier.Location);
-        Logger.LogParse(node.ToString());
-        return node;
-    }
-    
-    public static IEnumerable<VarNode> GetParameters(ITokenSource source) 
-    {
-        var parameters = new List<VarNode>();
-        if(source.CurrentToken.Type != TokenType.START_PARAMETER)
-            return parameters;
-
-        source.Advance();
-        while(source.CurrentToken.Type != TokenType.END_PARAMETER) 
-        {
-            if(source.CurrentToken.Type == TokenType.IDENTIFIER)
-            {
-                var value = source.CurrentToken;
-                source.Advance();    
-                source.Advance();
-                var type = source.CurrentToken;
-                parameters.Add((VarNode)value.ToReaxValue(type));
-            }
-            
-            source.Advance();
-        }
-        
-        source.Advance();
-        return parameters;
+        return new FunctionDeclarationNode(identifier, block, parameters, successType, errorType, identifier.Location);
     }
 }

@@ -28,7 +28,6 @@ public class ReaxImportModuleParse : INodeParser
         var functions = ReaxEnvironment.BuiltInRegistry.Get(identifier.Source);        
         var node = new ModuleNode(identifier.Source, functions, identifier.Location);
         DeclareFunctions(node);
-        Logger.LogParse(node.ToString());
         return node;
     }
 

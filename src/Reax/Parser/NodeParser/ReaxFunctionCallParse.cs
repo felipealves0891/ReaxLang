@@ -39,8 +39,6 @@ public class ReaxFunctionCallParse : INodeParser
         var textIdentifier = identifier.Value.Source;
         var values = parameter.Select(x => x.ToReaxValue()).ToArray();
 
-        var node = new FunctionCallNode(textIdentifier, values, identifier.Value.Location);
-        Logger.LogParse(node.ToString());
-        return node;
+        return new FunctionCallNode(textIdentifier, values, identifier.Value.Location);
     }
 }

@@ -20,11 +20,7 @@ public class ReaxWhileParse : INodeParser
         source.Advance();
         var statement = source.NextStatement().ToArray();
         var condition = (BinaryNode)ExpressionHelper.Parser(statement);
-
         var block = (ContextNode)source.NextBlock();
-
-        var node = new WhileNode(condition, block, condition.Location);
-        Logger.LogParse(node.ToString());
-        return node;
+        return new WhileNode(condition, block, condition.Location);
     }
 }

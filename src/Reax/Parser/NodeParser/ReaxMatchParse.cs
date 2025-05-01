@@ -45,7 +45,7 @@ public class ReaxMatchParse : INodeParser
     {
         var location = source.CurrentToken.Location;
         source.Advance(TokenType.START_PARAMETER);
-        var parameters = ReaxFunctionDeclarationParse.GetParameters(source).ToArray();
+        var parameters = ParameterHelper.GetParameters(source).ToArray();
         source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken.Type.ToDataType();
         source.Advance();

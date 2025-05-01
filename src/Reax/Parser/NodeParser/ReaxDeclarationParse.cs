@@ -22,7 +22,7 @@ public class ReaxDeclarationParse : INodeParser
            
         if(source.CurrentToken.Type == TokenType.END_STATEMENT)
         {
-            SymbolHelper.Register(identifier, immutable, isAsync, dataType);
+            SymbolHelper.VariableDeclaration(identifier, immutable, isAsync, dataType);
             source.Advance();
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
         }
@@ -33,14 +33,14 @@ public class ReaxDeclarationParse : INodeParser
             var value = source.CurrentToken.ToReaxValue();
             source.Advance(TokenType.END_STATEMENT);
             source.Advance();
-            SymbolHelper.RegisterAndAssign(identifier, immutable, isAsync, dataType, value.Location);
+            SymbolHelper.VariableDeclarationAndAssign(identifier, immutable, isAsync, dataType, value.Location);
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         else 
         {
             var assigned = source.NextNode() ?? new NullNode(identifier.Location);
             var value = new ContextNode([assigned], assigned.Location);
-            SymbolHelper.RegisterAndAssign(identifier, immutable, isAsync, dataType, value.Location);
+            SymbolHelper.VariableDeclarationAndAssign(identifier, immutable, isAsync, dataType, value.Location);
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         

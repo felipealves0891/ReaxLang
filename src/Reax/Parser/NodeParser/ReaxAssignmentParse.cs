@@ -27,16 +27,13 @@ public class ReaxAssignmentParse : INodeParser
             source.Advance(TokenType.END_STATEMENT);
             var assignment = new AssignmentNode(var, source.BeforeToken.ToReaxValue(), identifier.Location);
             source.Advance();
-            Logger.LogParse(assignment.ToString());
             return assignment;
         }
         else 
         {
             var node = source.NextNode() ?? new NullNode(identifier.Location);
             var assigned = new ContextNode([node], node.Location);
-            var assignment = new AssignmentNode(var, assigned, identifier.Location);
-            Logger.LogParse(assignment.ToString());
-            return assignment;
+            return new AssignmentNode(var, assigned, identifier.Location);
         }
     }
 }

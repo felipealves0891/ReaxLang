@@ -32,17 +32,13 @@ public class ReaxObservableParse : INodeParser
 
         if(source.CurrentToken.Type == TokenType.START_BLOCK)
         {
-            var node = new ObservableNode(variable, (ContextNode)source.NextBlock(), condition, source.CurrentToken.Location);
-            Logger.LogParse(node.ToString());
-            return node;
+            return new ObservableNode(variable, (ContextNode)source.NextBlock(), condition, source.CurrentToken.Location);
         }
         else if(source.CurrentToken.Type == TokenType.ARROW)
         {
             source.Advance();
             var nextNode = source.NextNode() ?? throw new InvalidOperationException();
-            var node = new ObservableNode(variable, new ContextNode([nextNode], variable.Location), condition, variable.Location);
-            Logger.LogParse(node.ToString());
-            return node;
+            return new ObservableNode(variable, new ContextNode([nextNode], variable.Location), condition, variable.Location);            
         }
         
         throw new InvalidOperationException($"Token invalido '{source.CurrentToken.Type}' na posição: {source.CurrentToken.Row}");
