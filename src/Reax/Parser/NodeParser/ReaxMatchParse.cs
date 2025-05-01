@@ -48,7 +48,7 @@ public class ReaxMatchParse : INodeParser
         var parameters = ParameterHelper.GetParameters(source).ToArray();
         source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken.Type.ToDataType();
-        source.Advance();
+        source.Advance([TokenType.ARROW, TokenType.START_BLOCK]);
         ReaxNode? expression = null;
         if(source.CurrentToken.Type == TokenType.ARROW)
         {
