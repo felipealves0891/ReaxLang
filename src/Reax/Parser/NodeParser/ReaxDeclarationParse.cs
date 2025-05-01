@@ -1,6 +1,5 @@
-using System;
-using Reax.Debugger;
 using Reax.Lexer;
+using Reax.Parser.Helper;
 using Reax.Parser.Node;
 
 namespace Reax.Parser.NodeParser;
@@ -15,46 +14,64 @@ public class ReaxDeclarationParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        DeclarationNode? declaration = null;
-
-        var isAsync = source.CurrentToken.Type == TokenType.ASYNC;
-        if(isAsync) source.Advance([TokenType.LET]);
-
-        var immutable = source.CurrentToken.Type == TokenType.CONST;
-        source.Advance([TokenType.IDENTIFIER]);
-
-        var identifier = source.CurrentToken;
-        source.Advance([TokenType.TYPING]);
-        source.Advance(Token.DataTypes);
-
-        var dataType = source.CurrentToken.Type.ToDataType();
-        source.Advance([TokenType.ASSIGNMENT, TokenType.END_STATEMENT]);
-        
+        var isAsync = IsAsync(source);
+        var immutable = IsImmutable(source);
+        var identifier = GetIdentifier(source);
+        var dataType = GetDataType(source);
+           
         if(source.CurrentToken.Type == TokenType.END_STATEMENT)
         {
-            declaration = new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
-            Logger.LogParse(declaration.ToString());
+            SymbolHelper.Register(identifier, immutable, isAsync, dataType);
             source.Advance();
-            return declaration;
+            return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
         }
 
         source.Advance();
         if(source.NextToken.Type == TokenType.END_STATEMENT)
         {
             var value = source.CurrentToken.ToReaxValue();
-            declaration = new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
             source.Advance(TokenType.END_STATEMENT);
             source.Advance();
+            SymbolHelper.RegisterAndAssign(identifier, immutable, isAsync, dataType, value.Location);
+            return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         else 
         {
             var assigned = source.NextNode() ?? new NullNode(identifier.Location);
             var value = new ContextNode([assigned], assigned.Location);
-            declaration = new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
+            SymbolHelper.RegisterAndAssign(identifier, immutable, isAsync, dataType, value.Location);
+            return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         
-        Logger.LogParse(declaration.ToString());
-        return declaration;
+    }
+
+    private bool IsAsync(ITokenSource source)
+    {
+        var isAsync = source.CurrentToken.Type == TokenType.ASYNC;
+        if(isAsync) source.Advance([TokenType.LET]);
+        return isAsync;
+    }
+
+    private bool IsImmutable(ITokenSource source) 
+    {
+        var immutable = source.CurrentToken.Type == TokenType.CONST;
+        source.Advance([TokenType.IDENTIFIER]);
+        return immutable;
+    }
+
+    private Token GetIdentifier(ITokenSource source) 
+    {
+        var identifier = source.CurrentToken;
+        source.Advance([TokenType.TYPING]);
+        source.Advance(Token.DataTypes);
+        return identifier;        
+    }
+
+    private DataType GetDataType(ITokenSource source)
+    {
+        var dataType = source.CurrentToken.Type.ToDataType();
+        source.Advance([TokenType.ASSIGNMENT, TokenType.END_STATEMENT]);
+        return dataType;
     }
 
 }

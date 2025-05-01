@@ -36,7 +36,10 @@ public class ReaxParser : ITokenSource
         {
             node = NextNode();
             if(node is not null)
+            {
+                Logger.LogParse(node.ToString());
                 yield return node;
+            }
         } 
         while(node is not null);
     }

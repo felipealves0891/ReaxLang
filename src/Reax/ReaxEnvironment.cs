@@ -1,6 +1,7 @@
 using System;
 using Reax.Interpreter;
 using Reax.Parser.Node;
+using Reax.Runtime.Contexts;
 using Reax.Runtime.Registries;
 
 namespace Reax;
@@ -13,4 +14,5 @@ public static class ReaxEnvironment
     public static Dictionary<string, ScriptNode> ImportedFiles { get; set; } = new();
     public static Dictionary<string, HashSet<int>> BreakPoints = new();
     public static BuiltInRegistry BuiltInRegistry = new();
+    public static IContext AnalyzerContext = new ContextManager();
 }
