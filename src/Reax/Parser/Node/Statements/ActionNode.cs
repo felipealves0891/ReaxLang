@@ -1,11 +1,10 @@
-
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Statements;
 
 public record ActionNode(
     VarNode[] Parameters,
     ReaxNode Context,
     DataType Type,
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : StatementNode(Location)
 {
     public override string ToString()
     {

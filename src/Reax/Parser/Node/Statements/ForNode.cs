@@ -1,13 +1,10 @@
-using Reax.Parser.Helper;
-using Reax.Parser.Node.Interfaces;
-
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Statements;
 
 public record ForNode(
     DeclarationNode Declaration, 
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : StatementNode(Location)
 {
     public override string ToString()
     {

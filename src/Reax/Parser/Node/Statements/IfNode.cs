@@ -1,12 +1,10 @@
-using Reax.Parser.Node.Interfaces;
-
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Statements;
 
 public record IfNode(
     BinaryNode Condition, 
     ContextNode True, 
     ContextNode? False, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : StatementNode(Location)
 {
     public override string ToString()
     {

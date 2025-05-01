@@ -6,6 +6,7 @@ using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
+using Reax.Parser.Node.Statements;
 using Reax.Runtime;
 using Reax.Runtime.Functions;
 
