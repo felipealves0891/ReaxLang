@@ -44,12 +44,17 @@ public static class SymbolHelper
     public static void FunctionDeclaration(
         Token identifier, 
         DataType resultType, 
-        VarNode[] parameters,
-        SourceLocation assignLocation)
+        VarNode[] parameters)
     {
         var symbols = parameters.Select(x => ParameterCreater(x, identifier.Source)).ToArray(); 
         var symbol = new Symbol(identifier.Source, resultType, SymbolCategory.FUNCTION, "main", identifier.Location, symbols);
-        symbol.MarkAsAssigned(assignLocation);
+        ReaxEnvironment.AnalyzerContext.Declare(symbol);
+    }
+
+    public static void BindDeclaration(Token identifier, DataType type) 
+    {
+        var category = SymbolCategory.BIND;
+        var symbol = new Symbol(identifier.Source, type, category, "main", identifier.Location);
         ReaxEnvironment.AnalyzerContext.Declare(symbol);
     }
 }

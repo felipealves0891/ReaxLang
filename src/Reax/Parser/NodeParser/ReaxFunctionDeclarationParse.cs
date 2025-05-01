@@ -31,7 +31,7 @@ public class ReaxFunctionDeclarationParse : INodeParser
             source.Advance(TokenType.START_BLOCK);
         }
 
-        SymbolHelper.FunctionDeclaration(token, successType | errorType, parameters, token.Location);
+        SymbolHelper.FunctionDeclaration(token, successType | errorType, parameters);
         var block = (ContextNode)source.NextBlock();
         return new FunctionDeclarationNode(identifier, block, parameters, successType, errorType, identifier.Location);
     }
