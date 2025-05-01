@@ -168,8 +168,8 @@ public class ReaxInterpreter
     {
         var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node], _context);
         interpreter.Debug += ReaxDebugger.Debugger;
-        _context.Declare(bind.Identifier.Identifier);
-        _context.SetBind(bind.Identifier.Identifier, interpreter);
+        _context.Declare(bind.Identifier);
+        _context.SetBind(bind.Identifier, interpreter);
     }
 
     private void ExecuteDeclarationScript(ScriptNode script) 
@@ -325,8 +325,8 @@ public class ReaxInterpreter
 
     private void ExecuteDeclarationFunction(FunctionDeclarationNode node) 
     {
-        var block = (ContextNode)node.Block;
-        var identifier = node.Identifier.Identifier;
+        var block = node.Block;
+        var identifier = node.Identifier;
         var interpreter = new ReaxInterpreter(node.ToString(), block.Block, _context, node.Parameters);
         interpreter.Debug += ReaxDebugger.Debugger;
         _context.Declare(identifier);

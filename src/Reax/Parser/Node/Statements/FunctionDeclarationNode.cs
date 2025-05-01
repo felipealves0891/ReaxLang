@@ -4,7 +4,7 @@ using Reax.Parser.Node.Statements;
 namespace Reax.Parser.Node;
 
 public record FunctionDeclarationNode(
-    IdentifierNode Identifier, 
+    string Identifier, 
     ContextNode Block, 
     VarNode[] Parameters, 
     DataType SuccessType,
@@ -14,6 +14,6 @@ public record FunctionDeclarationNode(
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));
-        return $"fun {Identifier.Identifier} ({param}):{SuccessType} | {ErrorType} {{...}}";
+        return $"fun {Identifier} ({param}):{SuccessType} | {ErrorType} {{...}}";
     }
 }

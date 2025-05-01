@@ -16,7 +16,7 @@ public class ReaxFunctionDeclarationParse : INodeParser
     {
         source.Advance(TokenType.IDENTIFIER);
         var token = source.CurrentToken;
-        var identifier = new IdentifierNode(source.CurrentToken.Source, source.CurrentToken.Location);
+        var identifier = source.CurrentToken;
         source.Advance(TokenType.START_PARAMETER);
         var parameters = ParameterHelper.GetParameters(source).ToArray();
         source.Advance(Token.DataTypes);
@@ -33,6 +33,6 @@ public class ReaxFunctionDeclarationParse : INodeParser
 
         SymbolHelper.FunctionDeclaration(token, successType | errorType, parameters);
         var block = (ContextNode)source.NextBlock();
-        return new FunctionDeclarationNode(identifier, block, parameters, successType, errorType, identifier.Location);
+        return new FunctionDeclarationNode(identifier.Source, block, parameters, successType, errorType, identifier.Location);
     }
 }

@@ -5,7 +5,7 @@ using Reax.Parser.Node.Statements;
 namespace Reax.Parser.Node;
 
 public record BindNode(
-    IdentifierNode Identifier, 
+    string Identifier, 
     ContextNode Node,
     DataType Type, 
     SourceLocation Location) : ReaxNode(Location)
