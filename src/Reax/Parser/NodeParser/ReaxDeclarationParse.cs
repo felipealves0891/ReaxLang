@@ -1,5 +1,4 @@
 using Reax.Lexer;
-using Reax.Parser.Helper;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Statements;
 
@@ -22,7 +21,6 @@ public class ReaxDeclarationParse : INodeParser
            
         if(source.CurrentToken.Type == TokenType.END_STATEMENT)
         {
-            SymbolHelper.VariableDeclaration(identifier, immutable, isAsync, dataType);
             source.Advance();
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
         }
@@ -33,14 +31,12 @@ public class ReaxDeclarationParse : INodeParser
             var value = source.CurrentToken.ToReaxValue();
             source.Advance(TokenType.END_STATEMENT);
             source.Advance();
-            SymbolHelper.VariableDeclarationAndAssign(identifier, immutable, isAsync, dataType, value.Location);
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         else 
         {
             var assigned = source.NextNode() ?? new NullNode(identifier.Location);
             var value = new ContextNode([assigned], assigned.Location);
-            SymbolHelper.VariableDeclarationAndAssign(identifier, immutable, isAsync, dataType, value.Location);
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         
