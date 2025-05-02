@@ -1,5 +1,6 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node.Operations;
 
@@ -7,6 +8,8 @@ public record FactorNode(
     string Operator, 
     SourceLocation Location) : ReaxNode(Location), IArithmeticOperator
 {
+    public override IReaxNode[] Children => [];
+
     public NumberNode Calculate(NumberNode x, NumberNode y)
     {
         return Operator switch 

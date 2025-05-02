@@ -1,6 +1,6 @@
-using Reax.Parser.Node.Interfaces;
+using Reax.Semantic;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Statements;
 
 public record DeclarationNode(
     string Identifier, 
@@ -8,8 +8,10 @@ public record DeclarationNode(
     bool Async, 
     DataType Type,
     ReaxNode? Assignment, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : StatementNode(Location)
 {
+    public override IReaxNode[] Children => [];
+
     public override string ToString()
     {
         var asc = Async ? "async " : "";

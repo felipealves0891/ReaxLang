@@ -1,7 +1,9 @@
 using System;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node.Expressions;
 
-public record ExpressionNode(SourceLocation Location) 
+public abstract record ExpressionNode(SourceLocation Location)
     : ReaxNode(Location)
-{}
+{
+}

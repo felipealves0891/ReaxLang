@@ -1,4 +1,5 @@
 using Reax.Parser.Node.Interfaces;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node.Operations;
 
@@ -6,6 +7,8 @@ public record EqualityNode(
     string Operator, 
     SourceLocation Location) : ReaxNode(Location), ILogicOperator
 {
+    public override IReaxNode[] Children => [];
+
     public bool Compare(ReaxNode x, ReaxNode y)
     {
         if(x is IReaxValue xValue && y is IReaxValue yValue)

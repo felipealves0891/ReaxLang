@@ -1,5 +1,6 @@
 using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Interfaces;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node;
 
@@ -9,7 +10,8 @@ public record VarNode(
     SourceLocation Location) : ExpressionNode(Location), IReaxValue
 {
     public object Value => Identifier;
-    
+    public override IReaxNode[] Children => [];
+
     public override string ToString()
     {
         return Identifier;

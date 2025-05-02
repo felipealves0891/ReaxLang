@@ -357,7 +357,7 @@ public class ReaxInterpreter
 
     private void ExecuteWhile(WhileNode node)
     {
-        var condition = (BinaryNode)node.condition;
+        var condition = (BinaryNode)node.Condition;
         var block = (ContextNode)node.Block;
 
         while(ExecuteBinary(condition))

@@ -1,13 +1,16 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node.Expressions;
 
 public record ExternalFunctionCallNode(
     string scriptName, 
     FunctionCallNode functionCall, 
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : ExpressionNode(Location)
 {
+    public override IReaxNode[] Children => [];
+
     public override string ToString()
     {
         var parameters = functionCall.Parameter.Select(x => x.ToString());

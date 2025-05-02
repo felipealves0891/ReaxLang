@@ -1,7 +1,6 @@
-using Reax.Parser.Node.Interfaces;
-using Reax.Parser.Node.Statements;
+using Reax.Semantic;
 
-namespace Reax.Parser.Node;
+namespace Reax.Parser.Node.Statements;
 
 public record FunctionDeclarationNode(
     string Identifier, 
@@ -9,8 +8,10 @@ public record FunctionDeclarationNode(
     VarNode[] Parameters, 
     DataType SuccessType,
     DataType ErrorType,
-    SourceLocation Location) : ReaxNode(Location)
+    SourceLocation Location) : StatementNode(Location)
 {
+    public override IReaxNode[] Children => Parameters.Concat(Block.Block).ToArray();
+
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));

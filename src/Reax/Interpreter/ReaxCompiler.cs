@@ -5,6 +5,9 @@ using Reax.Lexer;
 using Reax.Lexer.Reader;
 using Reax.Parser;
 using Reax.Parser.Node;
+using Reax.Semantic.Analyzers;
+using Reax.Semantic.Contexts;
+using Reax.Semantic.Rules;
 
 namespace Reax.Interpreter;
 
@@ -13,6 +16,14 @@ public class ReaxCompiler
     public static ReaxInterpreter Compile(string filename) 
     {
         var ast = GetNodes(filename);   
+
+        var analyser = new DefaultSemanticAnalyzer([
+            new SymbolRule()
+        ]);        
+
+        var context = new SemanticContext();
+        ast.Select(x => analyser.Analyze(x, context)).ToArray();
+
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast.ToArray());
     }

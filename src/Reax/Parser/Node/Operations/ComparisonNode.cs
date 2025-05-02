@@ -1,5 +1,6 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node.Operations;
 
@@ -7,6 +8,8 @@ public record ComparisonNode(
     string Operator, 
     SourceLocation Location) : ReaxNode(Location), ILogicOperator
 {
+    public override IReaxNode[] Children => [];
+
     public bool Compare(ReaxNode x, ReaxNode y)
     {
         var left = (NumberNode)x;

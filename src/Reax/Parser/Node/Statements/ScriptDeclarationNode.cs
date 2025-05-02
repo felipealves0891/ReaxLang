@@ -1,4 +1,5 @@
 using System;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node;
 
@@ -7,6 +8,8 @@ public record ScriptDeclarationNode(
     SourceLocation Location) 
     : ReaxNode(Location)
 {
+    public override IReaxNode[] Children => [];
+
     public override string ToString()
     {
         return $"script {Identifier};";

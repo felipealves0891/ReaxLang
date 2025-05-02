@@ -1,5 +1,6 @@
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node.Expressions;
 
@@ -8,6 +9,8 @@ public record FunctionCallNode(
     ReaxNode[] Parameter, 
     SourceLocation Location) : ExpressionNode(Location)
 {
+    public override IReaxNode[] Children => [];
+
     public override string ToString()
     {
         return $"{Identifier}({string.Join(',', Parameter.Select(x => x.ToString()))});";

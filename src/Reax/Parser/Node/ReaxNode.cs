@@ -2,11 +2,14 @@ using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
 using Reax.Runtime;
+using Reax.Semantic;
 
 namespace Reax.Parser.Node;
 
-public abstract record ReaxNode(SourceLocation Location)
+public abstract record ReaxNode(SourceLocation Location) : IReaxNode
 {
+    public abstract IReaxNode[] Children { get; }
+
     public ReaxNode GetValue(ReaxExecutionContext context) 
     {
         if(this is NumberNode number)
