@@ -199,8 +199,10 @@ public class ReaxInterpreter
         if(!declaration.Immutable)
         {
             _context.DeclareVariable(declaration.Identifier, declaration.Async);
-            if(declaration.Assignment is not null)
+            if(declaration.Assignment is not null && declaration.Assignment is not AssignmentNode)
                 ExecuteAssignment(new AssignmentNode(new VarNode(declaration.Identifier, declaration.Type, declaration.Location), declaration.Assignment, declaration.Location));    
+            else if(declaration.Assignment is not null && declaration.Assignment is AssignmentNode assignment)
+                ExecuteAssignment(assignment);    
         }
         else 
         {
@@ -221,6 +223,8 @@ public class ReaxInterpreter
             _context.SetVariable(assignment.Identifier.Identifier, ExecuteContextAndReturnValue(node));
         else if (assignment.Assigned is VarNode variable)
             _context.SetVariable(assignment.Identifier.Identifier, _context.GetVariable(variable.Identifier));
+        else if (assignment.Assigned is MatchNode match)
+            _context.SetVariable(assignment.Identifier.Identifier, ExecuteMatch(match));
         else
             _context.SetVariable(assignment.Identifier.Identifier, assignment.Assigned);
     }
@@ -408,7 +412,7 @@ public class ReaxInterpreter
         return logical.Compare(left, right);
     }
 
-    private ReaxNode? ExecuteMatch(MatchNode match) 
+    private ReaxNode ExecuteMatch(MatchNode match) 
     {
         var expressionInterpreter = new ReaxInterpreter(match.Expression.ToString(), [match.Expression], _context);
         expressionInterpreter.Interpret();
@@ -418,14 +422,14 @@ public class ReaxInterpreter
             var successInterpreter = new ReaxInterpreter(match.Success.ToString(), [match.Success.Context], _context, match.Success.Parameters);
             successInterpreter.Debug += ReaxDebugger.Debugger;
             successInterpreter.Interpret("Success", [expressionInterpreter.Output]);
-            return successInterpreter.Output;
+            return successInterpreter.Output ?? throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
         else if (expressionInterpreter.Error is not null)
         {
             var errorInterpreter = new ReaxInterpreter(match.Error.ToString(), [match.Error.Context], _context, match.Error.Parameters);
             errorInterpreter.Interpret("Error", [expressionInterpreter.Error]);
             errorInterpreter.Debug += ReaxDebugger.Debugger;
-            return errorInterpreter.Output;
+            return errorInterpreter.Output ?? throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
         else 
             throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");

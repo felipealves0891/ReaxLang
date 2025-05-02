@@ -5,6 +5,7 @@ using Reax.Lexer;
 using Reax.Lexer.Reader;
 using Reax.Parser;
 using Reax.Parser.Node;
+using Reax.Semantic;
 using Reax.Semantic.Analyzers;
 using Reax.Semantic.Contexts;
 using Reax.Semantic.Rules;
@@ -22,7 +23,11 @@ public class ReaxCompiler
         ]);        
 
         var context = new SemanticContext();
-        ast.Select(x => analyser.Analyze(x, context)).ToArray();
+        var results = ast.Select(x => analyser.Analyze(x, context)).Aggregate(ValidationResult.Success(), (a, b) => a.Join(b));
+        if(!results.Status)
+        {
+            throw new InvalidOperationException(results.Message);
+        }
 
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast.ToArray());

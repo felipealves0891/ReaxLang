@@ -9,7 +9,7 @@ public record FunctionCallNode(
     ReaxNode[] Parameter, 
     SourceLocation Location) : ExpressionNode(Location)
 {
-    public override IReaxNode[] Children => [];
+    public override IReaxNode[] Children => Parameter;
 
     public override string ToString()
     {

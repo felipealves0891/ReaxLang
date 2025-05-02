@@ -28,7 +28,7 @@ public class ReaxDeclarationParse : INodeParser
         source.Advance();
         if(source.NextToken.Type == TokenType.END_STATEMENT)
         {
-            var value = source.CurrentToken.ToReaxValue();
+            var value = new AssignmentNode(new VarNode(identifier.Source, dataType, identifier.Location), source.CurrentToken.ToReaxValue(), source.CurrentToken.Location); 
             source.Advance(TokenType.END_STATEMENT);
             source.Advance();
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
@@ -36,7 +36,7 @@ public class ReaxDeclarationParse : INodeParser
         else 
         {
             var assigned = source.NextNode() ?? new NullNode(identifier.Location);
-            var value = new ContextNode([assigned], assigned.Location);
+            var value = new AssignmentNode(new VarNode(identifier.Source, dataType, identifier.Location), assigned, assigned.Location);
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
         

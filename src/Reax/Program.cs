@@ -10,12 +10,11 @@ var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
 
 try
 {
-    
     interpreter.Interpret();
 }
 catch (System.Exception ex)
 {
     Logger.LogError(ex, "Error: "); 
-    Console.WriteLine("Reax Error:");
+    Console.WriteLine("Reax Error: {0}", ex.Message);
     interpreter.PrintStackTrace();
 }

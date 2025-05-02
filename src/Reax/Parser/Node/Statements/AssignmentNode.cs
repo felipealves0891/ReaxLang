@@ -8,7 +8,7 @@ public record AssignmentNode(
     ReaxNode Assigned, 
     SourceLocation Location) : StatementNode(Location)
 {
-    public override IReaxNode[] Children => [];
+    public override IReaxNode[] Children => [Assigned];
 
     public override string ToString()
     {

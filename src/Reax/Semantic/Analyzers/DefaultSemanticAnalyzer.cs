@@ -1,4 +1,5 @@
 using System;
+using Reax.Parser.Node.Statements;
 
 namespace Reax.Semantic.Analyzers;
 
@@ -17,10 +18,17 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
     {
         foreach (var rule in _rules)
             _result.Join(rule.Apply(node, context));
+        
+        IDisposable? scopeDisposable = null;
+        if(node is StatementNode)
+            scopeDisposable = context.EnterScope();
 
         foreach (var child in node.Children)
             _result.Join(Analyze(child, context));
         
+        if(scopeDisposable is not null)
+            scopeDisposable.Dispose();
+
         return _result;
     }
 }

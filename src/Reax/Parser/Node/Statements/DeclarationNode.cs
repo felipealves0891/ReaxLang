@@ -7,10 +7,10 @@ public record DeclarationNode(
     bool Immutable, 
     bool Async, 
     DataType Type,
-    ReaxNode? Assignment, 
+    AssignmentNode? Assignment, 
     SourceLocation Location) : StatementNode(Location)
 {
-    public override IReaxNode[] Children => [];
+    public override IReaxNode[] Children => Assignment is not null ? [Assignment] : [];
 
     public override string ToString()
     {

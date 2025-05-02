@@ -17,28 +17,25 @@ public class ReaxForParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        source.Advance();
+        source.Advance(TokenType.IDENTIFIER);
         var identifierControl = source.CurrentToken;
-        source.Advance();
-        source.Advance();
+        source.Advance(TokenType.TYPING);
+        source.Advance([TokenType.FLOAT_TYPE, TokenType.LONG_TYPE, TokenType.INT_TYPE]);
         var dataType = source.CurrentToken;
-        source.Advance();
-        if(source.CurrentToken.Type != TokenType.ASSIGNMENT)
-            throw new InvalidOperationException("Era esperado uma atribuição!");
-        source.Advance();
+        source.Advance(TokenType.ASSIGNMENT);
+        source.Advance(TokenType.NUMBER_LITERAL);
         var initialValue = source.CurrentToken;
-        source.Advance();
+        source.Advance(TokenType.TO);
+
         var declaration = new DeclarationNode(
             identifierControl.Source, 
             false, 
             false, 
             dataType.Type.ToDataType(),
-            initialValue.ToReaxValue(), 
+            new AssignmentNode(new VarNode(identifierControl.Source, DataType.NUMBER, identifierControl.Location), initialValue.ToReaxValue(), initialValue.Location), 
             identifierControl.Location);
             
-        if(source.CurrentToken.Type != TokenType.TO)
-            throw new InvalidOperationException("Era esperado uma expresão 'TO'!");
-        source.Advance();
+        source.Advance(TokenType.NUMBER_LITERAL);
 
         var limitValue = source.CurrentToken;
         var condition = new BinaryNode(
@@ -47,10 +44,8 @@ public class ReaxForParse : INodeParser
             limitValue.ToReaxValue(),
             identifierControl.Location);
         
-        source.Advance();
-
+        source.Advance(TokenType.START_BLOCK);
         var block = (ContextNode)source.NextBlock();
-
         return new ForNode(declaration, condition, block, declaration.Location);
     }
 }
