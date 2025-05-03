@@ -74,6 +74,21 @@ public class SemanticContext : ISemanticContext
         return null;
     }
 
+    public Symbol[] ResolveParameters(string identifier)
+    {
+        if(CurrentParametersTable.ContainsKey(identifier))
+            return CurrentParametersTable[identifier].ToArray();
+        
+        foreach (var table in _parametersTabe)
+        {
+            if(table.TryGetValue(identifier, out var symbolOfParent))
+                return symbolOfParent.ToArray();
+        }
+
+        return [];
+
+    }
+
     private class ExiterScope : IDisposable
     {
         private readonly Action _disposable;

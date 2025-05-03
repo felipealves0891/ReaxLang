@@ -38,20 +38,6 @@ public class ValidationResult
         return this;
     }
 
-    private bool MessageEquals(StringBuilder sb1, StringBuilder sb2) 
-    {
-        if(sb1.Length != sb2.Length)
-            return false;
-
-        for (int i = 0; i < sb1.Length; i++)
-        {
-            if(sb1[i] != sb2[i])
-                return false;
-        }
-
-        return true;
-    }
-
     public static ValidationResult Success()
         => new ValidationResult(true);
 
@@ -63,5 +49,11 @@ public class ValidationResult
 
     public static ValidationResult IncompatibleTypes(DataType expected, DataType current, SourceLocation location)
         => new ValidationResult(false, $"{location} - Atribuição invalida! Era esperado {expected}, mas foi atribuido {current}!");
+        
+    public static ValidationResult InvalidFunctionCall_ParametersCount(string identifier, int expected, int passed, SourceLocation location)
+        => new ValidationResult(false, $"{location} - A função {identifier} esperava {expected}, mas foi passado {passed} parametros!");
+
+    public static ValidationResult InvalidFunctionCall_InvalidParameter(string identifier, string name, DataType expected, DataType passed, SourceLocation location)
+        => new ValidationResult(false, $"{location} - O parametro {name} da função {identifier} esperava {expected}, mas foi passado {passed}!");
 
 }

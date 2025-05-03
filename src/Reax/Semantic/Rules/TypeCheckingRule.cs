@@ -4,6 +4,7 @@ using Reax.Parser.Node;
 using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Literals;
 using Reax.Parser.Node.Statements;
+using Reax.Semantic.Contexts;
 
 namespace Reax.Semantic.Rules;
 
@@ -14,6 +15,7 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(AssignmentNode)] = ApplyAssignmentNode;
         Handlers[typeof(ActionNode)] = ApplyActionNode;
         Handlers[typeof(FunctionDeclarationNode)] = ApplyFunctionDeclarationNode;
+        Handlers[typeof(FunctionCallNode)] = ApplyFunctionCallNode;
     }
 
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
@@ -47,6 +49,39 @@ public class TypeCheckingRule : BaseRule
             return ValidationResult.Success();
         else
             return ValidationResult.IncompatibleTypes(declarationNode.SuccessType | declarationNode.ErrorType, current, declarationNode.Location);
+    }
+
+    private ValidationResult ApplyFunctionCallNode(IReaxNode node)
+    {
+        var call = (FunctionCallNode)node;
+        var symbol = Context.Resolve(call.Identifier);
+        if (symbol is null)
+            return ValidationResult.SymbolUndeclared(call.Identifier, call.Location);
+        
+        var expectedParameters = Context.ResolveParameters(call.Identifier);
+        var passedParameters = call.Parameter;
+
+        if(expectedParameters.Length != passedParameters.Length)
+            return ValidationResult.InvalidFunctionCall_ParametersCount(
+                call.Identifier, 
+                expectedParameters.Length, 
+                passedParameters.Length, 
+                call.Location);
+
+        for (int i = 0; i < expectedParameters.Length; i++)
+        {
+            DataType passedType = GetDataType(passedParameters[i]);
+            if(passedType != expectedParameters[i].Type)
+                return ValidationResult.InvalidFunctionCall_InvalidParameter(
+                    call.Identifier, 
+                    expectedParameters[i].Identifier,
+                    expectedParameters[i].Type, 
+                    passedType, 
+                    call.Location);
+        }
+
+        return ValidationResult.Success();
+
     }
 
     private DataType GetDataType(ReaxNode node)

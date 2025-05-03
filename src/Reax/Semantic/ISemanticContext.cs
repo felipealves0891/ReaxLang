@@ -7,6 +7,7 @@ public interface ISemanticContext
 {
     ValidationResult Declare(Symbol symbol);
     Symbol? Resolve(string identifier);
+    Symbol[] ResolveParameters(string identifier);
 
     IDisposable EnterScope();
     void ExitScope();
