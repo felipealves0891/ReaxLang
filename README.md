@@ -85,7 +85,6 @@ while controle < 100 and controle > 0) {
 }
 ```
 
----
 ### Observadores assíncronos, os observadores são chamados de forma assíncrona
 ```
 async let minha_variavel = 'Meu Texto';
@@ -127,4 +126,12 @@ let minhaDivisao: int = match calculate.divider(50, 0) {
 ```
 
 ### Comentário
-> Para usar comentários você só precisa de um # antes e apartir da li toda a linha sera comentada
+> Para usar comentários você só precisa de um # antes do texto comentado, o resto da lina será entendido como um comentario
+
+´´´
+# Meu comentario de uma linha
+´´´
+
+´´´
+const meuValorImutavel: string = 'Sempre assim'; # uma constante e um comentário
+´´´
