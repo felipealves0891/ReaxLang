@@ -9,10 +9,11 @@ public class ReaxExpressionParser : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
-        return next.Type == TokenType.COMPARISON 
+        return current.IsReaxValue() && 
+              (next.Type == TokenType.COMPARISON 
             || next.Type == TokenType.EQUALITY
             || next.Type == TokenType.TERM
-            || next.Type == TokenType.FACTOR;
+            || next.Type == TokenType.FACTOR);
     }
 
     public ReaxNode? Parse(ITokenSource source)

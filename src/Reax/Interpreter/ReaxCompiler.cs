@@ -19,7 +19,8 @@ public class ReaxCompiler
         var ast = GetNodes(filename);   
 
         var analyser = new DefaultSemanticAnalyzer([
-            new SymbolRule()
+            new SymbolRule(),
+            new TypeCheckingRule()
         ]);        
 
         var context = new SemanticContext();

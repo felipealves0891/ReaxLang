@@ -14,6 +14,7 @@ public class SymbolRule : BaseRule
         Handlers[typeof(FunctionDeclarationNode)] = ApplyFunctionDeclarationNode;
         Handlers[typeof(AssignmentNode)] = ApplyAssignmentNode;
         Handlers[typeof(VarNode)] = ApplyVarNode;
+        Handlers[typeof(ActionNode)] = ApplyActionNode;
     }
 
     private ValidationResult ApplyDeclarationNode(IReaxNode node)
@@ -78,15 +79,29 @@ public class SymbolRule : BaseRule
     {
         var variable = (VarNode)node;
         if(variable.Type != Parser.DataType.NONE)
-            return ValidationResult.Success();
-
+        {
+            var declarationSymbol = Symbol.CreateConst(variable.Identifier, variable.Type, variable.Location);
+            return Context.Declare(declarationSymbol);
+        }
+        
         var symbol = Context.Resolve(variable.Identifier);
         if(symbol is null)
             return ValidationResult.SymbolUndeclared(variable.Identifier, variable.Location);
 
         variable.Type = symbol.Type;
         return ValidationResult.Success();
+    }
 
+    private ValidationResult ApplyActionNode(IReaxNode node)
+    {
+        var action = (ActionNode)node;
+        var results = ValidationResult.Success();
+        foreach (var parameter in action.Parameters)
+        {
+            var symbolDeclaration = Symbol.CreateConst(parameter.Identifier, parameter.Type, parameter.Location);
+            results.Join(Context.Declare(symbolDeclaration));
+        }
+        return results;
     }
     
 }

@@ -27,7 +27,7 @@ public class ValidationResult
     public ValidationResult Join(ValidationResult result) 
     {
         _status = _status && result.Status;
-        if(result._message.Length > 0 && !MessageEquals(result._message, _message))
+        if(result._message.Length > 0 && !_message.ToString().Contains(result._message.ToString()))
         {
             if(_message.Length > 0)
                 _message.AppendLine();

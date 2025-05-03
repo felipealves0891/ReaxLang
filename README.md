@@ -102,14 +102,29 @@ import module 'console';
 ```
 
 ### Funções
+As funções podem retornar dois tipos diferentem, um em caso e sucesso e outro em caso de erro.
+Caso não seja declarado o tipo de erro, é inferido como void
+
 ```
-fun sum(num: int, den: int) {
-	return num + den;
+fun divider(num: int, den: int): int | string {
+	if(den == 0) {
+		return error 'Tentativa de divisão por 0';
+	}
+	return success num / den + meuValorInterno;
+}
+```
+
+### Match
+Para invoca uma função com tipo de erro diferente de void, deve se usar o comando ```match```
+```
+let minhaDivisao: int = match calculate.divider(50, 0) {
+	success (val: int): int -> val;
+	error (message: string): int {
+		console.writer(message);
+		return -1;
+	}
 }
 ```
 
 ### Comentário
 > Para usar comentários você só precisa de um # antes e apartir da li toda a linha sera comentada
-
-### Debug
-O debug é bem inicial e simplificado, mas já é possível identificar as alterações de variáveis, contexto e stack trace  

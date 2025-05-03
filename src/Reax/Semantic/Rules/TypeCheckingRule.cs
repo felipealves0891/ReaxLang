@@ -12,6 +12,8 @@ public class TypeCheckingRule : BaseRule
     public TypeCheckingRule()
     {
         Handlers[typeof(AssignmentNode)] = ApplyAssignmentNode;
+        Handlers[typeof(ActionNode)] = ApplyActionNode;
+        Handlers[typeof(FunctionDeclarationNode)] = ApplyFunctionDeclarationNode;
     }
 
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
@@ -25,24 +27,52 @@ public class TypeCheckingRule : BaseRule
             return ValidationResult.IncompatibleTypes(expected, current, assignment.Location);
     }
 
+    private ValidationResult ApplyActionNode(IReaxNode node)
+    {
+        var action = (ActionNode)node;
+        var expected = action.Type;
+        var current = GetDataType(action.Context);
+        if(current.HasFlag(expected))
+            return ValidationResult.Success();
+        else
+            return ValidationResult.IncompatibleTypes(expected, current, action.Location);
+    }
+
+    private ValidationResult ApplyFunctionDeclarationNode(IReaxNode node)
+    {
+        var declarationNode = (FunctionDeclarationNode)node;
+        var expected = declarationNode.SuccessType | declarationNode.ErrorType;
+        var current = GetDataType(declarationNode.Block);
+        if((expected & current) == current)
+            return ValidationResult.Success();
+        else
+            return ValidationResult.IncompatibleTypes(declarationNode.SuccessType | declarationNode.ErrorType, current, declarationNode.Location);
+    }
+
     private DataType GetDataType(ReaxNode node)
     {
-        if(node is BinaryNode binary)
+        if(node is BinaryNode)
             return DataType.BOOLEAN;
-        else if(node is CalculateNode calculate)
+        else if(node is CalculateNode)
             return DataType.NUMBER;
         else if(node is ExternalFunctionCallNode externalFunction)
             return GetDataTypeByIdentifier(externalFunction.functionCall.Identifier);
         else if(node is FunctionCallNode functionCall)
             return GetDataTypeByIdentifier(functionCall.Identifier);
         else if(node is VarNode var)
-            return var.Type;
+            return var.Type != DataType.NONE ? var.Type : GetDataTypeByIdentifier(var.Identifier);
         else if(node is LiteralNode literal)
             return literal.Type;
         else if(node is MatchNode match)
             return GetResultDataType(match);
         else if(node is ContextNode contextNode)
             return GetDataByContextNode(contextNode);
+        else if(node is ReturnSuccessNode successNode)
+            return GetDataTypeByReturn(successNode);
+        else if(node is ReturnErrorNode errorNode)
+            return GetDataTypeByReturn(errorNode);
+        else if(node is IfNode ifNode)
+            return GetDataTypeByIf(ifNode);
         else
             return DataType.NONE;
     }
@@ -66,14 +96,53 @@ public class TypeCheckingRule : BaseRule
 
     private DataType GetDataByContextNode(ContextNode node)
     {
+        DataType returnType = DataType.NONE;
         foreach (var item in node.Block)
         {
             var type = (DataType)GetDataType(item);
             if(type != DataType.NONE)
-                return type;
+            {
+                if(returnType == DataType.NONE)
+                    returnType = type;
+                else
+                    returnType = returnType | type;
+            }
         }
 
-        return DataType.NONE;
+        return returnType;
     }
 
+    private DataType GetDataTypeByReturn(ReturnSuccessNode successNode) 
+    {
+        if(successNode.Expression is ContextNode context)
+            return GetDataByContextNode(context);
+        else if(successNode.Expression is VarNode var)
+            return GetDataType(var);
+        else if(successNode.Expression is LiteralNode literal)
+            return literal.Type;
+        else
+            return DataType.NONE;
+    }
+
+    private DataType GetDataTypeByReturn(ReturnErrorNode successNode) 
+    {
+        if(successNode.Expression is ContextNode context)
+            return GetDataByContextNode(context);
+        else if(successNode.Expression is VarNode var)
+            return GetDataType(var);
+        else if(successNode.Expression is LiteralNode literal)
+            return literal.Type;
+        else
+            return DataType.NONE;
+    }
+
+    private DataType GetDataTypeByIf(IfNode node)
+    {
+        var type = GetDataType(node.True);
+        if(node.False is null)
+            return type;
+
+        type = type | GetDataType(node.False);
+        return type;
+    }
 }
