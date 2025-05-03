@@ -129,7 +129,7 @@ let minhaDivisao: int = match calculate.divider(50, 0) {
 > Para usar comentários você só precisa de um # antes do texto comentado, o resto da lina será entendido como um comentario
 
 ´´´
-# Meu comentario de uma linha
+#Meu comentario de uma linha
 ´´´
 
 ´´´
