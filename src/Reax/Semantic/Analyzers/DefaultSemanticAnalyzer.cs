@@ -1,4 +1,5 @@
 using System;
+using Reax.Parser.Node;
 using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Statements;
 
@@ -17,6 +18,10 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
 
     public ValidationResult Analyze(IReaxNode node, ISemanticContext context)
     {
+        IDisposable? scriptDisposable =  null;
+        if(node is ScriptNode script)
+            scriptDisposable = context.EnterScript(script.Identifier);
+
         foreach (var rule in _rules)
             _result.Join(rule.Apply(node, context));
         
@@ -29,6 +34,9 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
         
         if(scopeDisposable is not null)
             scopeDisposable.Dispose();
+
+        if(scriptDisposable is not null)
+            scriptDisposable.Dispose();
 
         return _result;
     }

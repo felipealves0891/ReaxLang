@@ -6,8 +6,11 @@ namespace Reax.Semantic;
 public interface ISemanticContext
 {
     ValidationResult Declare(Symbol symbol);
-    Symbol? Resolve(string identifier);
-    Symbol[] ResolveParameters(string identifier);
+    Symbol? Resolve(string identifier, string? script = null);
+    Symbol[] ResolveParameters(string identifier, string? script = null);
+
+    IDisposable EnterScript(string name);
+    void ExitScript();
 
     IDisposable EnterScope();
     void ExitScope();

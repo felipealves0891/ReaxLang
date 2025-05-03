@@ -91,7 +91,7 @@ public class TypeCheckingRule : BaseRule
         else if(node is CalculateNode)
             return DataType.NUMBER;
         else if(node is ExternalFunctionCallNode externalFunction)
-            return GetDataTypeByIdentifier(externalFunction.functionCall.Identifier);
+            return GetDataTypeByIdentifier(externalFunction.functionCall.Identifier, externalFunction.scriptName);
         else if(node is FunctionCallNode functionCall)
             return GetDataTypeByIdentifier(functionCall.Identifier);
         else if(node is VarNode var)
@@ -112,9 +112,9 @@ public class TypeCheckingRule : BaseRule
             return DataType.NONE;
     }
 
-    private DataType GetDataTypeByIdentifier(string identifier)
+    private DataType GetDataTypeByIdentifier(string identifier, string? script = null)
     {
-        var symbol = Context.Resolve(identifier);
+        var symbol = Context.Resolve(identifier, script);
         if(symbol is not null)
             return symbol.Type;
         else

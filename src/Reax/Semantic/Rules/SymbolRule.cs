@@ -1,3 +1,4 @@
+using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Statements;
 using Reax.Runtime.Functions;
@@ -5,7 +6,7 @@ using Reax.Semantic.Contexts;
 
 namespace Reax.Semantic.Rules;
 
-public class SymbolRule : BaseRule
+public class SymbolRule : BaseRule 
 {
     public SymbolRule() : base()        
     {
@@ -15,6 +16,7 @@ public class SymbolRule : BaseRule
         Handlers[typeof(AssignmentNode)] = ApplyAssignmentNode;
         Handlers[typeof(VarNode)] = ApplyVarNode;
         Handlers[typeof(ActionNode)] = ApplyActionNode;
+        Handlers[typeof(ModuleNode)] = ApplyModuleNode;
     }
 
     private ValidationResult ApplyDeclarationNode(IReaxNode node)
@@ -102,6 +104,32 @@ public class SymbolRule : BaseRule
             results.Join(Context.Declare(symbolDeclaration));
         }
         return results;
+    }
+
+    private ValidationResult ApplyModuleNode(IReaxNode node)
+    {
+        var module = (ModuleNode)node;
+        var results = ValidationResult.Success();
+        foreach (var item in module.functions)
+        {
+            var name = item.Key;
+            var function = item.Value;
+            if(function is DecorateFunctionBuiltIn decorate)
+            {
+                var symbolFunction = Symbol.CreateFunction(name, decorate.Result, new SourceLocation());
+                results.Join(Context.Declare(symbolFunction));
+
+                var counter = 1;
+                foreach (var parameterType in decorate.Parameters)
+                {
+                    var symbolParameter = Symbol.CreateParameter($"{name}_parameter_{counter}", name, parameterType, new SourceLocation());
+                    results.Join(Context.Declare(symbolParameter));
+                    counter++;
+                }
+            }
+        }
+        return results;
+
     }
     
 }

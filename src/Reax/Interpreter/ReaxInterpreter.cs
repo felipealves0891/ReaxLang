@@ -65,6 +65,9 @@ public class ReaxInterpreter
 
     public void Initialize() 
     {
+        Output = null;
+        Error = null;
+        
         if(_isInitialized)
             return;
 
