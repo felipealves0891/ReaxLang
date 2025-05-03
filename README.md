@@ -39,7 +39,9 @@ const limite: int = 10;
 ```
 
 >Não é possivel utilizar um bind em outro que dependa dele exemplo:
+
 >**bind contador -> contador + 1;**
+
 >Isso ira gerar um erro em tempo de analise, devido a referencias circulares.
 
 >Vinculos não podem ser observados, pois, não são reatribuidos.
