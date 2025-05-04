@@ -21,6 +21,8 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
         IDisposable? scriptDisposable =  null;
         if(node is ScriptNode script)
             scriptDisposable = context.EnterScript(script.Identifier);
+        else if(node is ModuleNode module)
+            scriptDisposable = context.EnterScript(module.identifier);
 
         foreach (var rule in _rules)
             _result.Join(rule.Apply(node, context));

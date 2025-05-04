@@ -8,7 +8,7 @@ namespace Reax.Runtime.Functions.ConsoleFunctions;
     "console", 
     "writer", 
     1, 
-    10, 
+    9, 
     TypeSource = typeof(WriterFunction), 
     ParametersProperty = nameof(Parameters),
     ResultProperty = nameof(Result))

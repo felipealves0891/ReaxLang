@@ -119,17 +119,24 @@ public class SymbolRule : BaseRule
                 var symbolFunction = Symbol.CreateFunction(name, decorate.Result, new SourceLocation());
                 results.Join(Context.Declare(symbolFunction));
 
-                var counter = 1;
-                foreach (var parameterType in decorate.Parameters)
+                for (int i = 0; i < decorate.ParametersCount; i++)
                 {
-                    var symbolParameter = Symbol.CreateParameter($"{name}_parameter_{counter}", name, parameterType, new SourceLocation());
-                    results.Join(Context.Declare(symbolParameter));
-                    counter++;
+                    var parameterType = decorate.Parameters[i];
+                    if (i < decorate.RequiredParametersCount)
+                    {
+                        var symbolParameter = Symbol.CreateParameter($"{name}_parameter_{i}", name, parameterType, new SourceLocation());
+                        results.Join(Context.Declare(symbolParameter));
+                    }
+                    else 
+                    {
+                        var symbolParameter = Symbol.CreateParameterOptional($"{name}_parameter_{i}", name, parameterType, new SourceLocation());
+                        results.Join(Context.Declare(symbolParameter));
+                    }                    
                 }
             }
         }
+        
         return results;
-
     }
     
 }

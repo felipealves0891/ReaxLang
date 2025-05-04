@@ -16,6 +16,7 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(ActionNode)] = ApplyActionNode;
         Handlers[typeof(FunctionDeclarationNode)] = ApplyFunctionDeclarationNode;
         Handlers[typeof(FunctionCallNode)] = ApplyFunctionCallNode;
+        Handlers[typeof(ExternalFunctionCallNode)] = ApplyExternalFunctionCallNode;
     }
 
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
@@ -61,27 +62,61 @@ public class TypeCheckingRule : BaseRule
         var expectedParameters = Context.ResolveParameters(call.Identifier);
         var passedParameters = call.Parameter;
 
-        if(expectedParameters.Length != passedParameters.Length)
+        return ValidateParameters(
+            passedParameters,
+            expectedParameters,
+            call.Location,
+            call.Identifier,
+            "main");
+    }
+
+    private ValidationResult ApplyExternalFunctionCallNode(IReaxNode node)
+    {
+        var external = (ExternalFunctionCallNode)node;
+        var call = external.functionCall;
+        var symbol = Context.Resolve(call.Identifier, external.scriptName);
+        if (symbol is null)
+            return ValidationResult.SymbolUndeclared(call.Identifier, call.Location);
+        
+        var expectedParameters = Context.ResolveParameters(call.Identifier, external.scriptName);
+        var passedParameters = call.Parameter;
+
+        return ValidateParameters(
+            passedParameters,
+            expectedParameters,
+            external.Location,
+            call.Identifier,
+            external.scriptName);
+    }
+    
+    private ValidationResult ValidateParameters(
+        ReaxNode[] passedParameters, 
+        Symbol[] expectedParameters,
+        SourceLocation location,
+        string identifier,
+        string script) 
+    {
+        var requiredParameters = expectedParameters.Count(x => x.Category == SymbolCategory.PARAMETER);
+        if(passedParameters.Length > expectedParameters.Length || passedParameters.Length < requiredParameters)
             return ValidationResult.InvalidFunctionCall_ParametersCount(
-                call.Identifier, 
+                $"{script}.{identifier}", 
                 expectedParameters.Length, 
                 passedParameters.Length, 
-                call.Location);
+                location);
 
-        for (int i = 0; i < expectedParameters.Length; i++)
+        for (int i = 0; i < passedParameters.Length; i++)
         {
             DataType passedType = GetDataType(passedParameters[i]);
-            if(passedType != expectedParameters[i].Type)
+            if(!expectedParameters[i].Type.IsCompatatible(passedType))
                 return ValidationResult.InvalidFunctionCall_InvalidParameter(
-                    call.Identifier, 
+                    $"{script}.{identifier}", 
                     expectedParameters[i].Identifier,
                     expectedParameters[i].Type, 
                     passedType, 
-                    call.Location);
+                    location);
         }
 
         return ValidationResult.Success();
-
     }
 
     private DataType GetDataType(ReaxNode node)

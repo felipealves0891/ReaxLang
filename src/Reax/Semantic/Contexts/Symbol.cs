@@ -13,7 +13,8 @@ public enum SymbolCategory
     FUNCTION,
     MODULE,
     SCRIPT,
-    PARAMETER
+    PARAMETER,
+    PARAMETER_OPTIONAL
 }
 
 public record Symbol
@@ -64,5 +65,8 @@ public record Symbol
         
     public static Symbol CreateParameter(string identifier, string parentIdentifier, DataType type, SourceLocation location)
         => new Symbol(identifier, type, SymbolCategory.PARAMETER, location, parentIdentifier);
+        
+    public static Symbol CreateParameterOptional(string identifier, string parentIdentifier, DataType type, SourceLocation location)
+        => new Symbol(identifier, type, SymbolCategory.PARAMETER_OPTIONAL, location, parentIdentifier);
 
 }

@@ -35,7 +35,7 @@ public class SemanticContext : ISemanticContext
     {
         var identifier = GetIdentifier(symbol.Identifier);
 
-        if(symbol.Category == SymbolCategory.PARAMETER)
+        if(symbol.Category is SymbolCategory.PARAMETER or SymbolCategory.PARAMETER_OPTIONAL)
             return DeclareParameters(symbol);
         
         if(CurrentSymbolTable.ContainsKey(identifier))
