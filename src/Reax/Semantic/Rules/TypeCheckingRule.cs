@@ -27,7 +27,7 @@ public class TypeCheckingRule : BaseRule
         if(current.HasFlag(expected))
             return ValidationResult.Success();
         else
-            return ValidationResult.IncompatibleTypes(expected, current, assignment.Location);
+            return ValidationResult.FailureIncompatibleTypes(expected, current, assignment.Location);
     }
 
     private ValidationResult ApplyActionNode(IReaxNode node)
@@ -38,7 +38,7 @@ public class TypeCheckingRule : BaseRule
         if(current.HasFlag(expected))
             return ValidationResult.Success();
         else
-            return ValidationResult.IncompatibleTypes(expected, current, action.Location);
+            return ValidationResult.FailureIncompatibleTypes(expected, current, action.Location);
     }
 
     private ValidationResult ApplyFunctionDeclarationNode(IReaxNode node)
@@ -49,7 +49,7 @@ public class TypeCheckingRule : BaseRule
         if((expected & current) == current)
             return ValidationResult.Success();
         else
-            return ValidationResult.IncompatibleTypes(declarationNode.SuccessType | declarationNode.ErrorType, current, declarationNode.Location);
+            return ValidationResult.FailureIncompatibleTypes(declarationNode.SuccessType | declarationNode.ErrorType, current, declarationNode.Location);
     }
 
     private ValidationResult ApplyFunctionCallNode(IReaxNode node)
@@ -57,7 +57,7 @@ public class TypeCheckingRule : BaseRule
         var call = (FunctionCallNode)node;
         var symbol = Context.Resolve(call.Identifier);
         if (symbol is null)
-            return ValidationResult.SymbolUndeclared(call.Identifier, call.Location);
+            return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
         
         var expectedParameters = Context.ResolveParameters(call.Identifier);
         var passedParameters = call.Parameter;
@@ -76,7 +76,7 @@ public class TypeCheckingRule : BaseRule
         var call = external.functionCall;
         var symbol = Context.Resolve(call.Identifier, external.scriptName);
         if (symbol is null)
-            return ValidationResult.SymbolUndeclared(call.Identifier, call.Location);
+            return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
         
         var expectedParameters = Context.ResolveParameters(call.Identifier, external.scriptName);
         var passedParameters = call.Parameter;
@@ -98,7 +98,7 @@ public class TypeCheckingRule : BaseRule
     {
         var requiredParameters = expectedParameters.Count(x => x.Category == SymbolCategory.PARAMETER);
         if(passedParameters.Length > expectedParameters.Length || passedParameters.Length < requiredParameters)
-            return ValidationResult.InvalidFunctionCall_ParametersCount(
+            return ValidationResult.FailureInvalidFunctionCall_ParametersCount(
                 $"{script}.{identifier}", 
                 expectedParameters.Length, 
                 passedParameters.Length, 
@@ -108,7 +108,7 @@ public class TypeCheckingRule : BaseRule
         {
             DataType passedType = GetDataType(passedParameters[i]);
             if(!expectedParameters[i].Type.IsCompatatible(passedType))
-                return ValidationResult.InvalidFunctionCall_InvalidParameter(
+                return ValidationResult.FailureInvalidFunctionCall_InvalidParameter(
                     $"{script}.{identifier}", 
                     expectedParameters[i].Identifier,
                     expectedParameters[i].Type, 

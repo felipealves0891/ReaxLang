@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
+using Reax.Debugger;
+using Reax.Parser.Node.Statements;
 
 namespace Reax.Semantic.Contexts;
 
@@ -8,6 +10,9 @@ public class SemanticContext : ISemanticContext
 {
     private readonly ConcurrentStack<ConcurrentDictionary<string, Symbol>> _symbolsTable;
     private readonly ConcurrentStack<ConcurrentDictionary<string, HashSet<Symbol>>> _parametersTabe;
+    private readonly ConcurrentDictionary<Reference, HashSet<Reference>> _references;
+    private readonly ValidationResult _validationReferences;
+    private readonly ConcurrentStack<Reference> _from;
     private readonly ConcurrentStack<string> _scripts;
 
     public SemanticContext()
@@ -15,11 +20,13 @@ public class SemanticContext : ISemanticContext
         _symbolsTable = new();
         _parametersTabe = new();
         _scripts = new();
+        _from = new();
+        _references = new();
+        _validationReferences = ValidationResult.Success();
 
         _symbolsTable.Push(new());
         _parametersTabe.Push(new());
-        _scripts.Push("main");
-        
+        _scripts.Push("main");        
     }
 
     public ConcurrentDictionary<string, Symbol> CurrentSymbolTable => 
@@ -31,6 +38,9 @@ public class SemanticContext : ISemanticContext
     public string CurrentScript => 
         _scripts.TryPeek(out var name) ? name : string.Empty;
 
+    public Reference? CurrentFrom => 
+        _from.TryPeek(out var name) ? name : null!;
+
     public ValidationResult Declare(Symbol symbol)
     {
         var identifier = GetIdentifier(symbol.Identifier);
@@ -39,7 +49,7 @@ public class SemanticContext : ISemanticContext
             return DeclareParameters(symbol);
         
         if(CurrentSymbolTable.ContainsKey(identifier))
-            return ValidationResult.SymbolAlreadyDeclared(identifier, symbol.Location);
+            return ValidationResult.FailureSymbolAlreadyDeclared(identifier, symbol.Location);
 
         CurrentSymbolTable[identifier] = symbol;
         return ValidationResult.Success();    
@@ -57,7 +67,7 @@ public class SemanticContext : ISemanticContext
         
         var isAlreadyDeclared =  CurrentParametersTable[identifier].Any(x => x.Identifier == symbol.Identifier);
         if(isAlreadyDeclared)
-            return ValidationResult.SymbolAlreadyDeclared(symbol.Identifier, symbol.Location);
+            return ValidationResult.FailureSymbolAlreadyDeclared(symbol.Identifier, symbol.Location);
 
         CurrentParametersTable[identifier].Add(symbol);
         return ValidationResult.Success();
@@ -124,6 +134,89 @@ public class SemanticContext : ISemanticContext
             script = CurrentScript;
 
         return $"{script}.{identifier}";
+    }
+
+    public IDisposable EnterFrom(Reference from)
+    {
+        Logger.LogSemanticContext($"({from.Location.Line}) -> EnterFrom('{from}')");
+        _from.Push(from);
+        return new ExiterScope(ExitFrom);
+    }
+
+    public void ExitFrom()
+    {
+        if(!_from.TryPop(out var variable))
+            return;
+
+        var visited = new HashSet<Reference>(new ReferenceEqualityComparer());
+        var stack = new HashSet<Reference>(new ReferenceEqualityComparer());
+        var results = ValidationResult.Success();
+
+        Logger.LogSemanticContext($"({variable.Location.Line}) -> ExitFrom({variable})");
+        var hasCycle = HasCycle(variable, visited, stack);
+        if (hasCycle.Status)
+        {
+            var cycleStr = string.Join(" → ", hasCycle.CyclePath);
+            results.Join(ValidationResult.FailureReactiveCycle(cycleStr, variable.Location));
+        } 
+
+        _validationReferences.Join(results);
+        _references.Clear();        
+    }
+
+    public void SetTo(Reference to)
+    {
+        if(CurrentFrom is null)
+            return;
+            
+        if(!_references.ContainsKey(CurrentFrom)) _references[CurrentFrom] = new HashSet<Reference>();
+        _references[CurrentFrom].Add(to);
+        Logger.LogSemanticContext($"({to.Location.Line}) -> SetTo('{to}')");
+    }
+
+    public ValidationResult ValidateCycle()
+        => _validationReferences;
+
+    private (bool Status, string[] CyclePath) HasCycle(Reference variable, HashSet<Reference> visited, HashSet<Reference> stack)
+    {
+        if (stack.Contains(variable)) 
+        {
+            var from = stack.First(x => x.Equals(variable));
+            if(from.Type == typeof(ObservableNode))
+            {
+                if(!variable.IsAssignment)
+                    return (true, GetCyclePath(variable, stack));
+            }
+            else 
+                return (true, GetCyclePath(variable, stack));
+        }
+
+        if (visited.Contains(variable)) return (false, []);
+
+        visited.Add(variable);
+        stack.Add(variable);
+
+        if (_references.TryGetValue(variable, out var deps))
+        {
+            foreach (var dep in deps)
+            {
+                var (status, cyclePath) = HasCycle(dep, visited, stack);
+                if (status)
+                    return (true, cyclePath);
+            }
+        }
+
+        stack.Remove(variable);
+        return (false, []);
+    }
+
+    private string[] GetCyclePath(Reference variable, HashSet<Reference> stack)
+    {
+        return stack.Reverse()
+                    .Append(variable)
+                    .Select(x => x.ToString())
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToArray();
     }
 
     private class ExiterScope : IDisposable

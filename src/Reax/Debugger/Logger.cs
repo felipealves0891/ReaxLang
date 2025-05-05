@@ -42,6 +42,14 @@ public sealed class Logger : IDisposable
         _instance.Log(done, LoggerLevel.DEBUG);
     }
     
+    public static void LogSemanticContext(string message, [CallerMemberName] string caller = "") 
+    {
+        if(!Enabled) return;
+        var formateDate = DateTime.UtcNow.ToString(FormatDate);
+        var done = string.Format("DEB [{0}] | Context.{2} | {1}", formateDate, message, caller.PadRight(23, ' '));
+        _instance.Log(done, LoggerLevel.DEBUG);
+    }
+    
     public static void LogInterpreter(string message, [CallerMemberName] string caller = "") 
     {
         if(!Enabled) return;

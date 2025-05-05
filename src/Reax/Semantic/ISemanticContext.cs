@@ -14,4 +14,9 @@ public interface ISemanticContext
 
     IDisposable EnterScope();
     void ExitScope();
+
+    IDisposable EnterFrom(Reference from);
+    void ExitFrom();
+    void SetTo(Reference to);
+    ValidationResult ValidateCycle();
 }

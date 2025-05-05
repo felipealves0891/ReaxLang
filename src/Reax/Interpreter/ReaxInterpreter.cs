@@ -169,7 +169,7 @@ public class ReaxInterpreter
 
     private void ExecuteDeclareBind(BindNode bind) 
     {
-        var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node], _context);
+        var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node.Assigned], _context);
         interpreter.Debug += ReaxDebugger.Debugger;
         _context.Declare(bind.Identifier);
         _context.SetBind(bind.Identifier, interpreter);
@@ -228,8 +228,13 @@ public class ReaxInterpreter
             _context.SetVariable(assignment.Identifier.Identifier, _context.GetVariable(variable.Identifier));
         else if (assignment.Assigned is MatchNode match)
             _context.SetVariable(assignment.Identifier.Identifier, ExecuteMatch(match));
-        else
-            _context.SetVariable(assignment.Identifier.Identifier, assignment.Assigned);
+        else if(assignment.Assigned is LiteralNode literal)
+            _context.SetVariable(assignment.Identifier.Identifier, literal);
+        else 
+        {
+            var contextNode = new ContextNode([assignment.Assigned], assignment.Assigned.Location);
+            _context.SetVariable(assignment.Identifier.Identifier, ExecuteContextAndReturnValue(contextNode));
+        }
     }
 
     public ReaxNode Calculate(CalculateNode node)
@@ -436,6 +441,11 @@ public class ReaxInterpreter
         }
         else 
             throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
+    }
+
+    public ReaxNode? GetValue(string identifier) 
+    {
+        return _context.GetVariable(identifier);
     }
 
     private void OnDebug(SourceLocation location) 

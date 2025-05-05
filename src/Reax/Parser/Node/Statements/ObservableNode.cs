@@ -13,7 +13,7 @@ public record ObservableNode(
     public override IReaxNode[] Children => Condition is null ? [Var, Block] : [Var, Block, Condition];
     public override string ToString()
     {
-        var when = Condition is null ? "" : $"whe {Condition} "; 
-        return $"on {Var} {when}{{...}}";
+        var when = Condition is null ? "" : $"when {Condition} "; 
+        return $"on {Var} {when} {{...}}";
     }
 }

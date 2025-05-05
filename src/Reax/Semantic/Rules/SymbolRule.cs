@@ -71,7 +71,7 @@ public class SymbolRule : BaseRule
 
         var symbol = Context.Resolve(assignment.Identifier.Identifier);
         if(symbol is null)
-            return ValidationResult.SymbolUndeclared(assignment.Identifier.Identifier, assignment.Location);
+            return ValidationResult.FailureSymbolUndeclared(assignment.Identifier.Identifier, assignment.Location);
 
         assignment.Identifier.Type = symbol.Type;
         return ValidationResult.Success();
@@ -88,7 +88,7 @@ public class SymbolRule : BaseRule
         
         var symbol = Context.Resolve(variable.Identifier);
         if(symbol is null)
-            return ValidationResult.SymbolUndeclared(variable.Identifier, variable.Location);
+            return ValidationResult.FailureSymbolUndeclared(variable.Identifier, variable.Location);
 
         variable.Type = symbol.Type;
         return ValidationResult.Success();
@@ -138,5 +138,6 @@ public class SymbolRule : BaseRule
         
         return results;
     }
+
     
 }

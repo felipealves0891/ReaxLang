@@ -5,7 +5,7 @@ using Reax.Interpreter;
 var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
 ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
 ReaxEnvironment.Debug = false;
-ReaxEnvironment.BreakPoints[@"D:\Source\scripts\simple.reax"] = new HashSet<int>([60]);
+ReaxEnvironment.BreakPoints[@"D:\Source\scripts\simple.reax"] = new HashSet<int>([1]);
 var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
 
 try

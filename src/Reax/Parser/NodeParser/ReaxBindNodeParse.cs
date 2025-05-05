@@ -28,7 +28,7 @@ public class ReaxBindNodeParse : INodeParser
 
         return new BindNode(
             identifier.Source, 
-            new ContextNode([node], identifier.Location), 
+            new AssignmentNode(new VarNode(identifier.Source, dataType.Type.ToDataType(), identifier.Location), node, identifier.Location), 
             dataType.Type.ToDataType(),
             identifier.Location);
     }

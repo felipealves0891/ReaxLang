@@ -20,15 +20,23 @@ public class ReaxCompiler
 
         var analyser = new DefaultSemanticAnalyzer([
             new SymbolRule(),
-            new TypeCheckingRule()
+            new TypeCheckingRule(),
+            new CircularReferenceRule()
         ]);        
 
         var context = new SemanticContext();
-        var results = ast.Select(x => analyser.Analyze(x, context)).Aggregate(ValidationResult.Success(), (a, b) => a.Join(b));
+        var results = ValidationResult.Success();
+        
+        foreach (var node in ast)
+            results.Join(analyser.Analyze(node, context));
+        
+        results.Join(context.ValidateCycle());
         if(!results.Status)
         {
-            throw new InvalidOperationException(results.Message);
+            Console.WriteLine(results.Message);
+            Environment.Exit(-1);
         }
+            
 
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast.ToArray());

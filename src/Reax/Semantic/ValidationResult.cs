@@ -41,19 +41,21 @@ public class ValidationResult
     public static ValidationResult Success()
         => new ValidationResult(true);
 
-    public static ValidationResult SymbolAlreadyDeclared(string identifier, SourceLocation location)
+    public static ValidationResult FailureSymbolAlreadyDeclared(string identifier, SourceLocation location)
         => new ValidationResult(false, $"{location} - O simbolo {identifier} já foi declarado!");
 
-    public static ValidationResult SymbolUndeclared(string identifier, SourceLocation location)
+    public static ValidationResult FailureSymbolUndeclared(string identifier, SourceLocation location)
         => new ValidationResult(false, $"{location} - O simbolo {identifier} esta sendo usado, mas não foi declarado!");
 
-    public static ValidationResult IncompatibleTypes(DataType expected, DataType current, SourceLocation location)
+    public static ValidationResult FailureIncompatibleTypes(DataType expected, DataType current, SourceLocation location)
         => new ValidationResult(false, $"{location} - Atribuição invalida! Era esperado {expected}, mas foi atribuido {current}!");
         
-    public static ValidationResult InvalidFunctionCall_ParametersCount(string identifier, int expected, int passed, SourceLocation location)
+    public static ValidationResult FailureInvalidFunctionCall_ParametersCount(string identifier, int expected, int passed, SourceLocation location)
         => new ValidationResult(false, $"{location} - A função {identifier} esperava {expected}, mas foi passado {passed} parametros!");
 
-    public static ValidationResult InvalidFunctionCall_InvalidParameter(string identifier, string name, DataType expected, DataType passed, SourceLocation location)
+    public static ValidationResult FailureInvalidFunctionCall_InvalidParameter(string identifier, string name, DataType expected, DataType passed, SourceLocation location)
         => new ValidationResult(false, $"{location} - O parametro {name} da função {identifier} esperava {expected}, mas foi passado {passed}!");
 
+    public static ValidationResult FailureReactiveCycle(string identifier, SourceLocation location)
+        => new ValidationResult(false, $"{location} - Ciclo reativo detectado envolvendo variável {identifier}");
 }

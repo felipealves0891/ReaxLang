@@ -18,9 +18,17 @@ public abstract class BaseRule : ISemanticRule
     {
         Context = context;
         var type = node.GetType();
+
+        PrepareApply();
         if(Handlers.TryGetValue(type, out var handler))
             return handler(node);
 
         return ValidationResult.Success();
     }
+
+    protected virtual void PrepareApply()
+    {}
+
+    public virtual IDisposable? PrepareScope(ISemanticContext context)
+        => null!;
 }
