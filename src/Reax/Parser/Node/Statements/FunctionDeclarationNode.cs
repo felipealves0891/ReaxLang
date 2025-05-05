@@ -8,9 +8,14 @@ public record FunctionDeclarationNode(
     VarNode[] Parameters, 
     DataType SuccessType,
     DataType ErrorType,
-    SourceLocation Location) : StatementNode(Location)
+    SourceLocation Location) : StatementNode(Location), IControlFlowNode
 {
     public override IReaxNode[] Children => Parameters.Concat(Block.Block).ToArray();
+
+    public bool HasGuaranteedReturn()
+    {
+        return Block.HasGuaranteedReturn();
+    }
 
     public override string ToString()
     {

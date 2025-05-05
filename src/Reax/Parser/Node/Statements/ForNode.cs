@@ -6,9 +6,14 @@ public record ForNode(
     DeclarationNode Declaration, 
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : StatementNode(Location)
+    SourceLocation Location) : StatementNode(Location), IControlFlowNode
 {
     public override IReaxNode[] Children => [Declaration, Condition, Block];
+
+    public bool HasGuaranteedReturn()
+    {
+        return Block.HasGuaranteedReturn();
+    }
 
     public override string ToString()
     {

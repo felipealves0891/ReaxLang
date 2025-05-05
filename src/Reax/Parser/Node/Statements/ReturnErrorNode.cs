@@ -6,9 +6,14 @@ namespace Reax.Parser.Node.Statements;
 
 public record ReturnErrorNode(
     ReaxNode Expression, 
-    SourceLocation Location) : StatementNode(Location)
+    SourceLocation Location) : StatementNode(Location), IControlFlowNode
 {
     public override IReaxNode[] Children => [Expression];
+
+    public bool HasGuaranteedReturn()
+    {
+        return true;
+    }
 
     public override string ToString()
     {

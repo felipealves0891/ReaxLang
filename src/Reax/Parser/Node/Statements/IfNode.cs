@@ -7,9 +7,18 @@ public record IfNode(
     BinaryNode Condition, 
     ContextNode True, 
     ContextNode? False, 
-    SourceLocation Location) : StatementNode(Location)
+    SourceLocation Location) : StatementNode(Location), IControlFlowNode
 {
     public override IReaxNode[] Children => False is null ? [Condition, True] : [Condition, True, False];
+
+    public bool HasGuaranteedReturn()
+    {
+        var hasGuaranteedReturn = true;
+        if(False is not null)
+            hasGuaranteedReturn = False.HasGuaranteedReturn();
+
+        return hasGuaranteedReturn && True.HasGuaranteedReturn();
+    }
 
     public override string ToString()
     {
