@@ -53,7 +53,8 @@ public class ReaxMatchParse : INodeParser
         if(source.CurrentToken.Type == TokenType.ARROW)
         {
             source.Advance();
-            expression = ExpressionHelper.Parser(source.NextStatement());
+            var value = ExpressionHelper.Parser(source.NextStatement());
+            expression = new ReturnSuccessNode(value, value.Location);
         }
         else if(source.CurrentToken.Type == TokenType.START_BLOCK)
             expression = source.NextBlock();
