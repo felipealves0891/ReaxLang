@@ -20,6 +20,7 @@ public class ReaxCompiler
 
         var analyser = new DefaultSemanticAnalyzer([
             new SymbolRule(),
+            new ImmutableRule(),
             new TypeCheckingRule(),
             new CircularReferenceRule(),
             new ReturnFlowRule()
