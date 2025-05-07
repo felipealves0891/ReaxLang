@@ -1,10 +1,6 @@
-using System;
-using System.Linq.Expressions;
-using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Helper;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Statements;
 
 namespace Reax.Parser.NodeParser;
@@ -32,8 +28,7 @@ public class ReaxReturnHandleParse : INodeParser
         }
         else 
         {
-            var node = new ContextNode([ExpressionHelper.Parser(statement)], location);
-            result = CreateNode(resultBranch, node, location);
+            result = CreateNode(resultBranch, ExpressionHelper.Parser(statement), location);
         }
         
         return result;

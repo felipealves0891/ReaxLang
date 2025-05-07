@@ -6,7 +6,7 @@ namespace Reax.Parser.Node.Statements;
 
 public record ReturnErrorNode(
     ReaxNode Expression, 
-    SourceLocation Location) : StatementNode(Location), IControlFlowNode
+    SourceLocation Location) : StatementNode(Location), IBranchFlowNode
 {
     public override IReaxNode[] Children => [Expression];
 

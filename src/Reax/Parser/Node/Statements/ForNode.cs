@@ -6,7 +6,7 @@ public record ForNode(
     DeclarationNode Declaration, 
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : StatementNode(Location), IControlFlowNode
+    SourceLocation Location) : StatementNode(Location), IBranchFlowNode
 {
     public override IReaxNode[] Children => [Declaration, Condition, Block];
 

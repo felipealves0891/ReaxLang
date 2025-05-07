@@ -11,6 +11,10 @@ public record FunctionDeclarationNode(
     SourceLocation Location) : StatementNode(Location), IControlFlowNode
 {
     public override IReaxNode[] Children => Parameters.Concat(Block.Block).ToArray();
+    
+    public DataType ResultSuccess => SuccessType;
+
+    public DataType ResultError => ErrorType;
 
     public bool HasGuaranteedReturn()
     {

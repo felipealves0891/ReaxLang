@@ -21,7 +21,8 @@ public class ReaxCompiler
         var analyser = new DefaultSemanticAnalyzer([
             new SymbolRule(),
             new TypeCheckingRule(),
-            new CircularReferenceRule()
+            new CircularReferenceRule(),
+            new ReturnFlowRule()
         ]);        
 
         var context = new SemanticContext();

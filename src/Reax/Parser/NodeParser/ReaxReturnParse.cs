@@ -32,8 +32,7 @@ public class ReaxReturnParse : INodeParser
         }
         else 
         {
-            var node = new ContextNode([ExpressionHelper.Parser(statement)], location);
-            result = new ReturnSuccessNode(node, location);
+            result = new ReturnSuccessNode(ExpressionHelper.Parser(statement), location);
         }
         
         return result;

@@ -7,7 +7,7 @@ public record IfNode(
     BinaryNode Condition, 
     ContextNode True, 
     ContextNode? False, 
-    SourceLocation Location) : StatementNode(Location), IControlFlowNode
+    SourceLocation Location) : StatementNode(Location), IBranchFlowNode
 {
     public override IReaxNode[] Children => False is null ? [Condition, True] : [Condition, True, False];
 

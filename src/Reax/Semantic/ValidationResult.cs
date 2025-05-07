@@ -58,4 +58,7 @@ public class ValidationResult
 
     public static ValidationResult FailureReactiveCycle(string identifier, SourceLocation location)
         => new ValidationResult(false, $"{location} - Ciclo reativo detectado envolvendo variável {identifier}");
+    
+    public static ValidationResult FailureControlFlow(SourceLocation location)
+        => new ValidationResult(false, $"{location} - Nem todos os caminhos retornam valores!");
 }

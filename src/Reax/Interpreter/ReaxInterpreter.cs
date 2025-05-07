@@ -314,8 +314,7 @@ public class ReaxInterpreter
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
         
-        var block = (ContextNode)returnNode.Expression;
-        var interpreter = new ReaxInterpreter(returnNode.ToString(), block.Block, _context);
+        var interpreter = new ReaxInterpreter(returnNode.ToString(), [returnNode.Expression], _context);
         interpreter.Debug += ReaxDebugger.Debugger;
         interpreter.Interpret();
 

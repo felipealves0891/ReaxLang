@@ -30,8 +30,7 @@ public class ReaxAssignmentParse : INodeParser
         else 
         {
             var node = source.NextNode() ?? new NullNode(identifier.Location);
-            var assigned = new ContextNode([node], node.Location);
-            return new AssignmentNode(var, assigned, identifier.Location);
+            return new AssignmentNode(var, node, identifier.Location);
         }
     }
 }

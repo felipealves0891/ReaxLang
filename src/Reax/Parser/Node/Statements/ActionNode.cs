@@ -6,13 +6,13 @@ public record ActionNode(
     VarNode[] Parameters,
     ReaxNode Context,
     DataType Type,
-    SourceLocation Location) : StatementNode(Location), IControlFlowNode
+    SourceLocation Location) : StatementNode(Location), IBranchFlowNode
 {
     public override IReaxNode[] Children => [Context];
 
     public bool HasGuaranteedReturn()
     {
-        if(Context is IControlFlowNode control)
+        if(Context is IBranchFlowNode control)
             return control.HasGuaranteedReturn();
         else
             return false;

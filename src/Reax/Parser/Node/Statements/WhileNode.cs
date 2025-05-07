@@ -5,7 +5,7 @@ namespace Reax.Parser.Node.Statements;
 public record WhileNode(
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : StatementNode(Location), IControlFlowNode
+    SourceLocation Location) : StatementNode(Location), IBranchFlowNode
 {
     public override IReaxNode[] Children => [Condition, Block];
 
