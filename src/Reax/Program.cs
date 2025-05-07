@@ -1,20 +1,7 @@
-﻿using Reax;
-using Reax.Debugger;
-using Reax.Interpreter;
+﻿using Reax.Commands;
+using Spectre.Console.Cli;
 
-var fileInfo = new FileInfo(@"D:\Source\scripts\simple.reax");
-ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
-ReaxEnvironment.Debug = false;
-ReaxEnvironment.BreakPoints[@"D:\Source\scripts\simple.reax"] = new HashSet<int>([1]);
-var interpreter = ReaxCompiler.Compile(fileInfo.FullName);
+var app = new CommandApp<RunCommand>();
+return app.Run(args);
 
-try
-{
-    interpreter.Interpret();
-}
-catch (System.Exception ex)
-{
-    Logger.LogError(ex, "Error: "); 
-    Console.WriteLine("Reax Error: {0}", ex.Message);
-    interpreter.PrintStackTrace();
-}
+// dotnet run -- "D:\Source\Scripts\simple.reax" -b
