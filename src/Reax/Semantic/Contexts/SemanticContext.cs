@@ -138,7 +138,7 @@ public class SemanticContext : ISemanticContext
 
     public IDisposable EnterFrom(Reference from)
     {
-        Logger.LogSemanticContext($"({from.Location.Line}) -> EnterFrom('{from}')");
+        Logger.LogSemanticContext($"({from.Location.Start.Line}) -> EnterFrom('{from}')");
         _from.Push(from);
         return new ExiterScope(ExitFrom);
     }
@@ -152,7 +152,7 @@ public class SemanticContext : ISemanticContext
         var stack = new HashSet<Reference>(new ReferenceEqualityComparer());
         var results = ValidationResult.Success();
 
-        Logger.LogSemanticContext($"({variable.Location.Line}) -> ExitFrom({variable})");
+        Logger.LogSemanticContext($"({variable.Location.Start.Line}) -> ExitFrom({variable})");
         var hasCycle = HasCycle(variable, visited, stack);
         if (hasCycle.Status)
         {
@@ -171,7 +171,7 @@ public class SemanticContext : ISemanticContext
             
         if(!_references.ContainsKey(CurrentFrom)) _references[CurrentFrom] = new HashSet<Reference>();
         _references[CurrentFrom].Add(to);
-        Logger.LogSemanticContext($"({to.Location.Line}) -> SetTo('{to}')");
+        Logger.LogSemanticContext($"({to.Location.Start.Line}) -> SetTo('{to}')");
     }
 
     public ValidationResult ValidateCycle()

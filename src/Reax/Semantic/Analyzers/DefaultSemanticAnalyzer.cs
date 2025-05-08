@@ -23,7 +23,7 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
             EnterScript(node, context)
         ]);
         
-        Logger.LogAnalize($"({node.Location.Line}) -> {node}");
+        Logger.LogAnalize($"({node.Location.Start.Line}) -> {node}");
         foreach (var rule in _rules)
         {
             _result.Join(rule.Apply(node, context));

@@ -20,7 +20,7 @@ public class ImmutableRule : BaseRule
             
         if(symbol.Category is SymbolCategory.CONST or SymbolCategory.BIND)
         {
-            if(symbol.Location.File != assignment.Location.File || symbol.Location.Line != assignment.Location.Line)
+            if(symbol.Location.File != assignment.Location.File || symbol.Location.Start.Line != assignment.Location.Start.Line)
                 return ValidationResult.FailureViolationOfImmutability(symbol.Identifier, symbol.Location);
         }
             

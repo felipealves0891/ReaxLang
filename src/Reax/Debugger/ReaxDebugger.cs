@@ -108,7 +108,7 @@ public static class ReaxDebugger
             if(location.File.EndsWith(file))
             {
                 var lines = ReaxEnvironment.BreakPoints[file];
-                if(lines.Contains(location.Line))
+                if(lines.Contains(location.Start.Line))
                     return true;
             }
         }

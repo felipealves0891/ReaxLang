@@ -20,31 +20,45 @@ public struct Token
     private readonly SourceLocation _location;
     private readonly byte[] _source;
 
-    public Token(TokenType type, string source, string file, int position, int row)
+    public Token(TokenType type, string source, string file, Position start, Position end)
     {
         _source = Encoding.UTF8.GetBytes(source);
-        _location = new SourceLocation(file, row, position);
+        _location = new SourceLocation(file, start, end);
         Type = type;
     }
 
 
-    public Token(TokenType type, byte[] source, string file, int position, int row)
+    public Token(TokenType type, byte[] source, string file, Position start, Position end)
     {
         _source = source;
-        _location = new SourceLocation(file, row, position);
+        _location = new SourceLocation(file, start, end);
         Type = type;
     }
 
-    public Token(TokenType type, byte source, string file, int position, int row)
+    public Token(TokenType type, byte source, string file, Position start, Position end)
     {
         _source = new byte[] { source };
-        _location = new SourceLocation(file, row, position);
+        _location = new SourceLocation(file, start, end);
+        Type = type;
+    }
+    
+    public Token(TokenType type, byte source, string file, int column, int line)
+    {
+        _source = new byte[] { source };
+        _location = new SourceLocation(file, new Position(line, column), new Position(line, column));
+        Type = type;
+    }
+    
+    public Token(TokenType type, byte[] source, string file, int column, int line)
+    {
+        _source = source;
+        _location = new SourceLocation(file, new Position(line, column), new Position(line, column));
         Type = type;
     }
 
     public TokenType Type { get; init; }
-    public int Position => _location.Position;
-    public int Row  => _location.Line;
+    public int Position => _location.Start.Column;
+    public int Row  => _location.Start.Line;
     public string File => _location.File;
     public ReadOnlySpan<byte> ReadOnlySource => new ReadOnlySpan<byte>(_source);
     public string Source => Encoding.GetEncoding("utf-8").GetString(_source);
@@ -67,8 +81,7 @@ public struct Token
             position++;
         }
 
-        return new Token(Type, newSource, token.Location.File, token.Location.Position, token.Location.Line);
-
+        return new Token(Type, newSource, token.Location.File, token.Location.Start, token.Location.End);
     }
 
     public override string ToString()

@@ -4,19 +4,19 @@ namespace Reax.Parser;
 
 public struct SourceLocation
 {
-    public SourceLocation(string file, int line, int position)
+    public SourceLocation(string file, Position start, Position end)
     {
         File = file;
-        Line = line;
-        Position = position;
+        Start = start;
+        End = end;
     }
 
     public string File { get;  }
-    public int Line { get; }
-    public int Position { get; }
+    public Position Start { get; }
+    public Position End { get; }
 
     public override string ToString()
     {
-        return $"{File}({Line})#{Position}";
+        return $"{File}({Start.Line}:{Start.Column})";
     }
 }

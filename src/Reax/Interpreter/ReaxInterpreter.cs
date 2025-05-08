@@ -456,7 +456,7 @@ public class ReaxInterpreter
         if(!StackTrace.Any()) return;
         
         foreach (var node in StackTrace.Reverse()) {
-            Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");
+            Console.WriteLine($"  at {node.Location.File}:{node.Location.Start.Line}:{node.Location.Start.Column} -> {node.ToString()}");
         }
     }
 }

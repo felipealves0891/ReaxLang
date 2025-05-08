@@ -31,6 +31,6 @@ public class Reference
 
     public override string ToString()
     {
-        return $"({Type.Name}:{Location.Line}){Identifier}";
+        return $"({Type.Name}:{Location.Start.Line}){Identifier}";
     }
 }
