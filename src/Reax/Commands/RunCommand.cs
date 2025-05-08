@@ -49,7 +49,11 @@ public sealed class RunCommand : Command<RunCommand.Settings>
 
         ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
         ReaxEnvironment.Debug = settings.Debug;
-        if(ReaxEnvironment.Debug) Console.WriteLine("--MODO DEBUG ATIVO!\n");
+        if(ReaxEnvironment.Debug) 
+        {
+            Console.WriteLine("--MODO DEBUG ATIVO!\n");
+            ReaxDebugger.Start();
+        }
 
         var interpreter = ReaxCompiler.Compile(settings.ComputedScript);
 
@@ -65,6 +69,10 @@ public sealed class RunCommand : Command<RunCommand.Settings>
                 Console.WriteLine("Reax Error: {0}", ex.Message);
 
             interpreter.PrintStackTrace();
+        }
+        finally
+        {
+            ReaxDebugger.Done();
         }
 
         return 0;

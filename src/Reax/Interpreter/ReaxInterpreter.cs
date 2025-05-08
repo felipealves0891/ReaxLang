@@ -449,7 +449,7 @@ public class ReaxInterpreter
 
     private void OnDebug(SourceLocation location) 
     {
-        Debug?.Invoke(new DebuggerArgs(_context.Debug(), StackTrace, location));
+        Debug?.Invoke(new DebuggerArgs(_context.Debug(), StackTrace.Reverse().ToArray(), location));
     }
 
     public void PrintStackTrace() {

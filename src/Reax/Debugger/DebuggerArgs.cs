@@ -9,7 +9,7 @@ public class DebuggerArgs
 {
     public DebuggerArgs(
         IEnumerable<DebuggerModel> models, 
-        ConcurrentStack<ReaxNode> stackTrace, 
+        IEnumerable<ReaxNode> stackTrace, 
         SourceLocation location)
     {
         Models = models;
@@ -18,6 +18,6 @@ public class DebuggerArgs
     }
 
     public IEnumerable<DebuggerModel> Models { get; private set; }
-    public ConcurrentStack<ReaxNode> StackTrace { get; private set; }
+    public IEnumerable<ReaxNode> StackTrace { get; private set; }
     public SourceLocation Location { get; private set; }
 }

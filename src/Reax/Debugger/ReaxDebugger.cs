@@ -1,74 +1,100 @@
 using System.Collections.Concurrent;
-using Reax.ConsoleDisplay.ConsoleTable;
+using System.Collections.ObjectModel;
+using System.Text;
+using Reax.Parser;
 using Reax.Parser.Node;
+using Spectre.Console;
 
 namespace Reax.Debugger;
 
-public class ReaxDebugger
+public static class ReaxDebugger
 {
-    public static Table<DebuggerModel> Table { get; private set; } = new();
-    public static bool ToNextLine { get; private set; } = false;
-    public static ConsoleKey[] Actions = [ConsoleKey.DownArrow, ConsoleKey.Enter, ConsoleKey.LeftArrow];
+    private static Action<DebuggerArgs>? _update;
+    private static bool _done = false;
+    private static Task? _console;
 
-    static ReaxDebugger() 
+    public static void Start() 
     {
-        Table.AddItemMenu(ConsoleKey.DownArrow.ToString(), "Linha a linha");
-        Table.AddItemMenu(ConsoleKey.RightArrow.ToString(), "Continuar");
-        Table.AddItemMenu(ConsoleKey.Enter.ToString(), "Continuar até o fim!");
+        var table = new Table().Centered().Expand().NoBorder();
+        table.AddColumn("Name");
+        table.AddColumn("Immutable");
+        table.AddColumn("Bind");
+        table.AddColumn("Async");
+        table.AddColumn("Category");
+        table.AddColumn("Value");
+
+        var panelTable = new Panel(table);
+        panelTable.Header = new PanelHeader("[bold blue]Debug[/]");
+        panelTable.Expand();
+
+        var layout = new Layout("Root")
+            .SplitRows(
+                new Layout("Table").Update(panelTable),
+                new Layout("Panel")
+            );
+
+        _console = AnsiConsole
+            .Live(layout)
+            .AutoClear(true)   // Do not remove when done
+            .Overflow(VerticalOverflow.Crop) // Show ellipsis when overflowing
+            .Cropping(VerticalOverflowCropping.Top) // Crop overflow at top
+            .StartAsync(async ctx => 
+            {
+                _update += (DebuggerArgs args) => 
+                {
+                    var panel = new Panel(PrintStackTrace(args.StackTrace));
+                    panel.Header = new PanelHeader("[bold blue]Stack Trace[/]");
+                    panel.Expand = true;                    
+                    layout["Panel"].Update(panel);
+
+                    table.Rows.Clear();
+                    foreach (var model in args.Models)
+                    {
+                        if(model.Type is not "variable" or "bind" || model.Value == "")
+                            continue;
+
+                        table.AddRow(
+                            model.Name, 
+                            model.Immutable, 
+                            model.Bind, 
+                            model.Async, 
+                            model.Type, 
+                            model.Value);    
+                    }
+
+                    ctx.Refresh();
+                };
+
+                while(!_done) 
+                {
+                    await Task.Delay(1);
+                }
+                
+            }); 
+    }
+    
+    public static string PrintStackTrace(IEnumerable<ReaxNode> StackTrace) {
+        if(!StackTrace.Any()) return "";
+        
+        var sb = new StringBuilder();
+        foreach (var node in StackTrace) {
+            sb.Append("  at ");
+            sb.Append(node.Location);
+            sb.AppendLine();
+        }
+        return sb.ToString();
     }
 
     public static void Debugger(DebuggerArgs args)
     {
-        var source = args.Location;
-        if(!ToNextLine)
-        {
-            if(!ReaxEnvironment.BreakPoints.TryGetValue(source.File, out var lines) || !lines.Contains(source.Line))
-            {
-                return;
-            }
-        }
-    
         Console.Clear();
-        Table.SetData(args.Models);
-        Table.Print();
-        Console.WriteLine("|");
-        Console.WriteLine();
-        Console.WriteLine(source);
-        PrintStackTrace(args.StackTrace);
-        Execute();
+        _update?.Invoke(args);
+        Task.Delay(500).Wait();
     }
 
-    private static void Execute() 
+    public static void Done() 
     {
-        ToNextLine = false;
-        
-        ConsoleKey key;
-        do
-        {
-            key = Console.ReadKey().Key;
-            if(key == ConsoleKey.DownArrow)
-            {
-                ToNextLine = true;
-                break;
-            }
-            else if(key == ConsoleKey.RightArrow)
-            {
-                break;
-            }
-            else if(key == ConsoleKey.Enter)
-            {
-                ReaxEnvironment.BreakPoints.Clear();
-                break;
-            }
-        }
-        while(!Actions.Contains(key));
-
-    }
-
-    public static void PrintStackTrace(ConcurrentStack<ReaxNode> StackTrace) {
-        if(!StackTrace.Any()) return;
-        foreach (var node in StackTrace.Reverse()) {
-            Console.WriteLine($"  at {node.Location.File}:{node.Location.Line}:{node.Location.Position} -> {node.ToString()}");
-        }
+        _done = true;
+        _console?.Wait();
     }
 }
