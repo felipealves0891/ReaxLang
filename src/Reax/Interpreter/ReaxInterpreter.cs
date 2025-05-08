@@ -155,12 +155,12 @@ public class ReaxInterpreter
             else if(node is IReaxValue)
                 Output = node.GetValue(_context);
 
-            Logger.LogInterpreter($"Removendo {node} a stack!");
-            StackTrace.TryPop(out var _);
-            Logger.LogInterpreter($"Removido {node} a stack!");
-
             if(ReaxEnvironment.Debug)
                 OnDebug(node.Location);
+
+            Logger.LogInterpreter($"Removendo {node} a stack!");
+            StackTrace.TryPop(out var nodeOut);
+            Logger.LogInterpreter($"Removido {nodeOut} a stack!");
 
             if(Output is not null || Error is not null)
                 break;

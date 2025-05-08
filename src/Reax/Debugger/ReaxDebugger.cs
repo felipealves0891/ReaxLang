@@ -9,68 +9,74 @@ namespace Reax.Debugger;
 
 public static class ReaxDebugger
 {
+    private static Layout _layout;
+    private static Table _table;
     private static Action<DebuggerArgs>? _update;
     private static bool _done = false;
-    private static Task? _console;
 
-    public static void Start() 
+    static ReaxDebugger()
     {
-        var table = new Table().Centered().Expand().NoBorder();
-        table.AddColumn("Name");
-        table.AddColumn("Immutable");
-        table.AddColumn("Bind");
-        table.AddColumn("Async");
-        table.AddColumn("Category");
-        table.AddColumn("Value");
+        _table = new Table().Centered().Expand().NoBorder();
+        _table.AddColumn("Name");
+        _table.AddColumn("Immutable");
+        _table.AddColumn("Bind");
+        _table.AddColumn("Async");
+        _table.AddColumn("Category");
+        _table.AddColumn("Value");
 
-        var panelTable = new Panel(table);
+        var panelTable = new Panel(_table);
         panelTable.Header = new PanelHeader("[bold blue]Debug[/]");
         panelTable.Expand();
 
-        var layout = new Layout("Root")
+        _layout = new Layout("Root")
             .SplitRows(
                 new Layout("Table").Update(panelTable),
                 new Layout("Panel")
             );
+    }
 
-        _console = AnsiConsole
-            .Live(layout)
+    public static void Start() 
+    {
+        AnsiConsole
+            .Live(_layout)
             .AutoClear(true)   // Do not remove when done
             .Overflow(VerticalOverflow.Crop) // Show ellipsis when overflowing
             .Cropping(VerticalOverflowCropping.Top) // Crop overflow at top
             .StartAsync(async ctx => 
             {
-                _update += (DebuggerArgs args) => 
-                {
-                    var panel = new Panel(PrintStackTrace(args.StackTrace));
-                    panel.Header = new PanelHeader("[bold blue]Stack Trace[/]");
-                    panel.Expand = true;                    
-                    layout["Panel"].Update(panel);
-
-                    table.Rows.Clear();
-                    foreach (var model in args.Models)
-                    {
-                        if(model.Type is not "variable" or "bind" || model.Value == "")
-                            continue;
-
-                        table.AddRow(
-                            model.Name, 
-                            model.Immutable, 
-                            model.Bind, 
-                            model.Async, 
-                            model.Type, 
-                            model.Value);    
-                    }
-
-                    ctx.Refresh();
-                };
-
+                _update += (DebuggerArgs args) => Updater(args, ctx);
                 while(!_done) 
                 {
                     await Task.Delay(1);
                 }
                 
             }); 
+    } 
+
+    private static void Updater(DebuggerArgs args, LiveDisplayContext ctx) 
+    {
+        var panel = new Panel(PrintStackTrace(args.StackTrace));
+        panel.Header = new PanelHeader("[bold blue]Stack Trace[/]");
+        panel.Expand = true;                    
+        
+        _layout["Panel"].Update(panel);
+        _table.Rows.Clear();
+
+        foreach (var model in args.Models)
+        {
+            if(model.Type is not "variable" or "bind" || model.Value == "")
+                continue;
+
+            _table.AddRow(
+                model.Name, 
+                model.Immutable, 
+                model.Bind, 
+                model.Async, 
+                model.Type, 
+                model.Value);    
+        }
+
+        ctx.Refresh();
     }
     
     public static string PrintStackTrace(IEnumerable<ReaxNode> StackTrace) {
@@ -87,14 +93,31 @@ public static class ReaxDebugger
 
     public static void Debugger(DebuggerArgs args)
     {
+        if(!IsBreakPoint(args.Location))
+            return;
+
         Console.Clear();
         _update?.Invoke(args);
-        Task.Delay(500).Wait();
+        Console.ReadKey();
+    }
+    
+    private static bool IsBreakPoint(SourceLocation location) 
+    {
+        foreach (var file in ReaxEnvironment.BreakPoints.Keys)
+        {
+            if(location.File.EndsWith(file))
+            {
+                var lines = ReaxEnvironment.BreakPoints[file];
+                if(lines.Contains(location.Line))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     public static void Done() 
     {
         _done = true;
-        _console?.Wait();
     }
 }
