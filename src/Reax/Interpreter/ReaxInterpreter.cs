@@ -88,8 +88,6 @@ public class ReaxInterpreter
                 ExecuteDeclareBind(bind);
             else if (node is DeclarationNode declaration)
                 ExecuteDeclaration(declaration);
-            else if (node is ObservableNode observable)
-                ExecuteDeclarationOn(observable);
             else if(node is FunctionDeclarationNode function)
                 ExecuteDeclarationFunction(function);
 
@@ -152,6 +150,8 @@ public class ReaxInterpreter
                 Output = new BooleanNode(ExecuteBinary(binary).ToString(), binary.Location);
             else if(node is MatchNode match)
                 Output = ExecuteMatch(match);
+            else if (node is ObservableNode observable)
+                ExecuteDeclarationOn(observable);
             else if(node is IReaxValue)
                 Output = node.GetValue(_context);
 

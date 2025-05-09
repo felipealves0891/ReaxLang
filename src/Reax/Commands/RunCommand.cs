@@ -52,7 +52,9 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         if(ReaxEnvironment.Debug) 
         {
             Console.WriteLine("--MODO DEBUG ATIVO!\n");
+            SetBreakPoints(settings.BreakPoints);
             ReaxDebugger.Start();
+
         }
 
         var interpreter = ReaxCompiler.Compile(settings.ComputedScript);
@@ -62,7 +64,7 @@ public sealed class RunCommand : Command<RunCommand.Settings>
             
             interpreter.Interpret();   
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             Logger.LogError(ex, "Error: "); 
             if(ReaxEnvironment.Debug)
@@ -77,6 +79,20 @@ public sealed class RunCommand : Command<RunCommand.Settings>
 
         return 0;
         
+    }
+
+    private void SetBreakPoints(string? bp)
+    {
+        if(string.IsNullOrEmpty(bp))
+            return;
+
+        var options = bp.Split(':');
+        if(options.Length != 2)
+            return;
+
+        var filename = options[0];
+        var lines = options[1].Split(',').Select(x => int.Parse(x)).ToArray();
+        ReaxEnvironment.BreakPoints[filename] = new(lines);
     }
 
 }

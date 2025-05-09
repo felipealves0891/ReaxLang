@@ -13,6 +13,7 @@ public static class ReaxDebugger
     private static Table _table;
     private static Action<DebuggerArgs>? _update;
     private static bool _done = false;
+    private static bool _toNextLine = false;
 
     static ReaxDebugger()
     {
@@ -25,7 +26,7 @@ public static class ReaxDebugger
         _table.AddColumn("Value");
 
         var panelTable = new Panel(_table);
-        panelTable.Header = new PanelHeader("[bold blue]Debug[/]");
+        panelTable.Header = new PanelHeader(" [bold blue]Debug[/] - Options: [bold green]Key Down[/] - Next Line | [bold green]Key Right[/] - Next Break | [bold green]Enter[/] - Until the end ");
         panelTable.Expand();
 
         _layout = new Layout("Root")
@@ -93,12 +94,37 @@ public static class ReaxDebugger
 
     public static void Debugger(DebuggerArgs args)
     {
-        if(!IsBreakPoint(args.Location))
+        if(!IsBreakPoint(args.Location) && !_toNextLine)
             return;
 
+        _toNextLine = false;
         Console.Clear();
         _update?.Invoke(args);
-        Console.ReadKey();
+
+        ProcessInput();
+    }
+
+    private static void ProcessInput() 
+    {
+        do
+        {
+            var key = Console.ReadKey();
+            if(key.Key == ConsoleKey.RightArrow)
+            {
+                break;
+            }
+            else if(key.Key == ConsoleKey.DownArrow)
+            {
+                _toNextLine = true;
+                break;
+            }
+            else if(key.Key == ConsoleKey.Enter)
+            {
+                ReaxEnvironment.BreakPoints.Clear();
+                break;
+            }
+
+        } while(true);
     }
     
     private static bool IsBreakPoint(SourceLocation location) 
