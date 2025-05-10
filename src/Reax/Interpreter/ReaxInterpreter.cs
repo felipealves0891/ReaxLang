@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using Reax.ConsoleDisplay.ConsoleTable;
 using Reax.Debugger;
 using Reax.Parser;
 using Reax.Parser.Node;

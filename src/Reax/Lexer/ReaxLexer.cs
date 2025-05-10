@@ -6,6 +6,29 @@ namespace Reax.Lexer;
 
 public class ReaxLexer 
 {
+    private const byte SINGLE_QUOTES = (byte)'\'';
+    private const byte OPEN_BRACKET = (byte)'(';
+    private const byte CLOSE_BRACKET = (byte)')';
+    private const byte OPEN_BRACE = (byte)'{';
+    private const byte CLOSE_BRACE = (byte)'}';
+    private const byte COMMA = (byte)',';
+    private const byte SEMICOLON = (byte)';';
+    private const byte ASSIGNMENT = (byte)'=';
+    private const byte EXCLAMATION = (byte)'!';
+    private const byte MINUS = (byte)'!';
+    private const byte PLUS = (byte)'+';
+    private const byte GREATER_THAN = (byte)'>';
+    private const byte LESS_THAN = (byte)'>';
+    private const byte ASTERISK = (byte)'*';
+    private const byte SLASH = (byte)'*';
+    private const byte DOT = (byte)'.';
+    private const byte COLON = (byte)':';
+    private const byte PIPE = (byte)'|';
+    private const byte HASHTAG = (byte)'#';
+    private const byte NEWLINE = (byte)'\n';
+    private const byte UNDERSCORE = (byte)'_';
+
+
     private readonly IReader _source;
 
     public ReaxLexer(IReader source)
@@ -35,43 +58,43 @@ public class ReaxLexer
             return GetIdentifierOrKeyword();
         if(char.IsDigit((char)_source.CurrentChar)) 
             return GetDigit();
-        if(_source.CurrentChar == '\'') 
+        if(_source.CurrentChar == SINGLE_QUOTES) 
             return GetString();
-        if(_source.CurrentChar == '(') 
-            return AdvanceAndReturn(new Token(TokenType.START_PARAMETER, (byte)'(', _source.FileName, _source.Column, _source.Line));   
-        if(_source.CurrentChar == ',') 
-            return AdvanceAndReturn(new Token(TokenType.PARAMETER_SEPARATOR, (byte)',', _source.FileName, _source.Column, _source.Line));   
-        if(_source.CurrentChar == ')') 
-            return AdvanceAndReturn(new Token(TokenType.END_PARAMETER, (byte)')', _source.FileName, _source.Column, _source.Line));       
-        if(_source.CurrentChar == ';') 
-            return AdvanceAndReturn(new Token(TokenType.END_STATEMENT, (byte)';', _source.FileName, _source.Column, _source.Line));   
-        if(IsLetterOrIsDigitOrWhiteSpace(_source.BeforeChar) && _source.CurrentChar == '=' && IsLetterOrIsDigitOrWhiteSpace(_source.NextChar)) 
-            return AdvanceAndReturn(new Token(TokenType.ASSIGNMENT, (byte)'=', _source.FileName, _source.Column, _source.Line));   
-        if(_source.BeforeChar == '=' && _source.CurrentChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, new byte[] {(byte)'=', (byte)'='}, _source.FileName, _source.Column, _source.Line));   
-        if(_source.CurrentChar == '!' && _source.NextChar == '=') 
-            return AdvanceAndReturn(new Token(TokenType.EQUALITY, new byte[] {(byte)'!', (byte)'='}, _source.FileName, _source.Column, _source.Line));   
-        if(_source.CurrentChar == '-' && _source.NextChar == '>')
+        if(_source.CurrentChar == OPEN_BRACKET) 
+            return AdvanceAndReturn(TokenType.START_PARAMETER, OPEN_BRACKET);   
+        if(_source.CurrentChar == CLOSE_BRACKET) 
+            return AdvanceAndReturn(TokenType.END_PARAMETER, CLOSE_BRACKET);
+        if(_source.CurrentChar == COMMA) 
+            return AdvanceAndReturn(TokenType.PARAMETER_SEPARATOR, COMMA);          
+        if(_source.CurrentChar == SEMICOLON) 
+            return AdvanceAndReturn(TokenType.END_STATEMENT, SEMICOLON);   
+        if(IsAssignment(_source.BeforeChar, _source.CurrentChar, _source.NextChar)) 
+            return AdvanceAndReturn(TokenType.ASSIGNMENT, ASSIGNMENT);   
+        if(_source.BeforeChar == ASSIGNMENT && _source.CurrentChar == ASSIGNMENT) 
+            return AdvanceAndReturn(TokenType.EQUALITY, ASSIGNMENT, ASSIGNMENT);   
+        if(_source.CurrentChar == EXCLAMATION && _source.NextChar == ASSIGNMENT) 
+            return AdvanceAndReturn(TokenType.EQUALITY, EXCLAMATION, ASSIGNMENT);   
+        if(_source.CurrentChar == MINUS && _source.NextChar == GREATER_THAN)
             return GetArrow();
-        if(_source.CurrentChar == '<' || _source.CurrentChar == '>') 
+        if(_source.CurrentChar == LESS_THAN || _source.CurrentChar == GREATER_THAN) 
             return GetComparison();
-        if(_source.CurrentChar == '+' || _source.CurrentChar == '-') 
-            return AdvanceAndReturn(new Token(TokenType.TERM, _source.CurrentChar, _source.FileName, _source.Column, _source.Line));   
-        if(_source.CurrentChar == '*' || _source.CurrentChar == '/')
-            return AdvanceAndReturn(new Token(TokenType.FACTOR, _source.CurrentChar, _source.FileName, _source.Column, _source.Line));   
-        if(_source.CurrentChar == '!')
-            return AdvanceAndReturn(new Token(TokenType.NOT, _source.CurrentChar, _source.FileName, _source.Column, _source.Line)); 
-        if(_source.CurrentChar == '{')
-            return AdvanceAndReturn(new Token(TokenType.START_BLOCK, _source.CurrentChar, _source.FileName, _source.Column, _source.Line)); 
-        if(_source.CurrentChar == '}')
-            return AdvanceAndReturn(new Token(TokenType.END_BLOCK, _source.CurrentChar, _source.FileName, _source.Column, _source.Line));
-        if(_source.CurrentChar == '.')
-            return AdvanceAndReturn(new Token(TokenType.ACCESS, _source.CurrentChar, _source.FileName, _source.Column, _source.Line));
-        if(_source.CurrentChar == ':')
-            return AdvanceAndReturn(new Token(TokenType.TYPING, _source.CurrentChar, _source.FileName, _source.Column, _source.Line));
-        if(_source.CurrentChar == '|')
-            return AdvanceAndReturn(new Token(TokenType.PIPE, _source.CurrentChar, _source.FileName, _source.Column, _source.Line));
-        if(_source.CurrentChar == '#')
+        if(_source.CurrentChar == PLUS || _source.CurrentChar == MINUS) 
+            return AdvanceAndReturn(TokenType.TERM, _source.CurrentChar);   
+        if(_source.CurrentChar == ASTERISK || _source.CurrentChar == SLASH)
+            return AdvanceAndReturn(TokenType.FACTOR, _source.CurrentChar);   
+        if(_source.CurrentChar == EXCLAMATION)
+            return AdvanceAndReturn(TokenType.NOT, EXCLAMATION); 
+        if(_source.CurrentChar == OPEN_BRACE)
+            return AdvanceAndReturn(TokenType.START_BLOCK, _source.CurrentChar); 
+        if(_source.CurrentChar == CLOSE_BRACE)
+            return AdvanceAndReturn(TokenType.END_BLOCK, _source.CurrentChar);
+        if(_source.CurrentChar == DOT)
+            return AdvanceAndReturn(TokenType.ACCESS, _source.CurrentChar);
+        if(_source.CurrentChar == COLON)
+            return AdvanceAndReturn(TokenType.TYPING, _source.CurrentChar);
+        if(_source.CurrentChar == PIPE)
+            return AdvanceAndReturn(TokenType.PIPE, _source.CurrentChar);
+        if(_source.CurrentChar == HASHTAG)
             return Comment();
         
         _source.Advance();
@@ -81,25 +104,26 @@ public class ReaxLexer
     private Token Comment() 
     {
         _source.Advance();
-        while (_source.CurrentChar != '\n')
+        while (_source.CurrentChar != NEWLINE)
             _source.Advance();
         
          _source.Advance();
         return NextToken();
     }
-
-    private Token AdvanceAndReturn(Token token) 
+    
+    private Token AdvanceAndReturn(TokenType type, params byte[] source) 
     {
+        var token = new Token(type, source, _source.FileName, _source.Column, _source.Line);
         Logger.LogLexer(token.ToString());
         _source.Advance();
         return token;
     }
-
+    
     public Token GetDigit() 
     {
         var start = _source.Position;
         Position positionStart = new (_source.Line, _source.Column);
-        while(!_source.EndOfFile && (char.IsDigit((char)_source.CurrentChar) || _source.CurrentChar == '.'))
+        while(!_source.EndOfFile && (char.IsDigit((char)_source.CurrentChar) || _source.CurrentChar == DOT))
             _source.Advance();
 
         var number = _source.GetString(start, _source.Position);
@@ -131,7 +155,7 @@ public class ReaxLexer
         var start = _source.Position;
         Position positionStart = new (_source.Line, _source.Column);
 
-        while (!_source.EndOfFile && _source.CurrentChar != '\'')
+        while (!_source.EndOfFile && _source.CurrentChar != SINGLE_QUOTES)
             _source.Advance();
         
         var end = _source.Position;
@@ -151,7 +175,7 @@ public class ReaxLexer
         Position positionEnd;
 
         _source.Advance();
-        if(_source.BeforeChar != '=')
+        if(_source.BeforeChar != ASSIGNMENT)
         {
             positionEnd = new Position(_source.Line, _source.Column);
             return new Token(TokenType.COMPARISON, _source.BeforeChar, _source.FileName, positionStart, positionEnd);
@@ -172,16 +196,17 @@ public class ReaxLexer
         _source.Advance();
         _source.Advance();
         var end = new Position(_source.Line, _source.Column);
-        var token = new Token(TokenType.ARROW, new byte[] {(byte)'-', (byte)'>'}, _source.FileName, start, end);
+        var token = new Token(TokenType.ARROW, [MINUS, GREATER_THAN], _source.FileName, start, end);
         Logger.LogLexer(token.ToString());
         return token;
     }
 
+    public bool IsAssignment(byte beforeChar, byte currentChar, byte nextChar) 
+        => IsLetterOrIsDigitOrWhiteSpace(beforeChar) && currentChar == ASSIGNMENT && IsLetterOrIsDigitOrWhiteSpace(nextChar);
+
     public bool IsIdentifier(byte b) 
-        => char.IsLetter((char)b) || char.IsDigit((char)b) || (char)b == '_';
+        => char.IsLetter((char)b) || char.IsDigit((char)b) || (char)b == UNDERSCORE;
 
     private bool IsLetterOrIsDigitOrWhiteSpace(byte c) 
-    {
-        return char.IsLetter((char)c) || char.IsDigit((char)c) || char.IsWhiteSpace((char)c);
-    }   
+        => char.IsLetter((char)c) || char.IsDigit((char)c) || char.IsWhiteSpace((char)c);
 }
