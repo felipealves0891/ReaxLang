@@ -40,6 +40,10 @@ public class ReaxTextReader : IReader
         _position++;
     }
 
+    public void Dispose()
+    {
+    }
+
     public byte[] GetString(int start, int end)
     {
         return _source[start..end].ToCharArray().Select(x => (byte)x).ToArray();

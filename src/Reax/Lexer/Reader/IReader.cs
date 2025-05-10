@@ -2,7 +2,7 @@ using System;
 
 namespace Reax.Lexer.Reader;
 
-public interface IReader
+public interface IReader : IDisposable
 {
     public bool EndOfFile { get; }
     public byte BeforeChar { get; }

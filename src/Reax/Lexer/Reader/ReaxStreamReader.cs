@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Reax.Lexer.Reader;
 
-public class ReaxStreamReader : IReader
+public sealed class ReaxStreamReader : IReader
 {
     private readonly string _filename;
     private readonly FileStream _stream;
@@ -74,6 +74,11 @@ public class ReaxStreamReader : IReader
         } 
         
         _stream.Position++;
+    }
+
+    public void Dispose()
+    {
+        _stream.Dispose();
     }
 
     public byte[] GetString(int start, int end)
