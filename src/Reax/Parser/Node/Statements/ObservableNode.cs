@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Interfaces;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Statements;
 
+[ExcludeFromCodeCoverage]
 public record ObservableNode(
     VarNode Var, 
     ContextNode Block, 

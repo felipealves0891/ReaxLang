@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Interfaces;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Statements;
 
+[ExcludeFromCodeCoverage]
 public record AssignmentNode(
     VarNode Identifier, 
     ReaxNode Assigned, 

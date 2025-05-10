@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
 using Reax.Runtime;
@@ -5,6 +6,7 @@ using Reax.Semantic;
 
 namespace Reax.Parser.Node.Literals;
 
+[ExcludeFromCodeCoverage]
 public record BooleanNode(
     string Source, 
     SourceLocation Location) : LiteralNode(Source, Location)

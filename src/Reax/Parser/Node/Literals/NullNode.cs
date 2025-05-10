@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Literals;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node;
 
+[ExcludeFromCodeCoverage]
 public record NullNode(SourceLocation Location) : LiteralNode("NULL", Location)
 {
     public override object Value => new object{};

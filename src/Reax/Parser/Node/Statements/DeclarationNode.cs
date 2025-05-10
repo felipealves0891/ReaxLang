@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Statements;
 
+[ExcludeFromCodeCoverage]
 public record DeclarationNode(
     string Identifier, 
     bool Immutable, 

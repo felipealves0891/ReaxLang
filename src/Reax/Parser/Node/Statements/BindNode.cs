@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Statements;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Statements;
 
+[ExcludeFromCodeCoverage]
 public record BindNode(
     string Identifier, 
     AssignmentNode Node,

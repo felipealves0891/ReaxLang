@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Interfaces;
 
 namespace Reax.Parser.Node.Literals;
 
+[ExcludeFromCodeCoverage]
 public abstract record LiteralNode(
     string Source, 
     SourceLocation Location) : ReaxNode(Location), IReaxValue

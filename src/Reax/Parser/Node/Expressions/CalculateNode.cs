@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Expressions;
 
+[ExcludeFromCodeCoverage]
 public record CalculateNode(
     ReaxNode Left, 
     ReaxNode Operator, 

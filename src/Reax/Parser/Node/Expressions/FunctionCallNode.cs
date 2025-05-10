@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Interfaces;
 using Reax.Runtime;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Expressions;
 
+[ExcludeFromCodeCoverage]
 public record FunctionCallNode(
     string Identifier, 
     ReaxNode[] Parameter, 

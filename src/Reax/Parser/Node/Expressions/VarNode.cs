@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Parser.Node.Expressions;
 using Reax.Parser.Node.Interfaces;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node;
 
+[ExcludeFromCodeCoverage]
 public record VarNode : ExpressionNode, IReaxValue
 {
 

@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Reax.Runtime.Functions;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Statements;
 
+[ExcludeFromCodeCoverage]
 public record ModuleNode(
     string identifier, 
     Dictionary<string, Function> functions, 
