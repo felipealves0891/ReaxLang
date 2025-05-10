@@ -10,7 +10,7 @@ public abstract record ReaxNode(SourceLocation Location) : IReaxNode
 {
     public abstract IReaxNode[] Children { get; }
 
-    public ReaxNode GetValue(ReaxExecutionContext context) 
+    public LiteralNode GetValue(ReaxExecutionContext context) 
     {
         if(this is NumberNode number)
             return number;
@@ -27,7 +27,7 @@ public abstract record ReaxNode(SourceLocation Location) : IReaxNode
             throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
     }
 
-    private (ReaxNode? Success, ReaxNode? Error) GetFunctionResult(FunctionCallNode functionCall, ReaxExecutionContext context)
+    private (LiteralNode? Success, LiteralNode? Error) GetFunctionResult(FunctionCallNode functionCall, ReaxExecutionContext context)
     {
         var function = context.GetFunction(functionCall.Identifier);
             var parameters = functionCall.Parameter.Select(x => x.GetValue(context)).ToArray();

@@ -51,8 +51,8 @@ public class ReaxInterpreter
     }
 
     public Action<DebuggerArgs>? Debug { get; set; }
-    public ReaxNode? Output { get; private set; }
-    public ReaxNode? Error { get; private set; }
+    public LiteralNode? Output { get; private set; }
+    public LiteralNode? Error { get; private set; }
     public string Name { get; private set; } = "Main";
     public ReaxNode[] Nodes => _nodes;
 
@@ -107,7 +107,7 @@ public class ReaxInterpreter
         for (int i = 0; i < values.Length; i++)
         {
             var variable = _parameters[i].ToString();
-            var value = values[i];
+            var value = (LiteralNode)values[i];
             _context.DeclareImmutable(variable, value);
         }
 
@@ -236,7 +236,7 @@ public class ReaxInterpreter
         }
     }
 
-    public ReaxNode Calculate(CalculateNode node)
+    public LiteralNode Calculate(CalculateNode node)
     {
         var op = (IArithmeticOperator)node.Operator;
         var left = CalculateChild(node.Left).GetValue(_context) as NumberNode;
@@ -296,7 +296,7 @@ public class ReaxInterpreter
         _context.SetObservable(identifier, interpreter, node.Condition);
     }
 
-    private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 
+    private LiteralNode ExecuteContextAndReturnValue(ContextNode node) 
     {
         var interpreter = new ReaxInterpreter(node.ToString(), node.Block, _context);
         interpreter.Debug += ReaxDebugger.Debugger;
@@ -308,7 +308,7 @@ public class ReaxInterpreter
         return interpreter.Output;
     }
 
-    private ReaxNode ExecuteReturn(ReturnSuccessNode returnNode) 
+    private LiteralNode ExecuteReturn(ReturnSuccessNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -320,7 +320,7 @@ public class ReaxInterpreter
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
     }
     
-    private ReaxNode ExecuteReturn(ReturnErrorNode returnNode) 
+    private LiteralNode ExecuteReturn(ReturnErrorNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -418,7 +418,7 @@ public class ReaxInterpreter
         return logical.Compare(left, right);
     }
 
-    private ReaxNode ExecuteMatch(MatchNode match) 
+    private LiteralNode ExecuteMatch(MatchNode match) 
     {
         var expressionInterpreter = new ReaxInterpreter(match.Expression.ToString(), [match.Expression], _context);
         expressionInterpreter.Interpret();

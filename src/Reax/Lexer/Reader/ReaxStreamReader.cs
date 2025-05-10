@@ -41,6 +41,9 @@ public class ReaxStreamReader : IReader
         get
         {
             _stream.Position++;
+            if(EndOfFile)
+                return (byte)' ';
+                
             var b = _stream.ReadByte();
             _stream.Position--;
             _stream.Position--;

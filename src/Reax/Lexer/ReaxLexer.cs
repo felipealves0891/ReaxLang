@@ -15,12 +15,12 @@ public class ReaxLexer
     private const byte SEMICOLON = (byte)';';
     private const byte ASSIGNMENT = (byte)'=';
     private const byte EXCLAMATION = (byte)'!';
-    private const byte MINUS = (byte)'!';
+    private const byte MINUS = (byte)'-';
     private const byte PLUS = (byte)'+';
     private const byte GREATER_THAN = (byte)'>';
-    private const byte LESS_THAN = (byte)'>';
+    private const byte LESS_THAN = (byte)'<';
     private const byte ASTERISK = (byte)'*';
-    private const byte SLASH = (byte)'*';
+    private const byte SLASH = (byte)'/';
     private const byte DOT = (byte)'.';
     private const byte COLON = (byte)':';
     private const byte PIPE = (byte)'|';
@@ -96,8 +96,12 @@ public class ReaxLexer
             return AdvanceAndReturn(TokenType.PIPE, _source.CurrentChar);
         if(_source.CurrentChar == HASHTAG)
             return Comment();
+        if(_source.CurrentChar == NEWLINE && _source.NextChar == NEWLINE)
+            _source.Advance();
         
-        _source.Advance();
+        if(!_source.EndOfFile)
+            _source.Advance();
+
         return NextToken();
     }
 

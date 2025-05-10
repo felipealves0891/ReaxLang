@@ -89,7 +89,9 @@ public class ExpressionHelper
         {
             Consume();
             var node = ParseExpression();
-            if (Peek().Type != TokenType.END_PARAMETER) throw new InvalidOperationException("Esperado ')'");
+            var peek = Peek();
+            if (peek.Type != TokenType.END_PARAMETER) 
+                throw new InvalidOperationException("Esperado ')'");
             Consume();
             return node;
         }
