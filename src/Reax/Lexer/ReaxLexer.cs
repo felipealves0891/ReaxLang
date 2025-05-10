@@ -67,7 +67,7 @@ public class ReaxLexer
         if(_source.CurrentChar == COMMA) 
             return AdvanceAndReturn(TokenType.PARAMETER_SEPARATOR, COMMA);          
         if(_source.CurrentChar == SEMICOLON) 
-            return AdvanceAndReturn(TokenType.END_STATEMENT, SEMICOLON);   
+            return AdvanceAndReturn(TokenType.END_EXPRESSION, SEMICOLON);   
         if(IsAssignment(_source.BeforeChar, _source.CurrentChar, _source.NextChar)) 
             return AdvanceAndReturn(TokenType.ASSIGNMENT, ASSIGNMENT);   
         if(_source.BeforeChar == ASSIGNMENT && _source.CurrentChar == ASSIGNMENT) 

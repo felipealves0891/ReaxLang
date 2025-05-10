@@ -6,7 +6,7 @@ public enum TokenType
 {
     EOF = -1,
     UNKNOW,
-    END_STATEMENT,
+    END_EXPRESSION,
     IDENTIFIER,
     ASSIGNMENT,
     START_PARAMETER,

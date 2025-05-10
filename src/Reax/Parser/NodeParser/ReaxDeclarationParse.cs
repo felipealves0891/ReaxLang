@@ -19,17 +19,17 @@ public class ReaxDeclarationParse : INodeParser
         var identifier = GetIdentifier(source);
         var dataType = GetDataType(source);
            
-        if(source.CurrentToken.Type == TokenType.END_STATEMENT)
+        if(source.CurrentToken.Type == TokenType.END_EXPRESSION)
         {
             source.Advance();
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
         }
 
         source.Advance();
-        if(source.NextToken.Type == TokenType.END_STATEMENT)
+        if(source.NextToken.Type == TokenType.END_EXPRESSION)
         {
             var value = new AssignmentNode(new VarNode(identifier.Source, dataType, identifier.Location), source.CurrentToken.ToReaxValue(), source.CurrentToken.Location); 
-            source.Advance(TokenType.END_STATEMENT);
+            source.Advance(TokenType.END_EXPRESSION);
             source.Advance();
             return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
         }
@@ -67,7 +67,7 @@ public class ReaxDeclarationParse : INodeParser
     private DataType GetDataType(ITokenSource source)
     {
         var dataType = source.CurrentToken.Type.ToDataType();
-        source.Advance([TokenType.ASSIGNMENT, TokenType.END_STATEMENT]);
+        source.Advance([TokenType.ASSIGNMENT, TokenType.END_EXPRESSION]);
         return dataType;
     }
 

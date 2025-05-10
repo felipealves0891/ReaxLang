@@ -75,7 +75,7 @@ public class ReaxParser : ITokenSource
             if(CurrentToken.Type == TokenType.START_BLOCK)                
                 break;
         
-            if(CurrentToken.Type == TokenType.END_STATEMENT) 
+            if(CurrentToken.Type == TokenType.END_EXPRESSION) 
             {
                 Advance();
                 break;

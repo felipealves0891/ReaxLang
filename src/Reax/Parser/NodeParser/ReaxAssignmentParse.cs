@@ -20,9 +20,9 @@ public class ReaxAssignmentParse : INodeParser
         source.Advance(TokenType.ASSIGNMENT);
         source.Advance();
         
-        if(source.NextToken.Type == TokenType.END_STATEMENT)
+        if(source.NextToken.Type == TokenType.END_EXPRESSION)
         {
-            source.Advance(TokenType.END_STATEMENT);
+            source.Advance(TokenType.END_EXPRESSION);
             var assignment = new AssignmentNode(var, source.BeforeToken.ToReaxValue(), identifier.Location);
             source.Advance();
             return assignment;

@@ -21,7 +21,7 @@ public class ReaxImportModuleParse : INodeParser
         var identifier = source.CurrentToken;
         source.Advance();
         
-        if(source.CurrentToken.Type != TokenType.END_STATEMENT)
+        if(source.CurrentToken.Type != TokenType.END_EXPRESSION)
             throw new InvalidOperationException("Era esperado o encerramento da expressão!");
 
         source.Advance();
