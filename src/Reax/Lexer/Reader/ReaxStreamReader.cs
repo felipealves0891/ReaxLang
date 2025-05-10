@@ -36,6 +36,8 @@ public class ReaxStreamReader : IReader
         }
     }
 
+    public bool CanNext => _stream.Position + 1 > _stream.Length;
+
     public byte NextChar 
     {
         get

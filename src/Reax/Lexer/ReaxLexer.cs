@@ -52,8 +52,12 @@ public class ReaxLexer
         if(_source.EndOfFile)
             return new Token(TokenType.EOF, (byte)' ', _source.FileName, _source.Position, _source.Line);
 
-        if(char.IsWhiteSpace((char)_source.CurrentChar)) 
+        while(_source.CanNext && char.IsWhiteSpace((char)_source.CurrentChar)) 
             _source.Advance();
+
+        if(_source.EndOfFile)
+            return new Token(TokenType.EOF, (byte)' ', _source.FileName, _source.Position, _source.Line);
+
         if(char.IsLetter((char)_source.CurrentChar)) 
             return GetIdentifierOrKeyword();
         if(char.IsDigit((char)_source.CurrentChar)) 
@@ -96,8 +100,11 @@ public class ReaxLexer
             return AdvanceAndReturn(TokenType.PIPE, _source.CurrentChar);
         if(_source.CurrentChar == HASHTAG)
             return Comment();
-        if(_source.CurrentChar == NEWLINE && _source.NextChar == NEWLINE)
+        if(_source.CurrentChar == NEWLINE && !_source.CanNext)
+        {
             _source.Advance();
+            return NextToken();
+        }
         
         if(!_source.EndOfFile)
             _source.Advance();
@@ -108,10 +115,12 @@ public class ReaxLexer
     private Token Comment() 
     {
         _source.Advance();
-        while (_source.CurrentChar != NEWLINE)
+        while (!_source.EndOfFile && _source.CurrentChar != NEWLINE)
             _source.Advance();
         
-         _source.Advance();
+        if(!_source.EndOfFile)
+            _source.Advance();
+
         return NextToken();
     }
     

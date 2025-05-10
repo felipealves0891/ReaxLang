@@ -7,6 +7,7 @@ public interface IReader
     public bool EndOfFile { get; }
     public byte BeforeChar { get; }
     public byte CurrentChar { get; }
+    public bool CanNext { get; }
     public byte NextChar { get; }
     public int Position { get; }
     public int Line { get; }

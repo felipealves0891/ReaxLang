@@ -18,6 +18,7 @@ public class ReaxTextReader : IReader
     public bool EndOfFile => Position >= _source.Length;
     public byte BeforeChar => Position > 0 ? (byte)_source[Position-1] : (byte)' ';
     public byte CurrentChar => (byte)_source[Position];
+    public bool CanNext => Position + 1 < _source.Length;
     public byte NextChar => Position + 1 < _source.Length ? (byte)_source[Position+1] : (byte)' ';
     public int Position => _position;
     public string FileName => _filename;
