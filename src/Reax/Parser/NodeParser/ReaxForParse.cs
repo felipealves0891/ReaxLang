@@ -1,4 +1,5 @@
 using System;
+using Reax.Core.Types;
 using Reax.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;

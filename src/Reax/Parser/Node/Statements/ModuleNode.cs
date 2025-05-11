@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Reax.Core.Locations;
 using Reax.Runtime.Functions;
 using Reax.Semantic;
 

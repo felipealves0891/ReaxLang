@@ -1,4 +1,5 @@
 using System;
+using Reax.Core.Types;
 using Reax.Parser;
 
 namespace Reax.Runtime.Functions.Attributes;

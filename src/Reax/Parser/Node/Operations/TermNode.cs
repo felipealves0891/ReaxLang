@@ -1,3 +1,4 @@
+using Reax.Core.Locations;
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
 using Reax.Semantic;

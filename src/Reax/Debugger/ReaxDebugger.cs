@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Text;
+using Reax.Core.Locations;
 using Reax.Parser;
 using Reax.Parser.Node;
 using Spectre.Console;

@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Reax.Core.Locations;
+using Reax.Core.Types;
 using Reax.Semantic;
 
 namespace Reax.Parser.Node.Statements;

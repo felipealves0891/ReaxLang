@@ -1,3 +1,4 @@
+using Reax.Core.Types;
 using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Literals;

@@ -1,3 +1,4 @@
+using Reax.Core.Locations;
 using Reax.Debugger;
 using Reax.Lexer.Reader;
 using Reax.Parser;

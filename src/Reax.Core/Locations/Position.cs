@@ -1,6 +1,6 @@
 using System;
 
-namespace Reax.Parser;
+namespace Reax.Core.Locations;
 
 public struct Position
 {

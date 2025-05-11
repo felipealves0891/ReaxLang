@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using Reax.Core.Locations;
 using Reax.Parser;
 using Reax.Parser.Node;
 

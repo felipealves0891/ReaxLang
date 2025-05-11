@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Reax.Core.Locations;
+using Reax.Core.Types;
 using Reax.Parser.Node.Interfaces;
 using Reax.Parser.Node.Literals;
 using Reax.Runtime;

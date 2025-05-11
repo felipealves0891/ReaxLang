@@ -1,3 +1,5 @@
+using Reax.Core.Locations;
+using Reax.Core.Types;
 using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Statements;
@@ -66,7 +68,7 @@ public class SymbolRule : BaseRule
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
     {
         var assignment = (AssignmentNode)node;
-        if(assignment.Identifier.Type != Parser.DataType.NONE)
+        if(assignment.Identifier.Type != DataType.NONE)
             return ValidationResult.Success();
 
         var symbol = Context.Resolve(assignment.Identifier.Identifier);
@@ -80,7 +82,7 @@ public class SymbolRule : BaseRule
     private ValidationResult ApplyVarNode(IReaxNode node) 
     {
         var variable = (VarNode)node;
-        if(variable.Type != Parser.DataType.NONE)
+        if(variable.Type != DataType.NONE)
         {
             var declarationSymbol = Symbol.CreateConst(variable.Identifier, variable.Type, variable.Location);
             return Context.Declare(declarationSymbol);
