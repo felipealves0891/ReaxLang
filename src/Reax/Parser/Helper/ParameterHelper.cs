@@ -1,5 +1,6 @@
 using System;
 using Reax.Lexer;
+using Reax.Parser.Extensions;
 using Reax.Parser.Node;
 using Reax.Parser.NodeParser;
 

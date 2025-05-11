@@ -1,9 +1,5 @@
 using System.Text;
 using Reax.Core.Locations;
-using Reax.Parser;
-using Reax.Parser.Node;
-using Reax.Parser.Node.Literals;
-using Reax.Parser.Node.Operations;
 
 namespace Reax.Lexer;
 

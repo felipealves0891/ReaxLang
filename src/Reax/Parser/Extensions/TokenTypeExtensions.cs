@@ -1,5 +1,4 @@
 using Reax.Core.Types;
-using Reax.Parser;
 
 namespace Reax.Lexer;
 

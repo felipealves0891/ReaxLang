@@ -1,11 +1,11 @@
 using System;
 using Reax.Core.Types;
-using Reax.Parser;
+using Reax.Lexer;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Literals;
 using Reax.Parser.Node.Operations;
 
-namespace Reax.Lexer;
+namespace Reax.Parser.Extensions;
 
 public static class TokenExtensions
 {

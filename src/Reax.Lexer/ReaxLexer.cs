@@ -1,7 +1,6 @@
 using Reax.Core.Locations;
 using Reax.Core.Debugger;
 using Reax.Lexer.Reader;
-using Reax.Parser;
 
 namespace Reax.Lexer;
 

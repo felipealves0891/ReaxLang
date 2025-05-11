@@ -1,5 +1,3 @@
-using Reax.Parser;
-
 namespace Reax.Lexer;
 
 public enum TokenType 

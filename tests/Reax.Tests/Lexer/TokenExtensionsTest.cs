@@ -3,6 +3,7 @@ using Reax.Lexer;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Literals;
 using Reax.Parser.Node.Operations;
+using Reax.Parser.Extensions;
 
 namespace Reax.Tests.Lexer;
 
