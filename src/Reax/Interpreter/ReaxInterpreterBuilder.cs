@@ -1,6 +1,6 @@
 using System;
 using System.Reflection;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Parser.Node;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Functions.Attributes;

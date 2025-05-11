@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Helper;
 using Reax.Parser.Node;

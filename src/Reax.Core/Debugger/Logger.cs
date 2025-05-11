@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 
-namespace Reax.Debugger;
+namespace Reax.Core.Debugger;
 
 public enum LoggerLevel 
 {

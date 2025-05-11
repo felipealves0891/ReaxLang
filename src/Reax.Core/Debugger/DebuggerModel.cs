@@ -1,6 +1,6 @@
 using System;
 
-namespace Reax.Debugger;
+namespace Reax.Core.Debugger;
 
 public class DebuggerModel
 {

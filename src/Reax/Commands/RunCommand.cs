@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Interpreter;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -53,7 +53,7 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         {
             Console.WriteLine("--MODO DEBUG ATIVO!\n");
             SetBreakPoints(settings.BreakPoints);
-            ReaxDebugger.Start();
+            ReaxDebugger.Start(ReaxEnvironment.BreakPoints);
 
         }
 
@@ -92,7 +92,7 @@ public sealed class RunCommand : Command<RunCommand.Settings>
 
         var filename = options[0];
         var lines = options[1].Split(',').Select(x => int.Parse(x)).ToArray();
-        ReaxEnvironment.BreakPoints[filename] = new(lines);
+        ReaxEnvironment.BreakPoints[filename] = new HashSet<int>(lines);
     }
 
 }

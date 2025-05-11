@@ -1,5 +1,5 @@
 using Reax.Core.Locations;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Lexer.Reader;
 using Reax.Parser;
 

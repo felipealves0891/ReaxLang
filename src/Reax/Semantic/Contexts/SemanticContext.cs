@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Parser.Node.Statements;
 
 namespace Reax.Semantic.Contexts;

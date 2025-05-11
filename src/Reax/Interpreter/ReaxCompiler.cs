@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Lexer;
 using Reax.Lexer.Reader;
 using Reax.Parser;

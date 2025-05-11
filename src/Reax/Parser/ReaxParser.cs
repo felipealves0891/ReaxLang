@@ -1,4 +1,4 @@
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Lexer;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Statements;

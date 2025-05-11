@@ -2,14 +2,13 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Text;
 using Reax.Core.Locations;
-using Reax.Parser;
-using Reax.Parser.Node;
 using Spectre.Console;
 
-namespace Reax.Debugger;
+namespace Reax.Core.Debugger;
 
 public static class ReaxDebugger
 {
+    private static IDictionary<string, ISet<int>>? _breakPoints;
     private static Layout _layout;
     private static Table _table;
     private static Action<DebuggerArgs>? _update;
@@ -37,8 +36,10 @@ public static class ReaxDebugger
             );
     }
 
-    public static void Start() 
+    public static void Start(IDictionary<string, ISet<int>> breakPoints) 
     {
+        _breakPoints = breakPoints;
+
         AnsiConsole
             .Live(_layout)
             .AutoClear(true)   // Do not remove when done
@@ -57,7 +58,7 @@ public static class ReaxDebugger
 
     private static void Updater(DebuggerArgs args, LiveDisplayContext ctx) 
     {
-        var panel = new Panel(PrintStackTrace(args.StackTrace));
+        var panel = new Panel(args.StackTrace);
         panel.Header = new PanelHeader("[bold blue]Stack Trace[/]");
         panel.Expand = true;                    
         
@@ -79,18 +80,6 @@ public static class ReaxDebugger
         }
 
         ctx.Refresh();
-    }
-    
-    public static string PrintStackTrace(IEnumerable<ReaxNode> StackTrace) {
-        if(!StackTrace.Any()) return "";
-        
-        var sb = new StringBuilder();
-        foreach (var node in StackTrace) {
-            sb.Append("  at ");
-            sb.Append(node.Location);
-            sb.AppendLine();
-        }
-        return sb.ToString();
     }
 
     public static void Debugger(DebuggerArgs args)
@@ -121,7 +110,7 @@ public static class ReaxDebugger
             }
             else if(key.Key == ConsoleKey.Enter)
             {
-                ReaxEnvironment.BreakPoints.Clear();
+                _breakPoints?.Clear();
                 break;
             }
 
@@ -130,11 +119,11 @@ public static class ReaxDebugger
     
     private static bool IsBreakPoint(SourceLocation location) 
     {
-        foreach (var file in ReaxEnvironment.BreakPoints.Keys)
+        foreach (var file in _breakPoints?.Keys ?? [])
         {
             if(location.File.EndsWith(file))
             {
-                var lines = ReaxEnvironment.BreakPoints[file];
+                var lines = _breakPoints?[file] ?? new HashSet<int>();
                 if(lines.Contains(location.Start.Line))
                     return true;
             }

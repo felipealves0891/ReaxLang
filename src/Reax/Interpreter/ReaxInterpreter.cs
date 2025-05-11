@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using Reax.Core.Locations;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Parser.Node.Expressions;
@@ -10,6 +10,7 @@ using Reax.Parser.Node.Literals;
 using Reax.Parser.Node.Statements;
 using Reax.Runtime;
 using Reax.Runtime.Functions;
+using System.Text;
 
 namespace Reax.Interpreter;
 
@@ -449,14 +450,16 @@ public class ReaxInterpreter
 
     private void OnDebug(SourceLocation location) 
     {
-        Debug?.Invoke(new DebuggerArgs(_context.Debug(), StackTrace.Reverse().ToArray(), location));
+        Debug?.Invoke(new DebuggerArgs(_context.Debug(), PrintStackTrace(), location));
     }
 
-    public void PrintStackTrace() {
-        if(!StackTrace.Any()) return;
+    public string PrintStackTrace() {
+        if(!StackTrace.Any()) return "";
         
+        StringBuilder sb = new();
         foreach (var node in StackTrace.Reverse()) {
-            Console.WriteLine($"  at {node.Location.File}:{node.Location.Start.Line}:{node.Location.Start.Column} -> {node.ToString()}");
+            sb.Append($"  at {node.Location.File}:{node.Location.Start.Line}:{node.Location.Start.Column} -> {node.ToString()}");
         }
+        return sb.ToString();
     }
 }
