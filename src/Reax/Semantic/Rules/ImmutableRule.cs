@@ -1,5 +1,6 @@
 using System;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast;
+using Reax.Core.Ast.Statements;
 using Reax.Semantic.Contexts;
 
 namespace Reax.Semantic.Rules;

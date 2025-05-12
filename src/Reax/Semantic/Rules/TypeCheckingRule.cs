@@ -3,10 +3,11 @@ using Reax.Core.Locations;
 using Reax.Core.Types;
 using Reax.Parser;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
-using Reax.Parser.Node.Literals;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Ast.Statements;
 using Reax.Semantic.Contexts;
+using Reax.Core.Ast;
 
 namespace Reax.Semantic.Rules;
 

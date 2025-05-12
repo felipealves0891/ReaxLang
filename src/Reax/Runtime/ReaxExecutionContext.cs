@@ -2,11 +2,13 @@ using System.Collections.Concurrent;
 using Reax.Core.Debugger;
 using Reax.Interpreter;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
-using Reax.Parser.Node.Interfaces;
-using Reax.Parser.Node.Literals;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Observables;
+using Reax.Core.Functions;
+using Reax.Extensions;
 
 namespace Reax.Runtime;
 

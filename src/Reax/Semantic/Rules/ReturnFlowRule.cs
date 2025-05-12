@@ -2,7 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using Reax.Core.Types;
 using Reax.Parser;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast.Statements;
+using Reax.Core.Ast;
 
 namespace Reax.Semantic.Rules;
 

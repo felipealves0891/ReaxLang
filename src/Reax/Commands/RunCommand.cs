@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using Reax.Core;
 using Reax.Core.Debugger;
 using Reax.Interpreter;
 using Spectre.Console;

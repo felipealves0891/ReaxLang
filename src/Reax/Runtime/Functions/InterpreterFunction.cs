@@ -1,7 +1,9 @@
 using System;
 using Reax.Interpreter;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Literals;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Functions;
+using Reax.Core.Ast;
 
 namespace Reax.Runtime.Functions;
 

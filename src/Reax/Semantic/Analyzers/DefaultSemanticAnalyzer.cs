@@ -1,8 +1,9 @@
 using System;
 using Reax.Core.Debugger;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Statements;
+using Reax.Core.Ast;
 
 namespace Reax.Semantic.Analyzers;
 
@@ -43,10 +44,19 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
 
     private IDisposable? EnterScript(IReaxNode node, ISemanticContext context)
     {
-        if(node is ScriptNode script)
-            return context.EnterScript(script.Identifier);
-        else if(node is ModuleNode module)
+        if(node is ModuleNode module)
             return context.EnterScript(module.identifier);
+
+        if(node is ScriptNode script)
+        {
+            var scriptDeclaration = node.Children.FirstOrDefault(x => x is ScriptDeclarationNode) as ScriptDeclarationNode;
+            if(scriptDeclaration is null)
+                return context.EnterScript(script.Identifier);
+            
+            script.Identifier = scriptDeclaration.Identifier;
+            return context.EnterScript(script.Identifier);
+        }
+        
         return null;
     } 
 

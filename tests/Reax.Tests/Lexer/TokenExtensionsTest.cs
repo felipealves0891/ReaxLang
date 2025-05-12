@@ -1,9 +1,10 @@
 using System;
 using Reax.Lexer;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Literals;
-using Reax.Parser.Node.Operations;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Ast.Operations;
 using Reax.Parser.Extensions;
+using Reax.Core.Ast.Expressions;
 
 namespace Reax.Tests.Lexer;
 

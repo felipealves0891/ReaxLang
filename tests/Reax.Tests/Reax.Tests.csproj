@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Reax.Core\Reax.Core.csproj" />
     <ProjectReference Include="..\..\src\Reax.Lexer\Reax.Lexer.csproj" />
+    <ProjectReference Include="..\..\src\Reax.Parser\Reax.Parser.csproj" />
     <ProjectReference Include="..\..\src\Reax\Reax.csproj" />
   </ItemGroup>
 

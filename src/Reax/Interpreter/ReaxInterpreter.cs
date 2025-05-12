@@ -4,17 +4,21 @@ using Reax.Core.Locations;
 using Reax.Core.Debugger;
 using Reax.Parser;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
-using Reax.Parser.Node.Interfaces;
-using Reax.Parser.Node.Literals;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Ast.Statements;
 using Reax.Runtime;
 using Reax.Runtime.Functions;
 using System.Text;
+using Reax.Core.Ast;
+using Reax.Extensions;
+using Reax.Core.Functions;
+using Reax.Core;
 
 namespace Reax.Interpreter;
 
-public class ReaxInterpreter
+public class ReaxInterpreter : IReaxInterpreter
 {
     public static ConcurrentStack<ReaxNode> StackTrace = new ConcurrentStack<ReaxNode>();
     public static bool ToNextLine = false;
@@ -56,13 +60,6 @@ public class ReaxInterpreter
     public LiteralNode? Output { get; private set; }
     public LiteralNode? Error { get; private set; }
     public string Name { get; private set; } = "Main";
-    public ReaxNode[] Nodes => _nodes;
-
-    public void DeclareAndSetFunction(string identifier, Function function) 
-    {
-        _context.Declare(identifier);
-        _context.SetFunction(identifier, function);
-    }
 
     public void Initialize() 
     {
@@ -178,9 +175,11 @@ public class ReaxInterpreter
 
     private void ExecuteDeclarationScript(ScriptNode script) 
     {
-        script.Interpreter.Interpret();
-        _context.Declare(script.Identifier);
-        _context.SetScript(script.Identifier, script.Interpreter);
+        var interpreter = new ReaxInterpreter(script.Nodes);
+        interpreter.Interpret();
+
+        _context.Declare(interpreter.Name);
+        _context.SetScript(script.Identifier, interpreter);
     }
 
     private void ExecuteDeclarationModule(ModuleNode module)
@@ -238,7 +237,7 @@ public class ReaxInterpreter
         }
     }
 
-    public LiteralNode Calculate(CalculateNode node)
+    private LiteralNode Calculate(CalculateNode node)
     {
         var op = (IArithmeticOperator)node.Operator;
         var left = CalculateChild(node.Left).GetValue(_context) as NumberNode;
@@ -441,11 +440,6 @@ public class ReaxInterpreter
         }
         else 
             throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
-    }
-
-    public ReaxNode? GetValue(string identifier) 
-    {
-        return _context.GetVariable(identifier);
     }
 
     private void OnDebug(SourceLocation location) 

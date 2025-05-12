@@ -1,9 +1,6 @@
-using System;
-using System.Reflection;
+using Reax.Core;
+using Reax.Core.Ast;
 using Reax.Core.Debugger;
-using Reax.Parser.Node;
-using Reax.Runtime.Functions;
-using Reax.Runtime.Functions.Attributes;
 
 namespace Reax.Interpreter;
 
@@ -16,7 +13,7 @@ public class ReaxInterpreterBuilder
         Name = name ?? "main";
     }
 
-    public ReaxInterpreter BuildMain(ReaxNode[] nodes) 
+    public IReaxInterpreter BuildMain(ReaxNode[] nodes) 
     {
         if(ReaxEnvironment.MainInterpreter != null)
             return ReaxEnvironment.MainInterpreter;
@@ -32,6 +29,4 @@ public class ReaxInterpreterBuilder
         interpreter.Debug += ReaxDebugger.Debugger;
         return interpreter;
     }
-        
-    
 }

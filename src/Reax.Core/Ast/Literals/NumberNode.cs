@@ -1,0 +1,23 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using Reax.Core.Locations;
+using Reax.Core.Types;
+using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
+
+namespace Reax.Core.Ast.Literals;
+
+[ExcludeFromCodeCoverage]
+public record NumberNode(
+    string Source, 
+    SourceLocation Location) : LiteralNode(Source, Location)
+{
+    public override object Value => decimal.Parse(Source);
+    public override DataType Type => DataType.NUMBER;
+    public override IReaxNode[] Children => [];
+
+    public override string ToString()
+    {
+        return $"{Source}";
+    }
+}

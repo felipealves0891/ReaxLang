@@ -2,9 +2,12 @@ using Reax.Core.Locations;
 using Reax.Core.Types;
 using Reax.Parser;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast.Statements;
 using Reax.Runtime.Functions;
 using Reax.Semantic.Contexts;
+using Reax.Core.Ast;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Functions;
 
 namespace Reax.Semantic.Rules;
 

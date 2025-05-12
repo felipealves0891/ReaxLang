@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Reax.Lexer;
 using Reax.Parser.Helper;
-using Reax.Parser.Node.Expressions;
+using Reax.Core.Ast.Expressions;
 using Xunit;
 
 namespace Reax.Tests.Parser.Helper;

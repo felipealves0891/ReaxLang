@@ -1,8 +1,8 @@
 using Reax.Core.Types;
-using Reax.Parser;
-using Reax.Parser.Node;
-using Reax.Parser.Node.Literals;
-using Reax.Runtime.Functions.Attributes;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Ast;
+using Reax.Core.Functions.Attributes;
+using Reax.Core.Functions;
 
 namespace Reax.Runtime.Functions.ConsoleFunctions;
 
