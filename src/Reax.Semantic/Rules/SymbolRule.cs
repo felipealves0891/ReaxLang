@@ -3,7 +3,6 @@ using Reax.Core.Types;
 using Reax.Parser;
 using Reax.Parser.Node;
 using Reax.Core.Ast.Statements;
-using Reax.Runtime.Functions;
 using Reax.Semantic.Contexts;
 using Reax.Core.Ast;
 using Reax.Core.Ast.Expressions;
