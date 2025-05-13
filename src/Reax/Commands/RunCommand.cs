@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using Reax.Core;
 using Reax.Core.Debugger;
-using Reax.Interpreter;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -23,10 +22,6 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         [DefaultValue(false)]
         public bool Debug { get; set; }
 
-        [Description("Caminho para arquivo de configurações.")]
-        [CommandOption("-c|--configuration")]
-        public string? PathConfigurations { get; set; }
-        
         [Description("Os break points devem ser no formato 'arquivo.reax:10,25,32'")]
         [CommandOption("-b|--breakPoints")]
         public string? BreakPoints { get; set; }
@@ -57,27 +52,7 @@ public sealed class RunCommand : Command<RunCommand.Settings>
             ReaxDebugger.Start(ReaxEnvironment.BreakPoints);
 
         }
-
-        var interpreter = ReaxCompiler.Compile(settings.ComputedScript);
-
-        try
-        {
-            
-            interpreter.Interpret();   
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error: "); 
-            if(ReaxEnvironment.Debug)
-                Console.WriteLine("Reax Error: {0}", ex.Message);
-
-            interpreter.PrintStackTrace();
-        }
-        finally
-        {
-            ReaxDebugger.Done();
-        }
-
+        
         return 0;
         
     }

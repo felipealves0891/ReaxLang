@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reax.Parser", "src\Reax.Par
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reax.Semantic", "src\Reax.Semantic\Reax.Semantic.csproj", "{D54B4AC9-0FA1-40E1-9357-E27163C4352D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reax.Runtime", "src\Reax.Runtime\Reax.Runtime.csproj", "{25F56EB7-7DA8-4645-9AD2-B5D3B35487D2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,10 +49,6 @@ Global
 		{D54B4AC9-0FA1-40E1-9357-E27163C4352D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D54B4AC9-0FA1-40E1-9357-E27163C4352D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D54B4AC9-0FA1-40E1-9357-E27163C4352D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{25F56EB7-7DA8-4645-9AD2-B5D3B35487D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25F56EB7-7DA8-4645-9AD2-B5D3B35487D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25F56EB7-7DA8-4645-9AD2-B5D3B35487D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25F56EB7-7DA8-4645-9AD2-B5D3B35487D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +60,5 @@ Global
 		{BD3C3D5E-C8E7-4605-9620-6D88B19D7E72} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{C459AD49-4711-4EA5-BDD0-B9754604BD5D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{D54B4AC9-0FA1-40E1-9357-E27163C4352D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{25F56EB7-7DA8-4645-9AD2-B5D3B35487D2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 EndGlobal
