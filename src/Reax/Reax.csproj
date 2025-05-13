@@ -8,12 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reax.ConsoleDisplay\Reax.ConsoleDisplay.csproj" />
+    <PackageReference Include="Spectre.Console" Version="0.50.0" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.50.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Spectre.Console" Version="0.50.0" />
-    <PackageReference Include="Spectre.Console.Cli" Version="0.50.0" />
+    <ProjectReference Include="..\Reax.Core\Reax.Core.csproj" />
+    <ProjectReference Include="..\Reax.Lexer\Reax.Lexer.csproj" />
+    <ProjectReference Include="..\Reax.Parser\Reax.Parser.csproj" />
+    <ProjectReference Include="..\Reax.Semantic\Reax.Semantic.csproj" />
   </ItemGroup>
 
 </Project>

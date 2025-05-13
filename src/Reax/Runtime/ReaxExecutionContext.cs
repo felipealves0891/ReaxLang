@@ -1,11 +1,14 @@
 using System.Collections.Concurrent;
-using Reax.Debugger;
+using Reax.Core.Debugger;
 using Reax.Interpreter;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
-using Reax.Parser.Node.Interfaces;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Observables;
+using Reax.Core.Functions;
+using Reax.Extensions;
 
 namespace Reax.Runtime;
 
@@ -14,7 +17,7 @@ public class ReaxExecutionContext
     private readonly ISet<Guid> _immutableKeys;
     private readonly ISet<Guid> _asyncKeys;
     private readonly IDictionary<string, Guid> _symbols;
-    private readonly IDictionary<Guid, ReaxNode> _variableContext;
+    private readonly IDictionary<Guid, LiteralNode> _variableContext;
     private readonly IDictionary<Guid, Function> _functionContext;
     private readonly IDictionary<Guid, ReaxInterpreter> _scriptContext;
     private readonly IDictionary<Guid, ReaxInterpreter> _bindContext;
@@ -26,7 +29,7 @@ public class ReaxExecutionContext
     public ReaxExecutionContext(string name)
     {
         _symbols = new ConcurrentDictionary<string, Guid>();
-        _variableContext = new ConcurrentDictionary<Guid, ReaxNode>();
+        _variableContext = new ConcurrentDictionary<Guid, LiteralNode>();
         _functionContext = new ConcurrentDictionary<Guid, Function>();
         _observableContext = new ConcurrentDictionary<Guid, IList<VariableObservable>>();
         _scriptContext = new ConcurrentDictionary<Guid, ReaxInterpreter>();
@@ -70,7 +73,7 @@ public class ReaxExecutionContext
         if(isAsync) _asyncKeys.Add(key);
     }
     
-    public void DeclareImmutable(string identifier, ReaxNode node)
+    public void DeclareImmutable(string identifier, LiteralNode node)
     {
         var key = Guid.NewGuid();
         _symbols[identifier] = key;
@@ -86,7 +89,7 @@ public class ReaxExecutionContext
         _symbols[identifier] = Guid.NewGuid();
     }
 
-    public void SetVariable(string identifier, ReaxNode value)
+    public void SetVariable(string identifier, LiteralNode value)
     {
         if(!_symbols.TryGetValue(identifier, out var key))
         {
@@ -189,7 +192,7 @@ public class ReaxExecutionContext
         _bindContext[key] = interpreter;
     }
 
-    public ReaxNode GetVariable(string identifier)
+    public LiteralNode GetVariable(string identifier)
     {
         if(!_symbols.TryGetValue(identifier, out var key))
         {
@@ -212,7 +215,7 @@ public class ReaxExecutionContext
         return value;
     }
 
-    public ReaxNode? GetBind(string identifier)
+    public LiteralNode? GetBind(string identifier)
     {
         if(!_symbols.TryGetValue(identifier, out var key))
         {
@@ -230,7 +233,7 @@ public class ReaxExecutionContext
         return value.Output;
     }
 
-    private ReaxNode? GetParentBind(string identificar) 
+    private LiteralNode? GetParentBind(string identificar) 
     {
         try
         {
@@ -262,7 +265,7 @@ public class ReaxExecutionContext
         return value;
     }
 
-    private ReaxNode? GetParentVariable(string identifier) 
+    private LiteralNode? GetParentVariable(string identifier) 
     {
         try
         {

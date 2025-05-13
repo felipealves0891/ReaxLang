@@ -1,0 +1,34 @@
+using Reax.Core.Locations;
+using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
+
+namespace Reax.Core.Ast.Operations;
+
+public record ComparisonNode(
+    string Operator, 
+    SourceLocation Location) : ReaxNode(Location), ILogicOperator
+{
+    public override IReaxNode[] Children => [];
+
+    public bool Compare(ReaxNode x, ReaxNode y)
+    {
+        var left = (NumberNode)x;
+        var rigth = (NumberNode)y;
+
+        if(Operator == "<")
+            return (decimal)left.Value < (decimal)rigth.Value;
+        else if(Operator == ">")
+            return (decimal)left.Value > (decimal)rigth.Value;
+        else if(Operator == "<=")
+            return (decimal)left.Value <= (decimal)rigth.Value;
+        else if(Operator == ">=")
+            return (decimal)left.Value > (decimal)rigth.Value;
+        else
+            throw new InvalidOperationException($"Operador de comparação invalido: {Operator}");
+    }
+
+    public override string ToString()
+    {
+        return Operator.ToString();
+    }
+}

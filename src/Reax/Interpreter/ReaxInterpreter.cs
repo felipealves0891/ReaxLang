@@ -1,19 +1,24 @@
 using System;
 using System.Collections.Concurrent;
-using Reax.ConsoleDisplay.ConsoleTable;
-using Reax.Debugger;
+using Reax.Core.Locations;
+using Reax.Core.Debugger;
 using Reax.Parser;
 using Reax.Parser.Node;
-using Reax.Parser.Node.Expressions;
-using Reax.Parser.Node.Interfaces;
-using Reax.Parser.Node.Literals;
-using Reax.Parser.Node.Statements;
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Ast.Statements;
 using Reax.Runtime;
 using Reax.Runtime.Functions;
+using System.Text;
+using Reax.Core.Ast;
+using Reax.Extensions;
+using Reax.Core.Functions;
+using Reax.Core;
 
 namespace Reax.Interpreter;
 
-public class ReaxInterpreter
+public class ReaxInterpreter : IReaxInterpreter
 {
     public static ConcurrentStack<ReaxNode> StackTrace = new ConcurrentStack<ReaxNode>();
     public static bool ToNextLine = false;
@@ -52,16 +57,9 @@ public class ReaxInterpreter
     }
 
     public Action<DebuggerArgs>? Debug { get; set; }
-    public ReaxNode? Output { get; private set; }
-    public ReaxNode? Error { get; private set; }
+    public LiteralNode? Output { get; private set; }
+    public LiteralNode? Error { get; private set; }
     public string Name { get; private set; } = "Main";
-    public ReaxNode[] Nodes => _nodes;
-
-    public void DeclareAndSetFunction(string identifier, Function function) 
-    {
-        _context.Declare(identifier);
-        _context.SetFunction(identifier, function);
-    }
 
     public void Initialize() 
     {
@@ -108,7 +106,7 @@ public class ReaxInterpreter
         for (int i = 0; i < values.Length; i++)
         {
             var variable = _parameters[i].ToString();
-            var value = values[i];
+            var value = (LiteralNode)values[i];
             _context.DeclareImmutable(variable, value);
         }
 
@@ -177,9 +175,11 @@ public class ReaxInterpreter
 
     private void ExecuteDeclarationScript(ScriptNode script) 
     {
-        script.Interpreter.Interpret();
-        _context.Declare(script.Identifier);
-        _context.SetScript(script.Identifier, script.Interpreter);
+        var interpreter = new ReaxInterpreter(script.Nodes);
+        interpreter.Interpret();
+
+        _context.Declare(interpreter.Name);
+        _context.SetScript(script.Identifier, interpreter);
     }
 
     private void ExecuteDeclarationModule(ModuleNode module)
@@ -237,7 +237,7 @@ public class ReaxInterpreter
         }
     }
 
-    public ReaxNode Calculate(CalculateNode node)
+    private LiteralNode Calculate(CalculateNode node)
     {
         var op = (IArithmeticOperator)node.Operator;
         var left = CalculateChild(node.Left).GetValue(_context) as NumberNode;
@@ -297,7 +297,7 @@ public class ReaxInterpreter
         _context.SetObservable(identifier, interpreter, node.Condition);
     }
 
-    private ReaxNode ExecuteContextAndReturnValue(ContextNode node) 
+    private LiteralNode ExecuteContextAndReturnValue(ContextNode node) 
     {
         var interpreter = new ReaxInterpreter(node.ToString(), node.Block, _context);
         interpreter.Debug += ReaxDebugger.Debugger;
@@ -309,7 +309,7 @@ public class ReaxInterpreter
         return interpreter.Output;
     }
 
-    private ReaxNode ExecuteReturn(ReturnSuccessNode returnNode) 
+    private LiteralNode ExecuteReturn(ReturnSuccessNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -321,7 +321,7 @@ public class ReaxInterpreter
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
     }
     
-    private ReaxNode ExecuteReturn(ReturnErrorNode returnNode) 
+    private LiteralNode ExecuteReturn(ReturnErrorNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -419,7 +419,7 @@ public class ReaxInterpreter
         return logical.Compare(left, right);
     }
 
-    private ReaxNode ExecuteMatch(MatchNode match) 
+    private LiteralNode ExecuteMatch(MatchNode match) 
     {
         var expressionInterpreter = new ReaxInterpreter(match.Expression.ToString(), [match.Expression], _context);
         expressionInterpreter.Interpret();
@@ -442,21 +442,18 @@ public class ReaxInterpreter
             throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
     }
 
-    public ReaxNode? GetValue(string identifier) 
-    {
-        return _context.GetVariable(identifier);
-    }
-
     private void OnDebug(SourceLocation location) 
     {
-        Debug?.Invoke(new DebuggerArgs(_context.Debug(), StackTrace.Reverse().ToArray(), location));
+        Debug?.Invoke(new DebuggerArgs(_context.Debug(), PrintStackTrace(), location));
     }
 
-    public void PrintStackTrace() {
-        if(!StackTrace.Any()) return;
+    public string PrintStackTrace() {
+        if(!StackTrace.Any()) return "";
         
+        StringBuilder sb = new();
         foreach (var node in StackTrace.Reverse()) {
-            Console.WriteLine($"  at {node.Location.File}:{node.Location.Start.Line}:{node.Location.Start.Column} -> {node.ToString()}");
+            sb.Append($"  at {node.Location.File}:{node.Location.Start.Line}:{node.Location.Start.Column} -> {node.ToString()}");
         }
+        return sb.ToString();
     }
 }

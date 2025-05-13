@@ -1,0 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
+using Reax.Core.Functions;
+using Reax.Core.Locations;
+
+
+namespace Reax.Core.Ast.Statements;
+
+[ExcludeFromCodeCoverage]
+public record ModuleNode(
+    string identifier, 
+    Dictionary<string, Function> functions, 
+    SourceLocation Location) : StatementNode(Location)
+{
+    public override IReaxNode[] Children => [];
+
+    public override string ToString()
+    {
+        return $"import module {identifier};";
+    }
+}

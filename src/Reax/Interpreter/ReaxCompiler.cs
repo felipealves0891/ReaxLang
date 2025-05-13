@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
-using Reax.Debugger;
+using Reax.Core;
+using Reax.Core.Ast;
+using Reax.Core.Debugger;
 using Reax.Lexer;
 using Reax.Lexer.Reader;
 using Reax.Parser;
@@ -14,7 +16,7 @@ namespace Reax.Interpreter;
 
 public class ReaxCompiler
 {
-    public static ReaxInterpreter Compile(string filename) 
+    public static IReaxInterpreter Compile(string filename) 
     {
         var ast = GetNodes(filename);   
 
