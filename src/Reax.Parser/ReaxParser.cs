@@ -4,6 +4,7 @@ using Reax.Parser.Node;
 using Reax.Core.Ast.Statements;
 using Reax.Parser.NodeParser;
 using Reax.Core.Ast;
+using Reax.Core.Locations;
 
 namespace Reax.Parser;
 
@@ -31,19 +32,23 @@ public class ReaxParser : ITokenSource
     public Token CurrentToken => !EndOfTokens ? _tokens[_position] : new Token(TokenType.UNKNOW, (byte)' ', "", -1, -1);
     public Token NextToken => _position < _tokens.Length ? _tokens[_position+1] : new Token(TokenType.UNKNOW, (byte)' ', "",-1, -1);
 
-    public IEnumerable<ReaxNode> Parse() 
+    public ScriptNode Parse(string name, SourceLocation location) 
     {
+        List<ReaxNode> script = new List<ReaxNode>();
         ReaxNode? node = null;
+        
         do 
         {
             node = NextNode();
             if(node is not null)
             {
                 Logger.LogParse(node.ToString());
-                yield return node;
+                script.Add(node);
             }
         } 
         while(node is not null);
+
+        return new ScriptNode(name, script.ToArray(), location);
     }
 
     public ReaxNode? NextNode() 
