@@ -62,7 +62,7 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
 
     private IDisposable? EnterScope(IReaxNode node, ISemanticContext context)
     {
-        if(node is StatementNode)
+        if(node is StatementNode && node is not ScriptNode)
             return context.EnterScope();
         else 
             return null;
