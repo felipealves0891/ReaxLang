@@ -31,7 +31,6 @@ public class ReaxImportScriptsParse : INodeParser
             var reader = new ReaxStreamReader(info.FullName);
             var lexer = new ReaxLexer(reader);
             var tokens = lexer.Tokenize().ToArray();
-
             var parser = new ReaxParser(tokens);
             script = parser.Parse(file, source.CurrentToken.Location);
             ReaxEnvironment.ImportedFiles.Add(file, script);      

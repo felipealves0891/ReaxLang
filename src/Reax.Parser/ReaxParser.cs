@@ -32,6 +32,11 @@ public class ReaxParser : ITokenSource
     public Token CurrentToken => !EndOfTokens ? _tokens[_position] : new Token(TokenType.UNKNOW, (byte)' ', "", -1, -1);
     public Token NextToken => _position < _tokens.Length ? _tokens[_position+1] : new Token(TokenType.UNKNOW, (byte)' ', "",-1, -1);
 
+    public ScriptNode Parse(string name)
+    {
+        return Parse(name, new SourceLocation());
+    } 
+
     public ScriptNode Parse(string name, SourceLocation location) 
     {
         List<ReaxNode> script = new List<ReaxNode>();
