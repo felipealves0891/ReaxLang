@@ -8,5 +8,4 @@ namespace Reax.Core.Ast;
 public abstract record ReaxNode(SourceLocation Location) : IReaxNode
 {
     public abstract IReaxNode[] Children { get; }
-
 }

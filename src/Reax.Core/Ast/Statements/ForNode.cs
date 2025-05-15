@@ -11,6 +11,11 @@ public record ForNode(
 {
     public override IReaxNode[] Children => [Declaration, Condition, Block];
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         return Block.HasGuaranteedReturn();

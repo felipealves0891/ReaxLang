@@ -19,6 +19,11 @@ public record FunctionDeclarationNode(
 
     public DataType ResultError => ErrorType;
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         return Block.HasGuaranteedReturn();

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
 
 namespace Reax.Core.Ast.Expressions;
 
@@ -11,6 +12,11 @@ public record ExternalFunctionCallNode(
     SourceLocation Location) : ExpressionNode(Location)
 {
     public override IReaxNode[] Children => [];
+
+    public override LiteralNode Evaluate(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
 
     public override string ToString()
     {

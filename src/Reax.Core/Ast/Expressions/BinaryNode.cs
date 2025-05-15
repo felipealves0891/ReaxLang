@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Reax.Core.Ast.Literals;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Expressions;
@@ -11,6 +12,11 @@ public record BinaryNode(
     SourceLocation Location) : ExpressionNode(Location)
 {
     public override IReaxNode[] Children => [Left, Operator, Right];
+
+    public override LiteralNode Evaluate(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
 
     public override string ToString()
     {

@@ -12,6 +12,11 @@ public record IfNode(
 {
     public override IReaxNode[] Children => False is null ? [Condition, True] : [Condition, True, False];
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         var hasGuaranteedReturn = true;

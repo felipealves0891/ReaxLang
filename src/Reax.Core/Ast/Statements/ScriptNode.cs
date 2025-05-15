@@ -4,18 +4,17 @@ using Reax.Core.Locations;
 namespace Reax.Core.Ast.Statements;
 
 [ExcludeFromCodeCoverage]
-public record ScriptNode : ReaxNode
+public record ScriptNode(
+    string Identifier, 
+    ReaxNode[] Nodes, 
+    SourceLocation Location) : StatementNode(Location)
 {
-    public ScriptNode(string identifier, ReaxNode[] nodes, SourceLocation Location) : base(Location)
-    {
-        Identifier = identifier;
-        Nodes = nodes;
-    }
-
-    public string Identifier { get; set; }
-    public ReaxNode[] Nodes { get; init; }
-
     public override IReaxNode[] Children => Nodes;
+
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
 
     public override string ToString()
     {

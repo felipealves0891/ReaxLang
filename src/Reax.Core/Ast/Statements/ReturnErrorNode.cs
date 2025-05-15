@@ -11,6 +11,11 @@ public record ReturnErrorNode(
 {
     public override IReaxNode[] Children => [Expression];
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         return true;

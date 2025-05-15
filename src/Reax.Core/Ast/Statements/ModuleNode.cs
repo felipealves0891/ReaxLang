@@ -13,6 +13,11 @@ public record ModuleNode(
 {
     public override IReaxNode[] Children => [];
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
         return $"import module {identifier};";

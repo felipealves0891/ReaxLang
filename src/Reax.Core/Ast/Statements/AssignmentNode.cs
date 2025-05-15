@@ -14,6 +14,11 @@ public record AssignmentNode(
 {
     public override IReaxNode[] Children => [Assigned];
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
         return $"{Identifier} = {Assigned};";

@@ -12,6 +12,11 @@ public record ActionNode(
 {
     public override IReaxNode[] Children => [Context];
 
+    public override void Accept(IReaxInterpreter interpreter)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         if(Context is IBranchFlowNode control)
