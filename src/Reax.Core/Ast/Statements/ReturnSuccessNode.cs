@@ -12,6 +12,11 @@ public record ReturnSuccessNode(
 {
     public override IReaxNode[] Children => [Expression];
 
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         return true;

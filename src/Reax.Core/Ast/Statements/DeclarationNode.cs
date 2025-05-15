@@ -16,6 +16,11 @@ public record DeclarationNode(
 {
     public override IReaxNode[] Children => Assignment is not null ? [Assignment] : [];
 
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
         var asc = Async ? "async " : "";

@@ -10,6 +10,11 @@ public record ContextNode(
 {
     public override IReaxNode[] Children => Block;
 
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         return Block.Any(x => x is IBranchFlowNode control ? control.HasGuaranteedReturn() : false);

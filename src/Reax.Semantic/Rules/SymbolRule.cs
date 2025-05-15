@@ -102,11 +102,9 @@ public class SymbolRule : BaseRule
     {
         var action = (ActionNode)node;
         var results = ValidationResult.Success();
-        foreach (var parameter in action.Parameters)
-        {
-            var symbolDeclaration = Symbol.CreateConst(parameter.Identifier, parameter.Type, parameter.Location);
-            results.Join(Context.Declare(symbolDeclaration));
-        }
+        var parameter = action.Parameter;
+        var symbolDeclaration = Symbol.CreateConst(parameter.Identifier, parameter.Type, parameter.Location);
+        results.Join(Context.Declare(symbolDeclaration));
         return results;
     }
 

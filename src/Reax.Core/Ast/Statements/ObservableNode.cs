@@ -14,6 +14,12 @@ public record ObservableNode(
     SourceLocation Location) : StatementNode(Location)
 {
     public override IReaxNode[] Children => Condition is null ? [Var, Block] : [Var, Block, Condition];
+
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
         var when = Condition is null ? "" : $"when {Condition} "; 

@@ -21,13 +21,10 @@ namespace Reax.Interpreter;
 public class ReaxInterpreter : IReaxInterpreter
 {
     public static ConcurrentStack<ReaxNode> StackTrace = new ConcurrentStack<ReaxNode>();
-    public static bool ToNextLine = false;
-
     private readonly ReaxNode[] _nodes;
     private readonly ReaxExecutionContext _context;
     private readonly Dictionary<int, ReaxNode> _parameters;
     private bool _isInitialized = false;
-
 
     public ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context, ReaxNode[] parameters)
         : this(name, nodes, context)
@@ -165,7 +162,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
 
-    private void ExecuteDeclareBind(BindNode bind) 
+    public void ExecuteDeclareBind(BindNode bind) 
     {
         var interpreter = new ReaxInterpreter($"bind->{bind.Identifier}", [bind.Node.Assigned], _context);
         interpreter.Debug += ReaxDebugger.Debugger;
@@ -173,7 +170,7 @@ public class ReaxInterpreter : IReaxInterpreter
         _context.SetBind(bind.Identifier, interpreter);
     }
 
-    private void ExecuteDeclarationScript(ScriptNode script) 
+    public void ExecuteDeclarationScript(ScriptNode script) 
     {
         var interpreter = new ReaxInterpreter(script.Nodes);
         interpreter.Interpret();
@@ -182,13 +179,13 @@ public class ReaxInterpreter : IReaxInterpreter
         _context.SetScript(script.Identifier, interpreter);
     }
 
-    private void ExecuteDeclarationModule(ModuleNode module)
+    public void ExecuteDeclarationModule(ModuleNode module)
     {
         _context.Declare(module.identifier);
         _context.SetModule(module.identifier, module.functions);   
     }
 
-    private void ExecuteFunctionCall(FunctionCallNode functionCall) 
+    public void ExecuteFunctionCall(FunctionCallNode functionCall) 
     {
         var function = _context.GetFunction(functionCall.Identifier);
         var parameters = functionCall.Parameter.Select(x => x.GetValue(_context)).ToArray();
@@ -197,7 +194,7 @@ public class ReaxInterpreter : IReaxInterpreter
         Error = error;
     }
 
-    private void ExecuteDeclaration(DeclarationNode declaration) 
+    public void ExecuteDeclaration(DeclarationNode declaration) 
     {
         if(!declaration.Immutable)
         {
@@ -237,7 +234,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
 
-    private LiteralNode Calculate(CalculateNode node)
+    public LiteralNode Calculate(CalculateNode node)
     {
         var op = (IArithmeticOperator)node.Operator;
         var left = CalculateChild(node.Left).GetValue(_context) as NumberNode;
@@ -252,7 +249,7 @@ public class ReaxInterpreter : IReaxInterpreter
         return op.Calculate(left, right);
     }
 
-    private ReaxNode CalculateChild(ReaxNode node) 
+    public ReaxNode CalculateChild(ReaxNode node) 
     {
         if(node is CalculateNode calculate)
             return Calculate(calculate);
@@ -262,7 +259,7 @@ public class ReaxInterpreter : IReaxInterpreter
             throw new InvalidOperationException("Não é possivel tratar o nó da operação!");
     }
 
-    private void ExecuteIf(IfNode node) 
+    public void ExecuteIf(IfNode node) 
     {
         var left = node.Condition.Left.GetValue(_context);
         var right = node.Condition.Right.GetValue(_context);
@@ -288,7 +285,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
 
-    private void ExecuteDeclarationOn(ObservableNode node) 
+    public void ExecuteDeclarationOn(ObservableNode node) 
     {
         var identifier = node.Var.ToString();
         var contextNode = (ContextNode)node.Block;
@@ -297,7 +294,7 @@ public class ReaxInterpreter : IReaxInterpreter
         _context.SetObservable(identifier, interpreter, node.Condition);
     }
 
-    private LiteralNode ExecuteContextAndReturnValue(ContextNode node) 
+    public LiteralNode ExecuteContextAndReturnValue(ContextNode node) 
     {
         var interpreter = new ReaxInterpreter(node.ToString(), node.Block, _context);
         interpreter.Debug += ReaxDebugger.Debugger;
@@ -309,7 +306,7 @@ public class ReaxInterpreter : IReaxInterpreter
         return interpreter.Output;
     }
 
-    private LiteralNode ExecuteReturn(ReturnSuccessNode returnNode) 
+    public LiteralNode ExecuteReturn(ReturnSuccessNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -321,7 +318,7 @@ public class ReaxInterpreter : IReaxInterpreter
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
     }
     
-    private LiteralNode ExecuteReturn(ReturnErrorNode returnNode) 
+    public LiteralNode ExecuteReturn(ReturnErrorNode returnNode) 
     {
         if(returnNode.Expression is IReaxValue)
             return returnNode.Expression.GetValue(_context);
@@ -334,7 +331,7 @@ public class ReaxInterpreter : IReaxInterpreter
         return interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
     }
 
-    private void ExecuteDeclarationFunction(FunctionDeclarationNode node) 
+    public void ExecuteDeclarationFunction(FunctionDeclarationNode node) 
     {
         var block = node.Block;
         var identifier = node.Identifier;
@@ -344,7 +341,7 @@ public class ReaxInterpreter : IReaxInterpreter
         _context.SetFunction(identifier, interpreter);
     }
 
-    private void ExecuteFor(ForNode node) 
+    public void ExecuteFor(ForNode node) 
     {
         var declaration = node.Declaration;
         var condition = (BinaryNode)node.Condition;
@@ -366,7 +363,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
 
-    private void ExecuteWhile(WhileNode node)
+    public void ExecuteWhile(WhileNode node)
     {
         var condition = (BinaryNode)node.Condition;
         var block = (ContextNode)node.Block;
@@ -379,7 +376,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
     
-    private void ExecuteExternalFunctionCallNode(ExternalFunctionCallNode node)
+    public void ExecuteExternalFunctionCallNode(ExternalFunctionCallNode node)
     {
         if(_context.ScriptExists(node.scriptName))
         {
@@ -405,7 +402,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
 
-    private bool ExecuteBinary(BinaryNode condition) 
+    public bool ExecuteBinary(BinaryNode condition) 
     {
         var left = condition.Left is BinaryNode 
                  ? new BooleanNode(ExecuteBinary((BinaryNode)condition.Left).ToString(), condition.Location) 
@@ -419,21 +416,21 @@ public class ReaxInterpreter : IReaxInterpreter
         return logical.Compare(left, right);
     }
 
-    private LiteralNode ExecuteMatch(MatchNode match) 
+    public LiteralNode ExecuteMatch(MatchNode match) 
     {
         var expressionInterpreter = new ReaxInterpreter(match.Expression.ToString(), [match.Expression], _context);
         expressionInterpreter.Interpret();
 
         if(expressionInterpreter.Output is not null)
         {
-            var successInterpreter = new ReaxInterpreter(match.Success.ToString(), [match.Success.Context], _context, match.Success.Parameters);
+            var successInterpreter = new ReaxInterpreter(match.Success.ToString(), [match.Success.Context], _context, [match.Success.Parameter]);
             successInterpreter.Debug += ReaxDebugger.Debugger;
             successInterpreter.Interpret("Success", [expressionInterpreter.Output]);
             return successInterpreter.Output ?? throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
         else if (expressionInterpreter.Error is not null)
         {
-            var errorInterpreter = new ReaxInterpreter(match.Error.ToString(), [match.Error.Context], _context, match.Error.Parameters);
+            var errorInterpreter = new ReaxInterpreter(match.Error.ToString(), [match.Error.Context], _context, [match.Error.Parameter]);
             errorInterpreter.Interpret("Error", [expressionInterpreter.Error]);
             errorInterpreter.Debug += ReaxDebugger.Debugger;
             return errorInterpreter.Output ?? throw new InvalidOperationException($"{match.Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");

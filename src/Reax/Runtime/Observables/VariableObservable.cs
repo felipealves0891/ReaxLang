@@ -2,16 +2,17 @@ using Reax.Interpreter;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Interfaces;
 using Reax.Extensions;
+using Reax.Core;
 
 namespace Reax.Runtime.Observables;
 
 public class VariableObservable
 {
-    private readonly ReaxInterpreter _interpreter;
+    private readonly IReaxInterpreter _interpreter;
 
     private readonly BinaryNode? _condition;
 
-    public VariableObservable(ReaxInterpreter interpreter, BinaryNode? condition = null)
+    public VariableObservable(IReaxInterpreter interpreter, BinaryNode? condition = null)
     {
         _interpreter = interpreter;
         _condition = condition;

@@ -5,12 +5,17 @@ using Reax.Core.Types;
 namespace Reax.Core.Ast.Statements;
 
 public record ActionNode(
-    VarNode[] Parameters,
+    VarNode Parameter,
     ReaxNode Context,
     DataType Type,
     SourceLocation Location) : StatementNode(Location), IBranchFlowNode
 {
     public override IReaxNode[] Children => [Context];
+
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
 
     public bool HasGuaranteedReturn()
     {
@@ -22,7 +27,6 @@ public record ActionNode(
 
     public override string ToString()
     {
-        var parameters = string.Join(',', Parameters.Select(x => x.ToString()));
-        return $"({parameters}){Type} -> {{...}}";
+        return $"({Parameter}){Type} -> {{...}}";
     }
 }

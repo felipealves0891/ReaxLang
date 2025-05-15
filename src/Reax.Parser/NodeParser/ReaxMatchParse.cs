@@ -39,14 +39,14 @@ public class ReaxMatchParse : INodeParser
         if(success is null || error is null)
             throw new InvalidOperationException($"{location} - Token invalido! Era espera sucesso ou erro!");
 
-        return new MatchNode(expression, success, error, location);
+        return new MatchNode((ExpressionNode)expression, success, error, location);
     }
 
     private ActionNode ParseFunction(ITokenSource source) 
     {
         var location = source.CurrentToken.Location;
         source.Advance(TokenType.START_PARAMETER);
-        var parameters = ParameterHelper.GetParameters(source).ToArray();
+        var parameters = ParameterHelper.GetParameters(source).First();
         source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken.Type.ToDataType();
         source.Advance([TokenType.ARROW, TokenType.START_BLOCK]);

@@ -1,19 +1,41 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
-using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Statements;
+using Reax.Core.Ast.Literals;
+using Reax.Core.Debugger;
 
 namespace Reax.Core.Ast.Expressions;
 
 [ExcludeFromCodeCoverage]
 public record MatchNode(
-    ReaxNode Expression,    
+    ExpressionNode Expression,    
     ActionNode Success,
     ActionNode Error,  
     SourceLocation Location) : ExpressionNode(Location)
 {
     public override IReaxNode[] Children => [Expression, Success, Error];
+
+    public override LiteralNode Evaluation(IReaxExecutionContext context)
+    {
+        var result = Expression.Evaluation(context);
+        if (result.Type == Success.Parameter.Type)
+        {
+            var successInterpreter = context.CreateInterpreter(Success.ToString(), [Success.Context], [Success.Parameter]);
+            successInterpreter.Debug += ReaxDebugger.Debugger;
+            successInterpreter.Interpret("Success", [result]);
+            return successInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
+        }
+        else if (result.Type == Error.Parameter.Type)
+        {
+            var errorInterpreter = context.CreateInterpreter(Error.ToString(), [Error.Context], [Error.Parameter]);
+            errorInterpreter.Interpret("Error", result);
+            errorInterpreter.Debug += ReaxDebugger.Debugger;
+            return errorInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
+        }
+        else
+            throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
+    }
 
     public override string ToString()
     {

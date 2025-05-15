@@ -10,6 +10,11 @@ public record WhileNode(
 {
     public override IReaxNode[] Children => [Condition, Block];
 
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool HasGuaranteedReturn()
     {
         return Block.HasGuaranteedReturn();

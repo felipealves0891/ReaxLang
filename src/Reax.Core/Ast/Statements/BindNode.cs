@@ -16,6 +16,12 @@ public record BindNode(
     SourceLocation Location) : StatementNode(Location)
 {
     public override IReaxNode[] Children => Node.Assigned is ContextNode context ? context.Block : [Node.Assigned];
+
+    public override void Execute(IReaxExecutionContext context)
+    {
+        throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
         return $"bind {Identifier}: {Type} -> {{...}}";

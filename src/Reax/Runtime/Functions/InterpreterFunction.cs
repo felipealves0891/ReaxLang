@@ -4,15 +4,16 @@ using Reax.Parser.Node;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Functions;
 using Reax.Core.Ast;
+using Reax.Core;
 
 namespace Reax.Runtime.Functions;
 
 public class InterpreterFunction : Function
 {
     private readonly string _identifier;
-    private readonly ReaxInterpreter _interpreter;
+    private readonly IReaxInterpreter _interpreter;
 
-    public InterpreterFunction(string identifier, ReaxInterpreter interpreter)
+    public InterpreterFunction(string identifier, IReaxInterpreter interpreter)
     {
         _interpreter = interpreter;
         _identifier = identifier;
