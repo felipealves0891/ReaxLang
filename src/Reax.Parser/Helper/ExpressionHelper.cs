@@ -87,12 +87,12 @@ public class ExpressionHelper
             var value = Consume().AppendAtBeginning(unary);
             return value.ToReaxValue();
         }
-        else if(token.Type == TokenType.START_PARAMETER)
+        else if(token.Type == TokenType.OPEN_PARENTHESIS)
         {
             Consume();
             var node = ParseExpression();
             var peek = Peek();
-            if (peek.Type != TokenType.END_PARAMETER) 
+            if (peek.Type != TokenType.CLOSE_PARENTHESIS) 
                 throw new InvalidOperationException("Esperado ')'");
             Consume();
             return node;
@@ -114,15 +114,15 @@ public class ExpressionHelper
             var functionCall = (FunctionCallNode)Parse(Peek()); 
             return new ExternalFunctionCallNode(token.Source, functionCall, token.Location);
         }
-        else if(peek.Type == TokenType.START_PARAMETER)
+        else if(peek.Type == TokenType.OPEN_PARENTHESIS)
         {
             Consume();
             var identifier = token;
             var listParameters = new List<ReaxNode>();
 
-            while(Peek().Type != TokenType.END_PARAMETER && Peek().Type != TokenType.EOF)
+            while(Peek().Type != TokenType.CLOSE_PARENTHESIS && Peek().Type != TokenType.EOF)
             {
-                if(Peek().Type != TokenType.PARAMETER_SEPARATOR)
+                if(Peek().Type != TokenType.COMMA)
                     listParameters.Add(ParseValue());
 
                 Consume();

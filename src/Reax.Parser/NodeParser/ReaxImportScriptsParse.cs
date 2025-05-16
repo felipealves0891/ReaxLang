@@ -38,7 +38,7 @@ public class ReaxImportScriptsParse : INodeParser
         }
 
         source.Advance();
-        if(source.CurrentToken.Type != TokenType.END_EXPRESSION)
+        if(source.CurrentToken.Type != TokenType.SEMICOLON)
             throw new InvalidOperationException($"Era esperado o fim da expressão na linha {source.CurrentToken.Row}!");
 
         source.Advance();

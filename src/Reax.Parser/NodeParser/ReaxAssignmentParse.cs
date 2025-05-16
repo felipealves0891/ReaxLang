@@ -24,9 +24,9 @@ public class ReaxAssignmentParse : INodeParser
         source.Advance(TokenType.ASSIGNMENT);
         source.Advance();
         
-        if(source.NextToken.Type == TokenType.END_EXPRESSION)
+        if(source.NextToken.Type == TokenType.SEMICOLON)
         {
-            source.Advance(TokenType.END_EXPRESSION);
+            source.Advance(TokenType.SEMICOLON);
             var assignment = new AssignmentNode(var, source.BeforeToken.ToReaxValue(), identifier.Location);
             source.Advance();
             return assignment;

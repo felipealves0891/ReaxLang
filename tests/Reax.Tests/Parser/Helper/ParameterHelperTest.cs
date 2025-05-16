@@ -13,11 +13,11 @@ public class ParameterHelperTest : BaseTest<ParameterHelper>
     {
         //Arrange
         var _mockedTokenSource = CreateTokenSource([
-            new Token(TokenType.START_PARAMETER, (byte)' ', "", 0, 0),
+            new Token(TokenType.OPEN_PARENTHESIS, (byte)' ', "", 0, 0),
             new Token(TokenType.IDENTIFIER, (byte)'m', "", 0, 0),
             new Token(TokenType.IDENTIFIER, (byte)'m', "", 0, 0),
             new Token(TokenType.INT_TYPE, (byte)' ', "", 0, 0),
-            new Token(TokenType.END_PARAMETER, (byte)' ', "", 0, 0),
+            new Token(TokenType.CLOSE_PARENTHESIS, (byte)' ', "", 0, 0),
         ]);
 
         //Act

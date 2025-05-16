@@ -73,10 +73,10 @@ public class ReaxParser : ITokenSource
             if(EndOfTokens)
                 break;
             
-            if(CurrentToken.Type == TokenType.START_BLOCK)                
+            if(CurrentToken.Type == TokenType.OPEN_BRACE)                
                 break;
         
-            if(CurrentToken.Type == TokenType.END_EXPRESSION) 
+            if(CurrentToken.Type == TokenType.SEMICOLON) 
             {
                 Advance();
                 break;
@@ -90,11 +90,11 @@ public class ReaxParser : ITokenSource
     public ReaxNode NextBlock()
     {
         var block = new List<ReaxNode>();
-        if(CurrentToken.Type != TokenType.START_BLOCK)
+        if(CurrentToken.Type != TokenType.OPEN_BRACE)
             return new ContextNode(block.ToArray(), CurrentToken.Location);
 
         Advance();
-        while(CurrentToken.Type != TokenType.END_BLOCK)
+        while(CurrentToken.Type != TokenType.CLOSE_BRACE)
         {
             var node = NextNode();
             if(node is null)

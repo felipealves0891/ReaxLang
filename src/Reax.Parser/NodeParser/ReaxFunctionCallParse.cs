@@ -13,7 +13,7 @@ public class ReaxFunctionCallParse : INodeParser
     public bool IsParse(Token before, Token current, Token next)
     {
         return current.Type == TokenType.IDENTIFIER 
-            && next.Type == TokenType.START_PARAMETER;
+            && next.Type == TokenType.OPEN_PARENTHESIS;
     }
 
     public ReaxNode? Parse(ITokenSource source)
@@ -29,9 +29,9 @@ public class ReaxFunctionCallParse : INodeParser
                 identifier = statement;
             else if (startParameter && statement.IsReaxValue())
                 parameter.Add(statement);
-            else if (statement.Type == TokenType.START_PARAMETER)
+            else if (statement.Type == TokenType.OPEN_PARENTHESIS)
                 startParameter = true;
-            else if (statement.Type == TokenType.END_PARAMETER)
+            else if (statement.Type == TokenType.CLOSE_PARENTHESIS)
                 break;
         }
 

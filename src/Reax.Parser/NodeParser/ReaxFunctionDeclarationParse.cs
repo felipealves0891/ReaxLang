@@ -19,18 +19,18 @@ public class ReaxFunctionDeclarationParse : INodeParser
         source.Advance(TokenType.IDENTIFIER);
         var token = source.CurrentToken;
         var identifier = source.CurrentToken;
-        source.Advance(TokenType.START_PARAMETER);
+        source.Advance(TokenType.OPEN_PARENTHESIS);
         var parameters = ParameterHelper.GetParameters(source).ToArray();
         source.Advance(Token.DataTypes);
         var successType = source.CurrentToken.Type.ToDataType();
-        source.Advance([TokenType.PIPE, TokenType.START_BLOCK]);
+        source.Advance([TokenType.PIPE, TokenType.OPEN_BRACE]);
 
         var errorType = DataType.VOID;
         if(source.CurrentToken.Type == TokenType.PIPE)
         {
             source.Advance(Token.DataTypes);
             errorType = source.CurrentToken.Type.ToDataType();
-            source.Advance(TokenType.START_BLOCK);
+            source.Advance(TokenType.OPEN_BRACE);
         }
 
         var block = (ContextNode)source.NextBlock();

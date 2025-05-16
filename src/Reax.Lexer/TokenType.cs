@@ -4,12 +4,12 @@ public enum TokenType
 {
     EOF = -1,
     UNKNOW,
-    END_EXPRESSION,
+    SEMICOLON,
     IDENTIFIER,
     ASSIGNMENT,
-    START_PARAMETER,
-    PARAMETER_SEPARATOR,
-    END_PARAMETER,
+    OPEN_PARENTHESIS,
+    COMMA,
+    CLOSE_PARENTHESIS,
     STRING_LITERAL,
     NUMBER_LITERAL,
     LET,
@@ -17,8 +17,8 @@ public enum TokenType
     EQUALITY,
     IF,
     ELSE,
-    START_BLOCK,
-    END_BLOCK,
+    OPEN_BRACE,
+    CLOSE_BRACE,
     TERM,
     FACTOR,
     ON,
@@ -53,4 +53,3 @@ public enum TokenType
     VOID_TYPE,
     MATCH
 } 
-

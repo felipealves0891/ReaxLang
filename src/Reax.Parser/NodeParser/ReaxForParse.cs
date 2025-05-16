@@ -47,7 +47,7 @@ public class ReaxForParse : INodeParser
             limitValue.ToReaxValue(),
             identifierControl.Location);
         
-        source.Advance(TokenType.START_BLOCK);
+        source.Advance(TokenType.OPEN_BRACE);
         var block = (ContextNode)source.NextBlock();
         return new ForNode(declaration, condition, block, declaration.Location);
     }

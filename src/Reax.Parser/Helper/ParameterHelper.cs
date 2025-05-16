@@ -12,11 +12,11 @@ public class ParameterHelper
     public static IEnumerable<VarNode> GetParameters(ITokenSource source) 
     {
         var parameters = new List<VarNode>();
-        if(source.CurrentToken.Type != TokenType.START_PARAMETER)
+        if(source.CurrentToken.Type != TokenType.OPEN_PARENTHESIS)
             return parameters;
 
         source.Advance();
-        while(source.CurrentToken.Type != TokenType.END_PARAMETER) 
+        while(source.CurrentToken.Type != TokenType.CLOSE_PARENTHESIS) 
         {
             if(source.CurrentToken.Type == TokenType.IDENTIFIER)
             {

@@ -32,7 +32,7 @@ public class ReaxObservableParse : INodeParser
             condition = ExpressionHelper.ParserBinary(statement.ToArray());
         }
 
-        if(source.CurrentToken.Type == TokenType.START_BLOCK)
+        if(source.CurrentToken.Type == TokenType.OPEN_BRACE)
         {
             return new ObservableNode(variable, (ContextNode)source.NextBlock(), condition, source.CurrentToken.Location);
         }

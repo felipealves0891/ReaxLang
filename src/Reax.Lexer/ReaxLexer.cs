@@ -7,8 +7,8 @@ namespace Reax.Lexer;
 public class ReaxLexer 
 {
     private const byte SINGLE_QUOTES = (byte)'\'';
-    private const byte OPEN_BRACKET = (byte)'(';
-    private const byte CLOSE_BRACKET = (byte)')';
+    private const byte OPEN_PARENTHESIS = (byte)'(';
+    private const byte CLOSE_PARENTHESIS = (byte)')';
     private const byte OPEN_BRACE = (byte)'{';
     private const byte CLOSE_BRACE = (byte)'}';
     private const byte COMMA = (byte)',';
@@ -64,14 +64,14 @@ public class ReaxLexer
             return GetDigit();
         if(_source.CurrentChar == SINGLE_QUOTES) 
             return GetString();
-        if(_source.CurrentChar == OPEN_BRACKET) 
-            return AdvanceAndReturn(TokenType.START_PARAMETER, OPEN_BRACKET);   
-        if(_source.CurrentChar == CLOSE_BRACKET) 
-            return AdvanceAndReturn(TokenType.END_PARAMETER, CLOSE_BRACKET);
+        if(_source.CurrentChar == OPEN_PARENTHESIS) 
+            return AdvanceAndReturn(TokenType.OPEN_PARENTHESIS, OPEN_PARENTHESIS);   
+        if(_source.CurrentChar == CLOSE_PARENTHESIS) 
+            return AdvanceAndReturn(TokenType.CLOSE_PARENTHESIS, CLOSE_PARENTHESIS);
         if(_source.CurrentChar == COMMA) 
-            return AdvanceAndReturn(TokenType.PARAMETER_SEPARATOR, COMMA);          
+            return AdvanceAndReturn(TokenType.COMMA, COMMA);          
         if(_source.CurrentChar == SEMICOLON) 
-            return AdvanceAndReturn(TokenType.END_EXPRESSION, SEMICOLON);   
+            return AdvanceAndReturn(TokenType.SEMICOLON, SEMICOLON);   
         if(IsAssignment(_source.BeforeChar, _source.CurrentChar, _source.NextChar)) 
             return AdvanceAndReturn(TokenType.ASSIGNMENT, ASSIGNMENT);   
         if(_source.BeforeChar == ASSIGNMENT && _source.CurrentChar == ASSIGNMENT) 
@@ -89,9 +89,9 @@ public class ReaxLexer
         if(_source.CurrentChar == EXCLAMATION)
             return AdvanceAndReturn(TokenType.NOT, EXCLAMATION); 
         if(_source.CurrentChar == OPEN_BRACE)
-            return AdvanceAndReturn(TokenType.START_BLOCK, _source.CurrentChar); 
+            return AdvanceAndReturn(TokenType.OPEN_BRACE, _source.CurrentChar); 
         if(_source.CurrentChar == CLOSE_BRACE)
-            return AdvanceAndReturn(TokenType.END_BLOCK, _source.CurrentChar);
+            return AdvanceAndReturn(TokenType.CLOSE_BRACE, _source.CurrentChar);
         if(_source.CurrentChar == DOT)
             return AdvanceAndReturn(TokenType.ACCESS, _source.CurrentChar);
         if(_source.CurrentChar == COLON)

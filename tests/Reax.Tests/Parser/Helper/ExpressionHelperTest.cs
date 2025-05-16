@@ -76,19 +76,19 @@ public class ExpressionHelperTests
     {
         var tokens = new Token[]
         {
-            new Token(TokenType.START_PARAMETER, (byte)'(', "source.reax", 2, 0),
+            new Token(TokenType.OPEN_PARENTHESIS, (byte)'(', "source.reax", 2, 0),
             new Token(TokenType.TERM, (byte)'-', "source.reax", 0, 0),
             new Token(TokenType.NUMBER_LITERAL, [(byte)'2'], "source.reax", 0, 0),
             new Token(TokenType.TERM, (byte)'+', "source.reax", 1, 0),
             new Token(TokenType.NUMBER_LITERAL, (byte)'3', "source.reax", 2, 0),
-            new Token(TokenType.END_PARAMETER, (byte)')', "source.reax", 2, 0),
+            new Token(TokenType.CLOSE_PARENTHESIS, (byte)')', "source.reax", 2, 0),
             new Token(TokenType.FACTOR, (byte)'*', "source.reax", 2, 0),
             new Token(TokenType.IDENTIFIER, [(byte)'m'], "source.reax", 2, 0),
             new Token(TokenType.ACCESS, [(byte)'.'], "source.reax", 2, 0),
             new Token(TokenType.IDENTIFIER, [(byte)'m'], "source.reax", 2, 0),
-            new Token(TokenType.START_PARAMETER, (byte)'(', "source.reax", 2, 0),
+            new Token(TokenType.OPEN_PARENTHESIS, (byte)'(', "source.reax", 2, 0),
             new Token(TokenType.NUMBER_LITERAL, [(byte)'2'], "source.reax", 0, 0),
-            new Token(TokenType.END_PARAMETER, (byte)')', "source.reax", 2, 0),
+            new Token(TokenType.CLOSE_PARENTHESIS, (byte)')', "source.reax", 2, 0),
         };
 
         var result = ExpressionHelper.Parser(tokens);

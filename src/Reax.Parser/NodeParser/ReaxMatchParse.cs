@@ -45,11 +45,11 @@ public class ReaxMatchParse : INodeParser
     private ActionNode ParseFunction(ITokenSource source) 
     {
         var location = source.CurrentToken.Location;
-        source.Advance(TokenType.START_PARAMETER);
+        source.Advance(TokenType.OPEN_PARENTHESIS);
         var parameters = ParameterHelper.GetParameters(source).First();
         source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken.Type.ToDataType();
-        source.Advance([TokenType.ARROW, TokenType.START_BLOCK]);
+        source.Advance([TokenType.ARROW, TokenType.OPEN_BRACE]);
         ReaxNode? expression = null;
         if(source.CurrentToken.Type == TokenType.ARROW)
         {
@@ -57,7 +57,7 @@ public class ReaxMatchParse : INodeParser
             var value = ExpressionHelper.Parser(source.NextStatement());
             expression = new ReturnSuccessNode(value, value.Location);
         }
-        else if(source.CurrentToken.Type == TokenType.START_BLOCK)
+        else if(source.CurrentToken.Type == TokenType.OPEN_BRACE)
             expression = source.NextBlock();
 
         if(expression is null)

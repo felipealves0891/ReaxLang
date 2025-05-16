@@ -22,18 +22,18 @@ public class ReaxExternalFunctionCallParse : INodeParser
         source.Advance();
         var identifier = source.CurrentToken;
         source.Advance();
-        if(source.CurrentToken.Type != TokenType.START_PARAMETER)
+        if(source.CurrentToken.Type != TokenType.OPEN_PARENTHESIS)
             throw new InvalidOperationException($"Era esperado um abre parenteses '(' na linha {source.CurrentToken.Row}!");
         
         source.Advance();
         var parameters = new List<ReaxNode>();
-        while(source.CurrentToken.Type != TokenType.END_PARAMETER)
+        while(source.CurrentToken.Type != TokenType.CLOSE_PARENTHESIS)
         {
-            if(source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type == TokenType.START_PARAMETER)
+            if(source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type == TokenType.OPEN_PARENTHESIS)
                 parameters.Add(functionCall(source));
             else if(source.CurrentToken.IsReaxValue())
                 parameters.Add(source.CurrentToken.ToReaxValue());
-            else if(source.CurrentToken.Type != TokenType.PARAMETER_SEPARATOR)
+            else if(source.CurrentToken.Type != TokenType.COMMA)
                 throw new InvalidOperationException($"Token invalido '{source.CurrentToken}' na linha {source.CurrentToken.Row}.");
 
             source.Advance();

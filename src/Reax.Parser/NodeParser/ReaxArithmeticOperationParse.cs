@@ -13,7 +13,7 @@ public class ReaxArithmeticOperationParse : INodeParser
     public bool IsParse(Token before, Token current, Token next)
     {
         return (current.CanCalculated() && next.IsArithmeticOperator()) ||
-               (current.Type == TokenType.START_PARAMETER && next.CanCalculated());
+               (current.Type == TokenType.OPEN_PARENTHESIS && next.CanCalculated());
     }
 
     public ReaxNode? Parse(ITokenSource source)
