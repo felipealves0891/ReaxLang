@@ -35,13 +35,14 @@ public class ReaxInterpreter : IReaxInterpreter
     }
 
     public ReaxInterpreter(string name, ReaxNode[] nodes, ReaxExecutionContext context)
-        : this(nodes)
+        : this(name, nodes)
     {
         _context = new ReaxExecutionContext(name, context);
     }
 
     public ReaxInterpreter(string name, ReaxNode[] nodes)
     {
+        Name = name;
         _nodes = nodes;
         _context = new ReaxExecutionContext(name);
         _parameters = new Dictionary<int, ReaxNode>();
@@ -49,6 +50,7 @@ public class ReaxInterpreter : IReaxInterpreter
 
     public ReaxInterpreter(ReaxNode[] nodes)
     {
+        Name = "Main";
         _nodes = nodes;
         _context = new ReaxExecutionContext("main");
         _parameters = new Dictionary<int, ReaxNode>();
@@ -57,7 +59,7 @@ public class ReaxInterpreter : IReaxInterpreter
     public Action<DebuggerArgs>? Debug { get; set; }
     public LiteralNode? Output { get; private set; }
     public LiteralNode? Error { get; private set; }
-    public string Name { get; private set; } = "Main";
+    public string Name { get; private set; }
 
     public void Initialize() 
     {
@@ -69,14 +71,14 @@ public class ReaxInterpreter : IReaxInterpreter
 
         foreach (var node in _nodes)
         {
-            Logger.LogInterpreter($"Adicionando {node} a stack!");
-            StackTrace.Push(node);
-
             if (node is IReaxDeclaration declaration)
+            {
+                Logger.LogInterpreter($"Adicionando {node} a stack!");
+                StackTrace.Push(node);
                 declaration.Execute(_context);
-
-            Logger.LogInterpreter($"Removendo {node} a stack!");
-            StackTrace.TryPop(out var _);
+                Logger.LogInterpreter($"Removendo {node} a stack!");
+                StackTrace.TryPop(out var _);
+            }
         }
 
         _isInitialized = true;
@@ -98,17 +100,16 @@ public class ReaxInterpreter : IReaxInterpreter
         Interpret(rethrow);
     }
 
-    public void Interpret(bool rethrow = false) 
+    public void Interpret(bool rethrow = false)
     {
         Initialize();
-        
+        Logger.LogInterpreter($"################################### Start {Name} ###################################");
         foreach (var node in _nodes)
         {
             ProcessNode(node, rethrow);
-
-            if ((Output is not null and not NullNode)
-             || (Error is not null and not NullNode)) return;
+            if ((Output is not null and not NullNode) || (Error is not null and not NullNode)) break;
         }
+        Logger.LogInterpreter($"#################################### END  {Name} ###################################");
     }
 
     private void ProcessNode(ReaxNode node, bool rethrow = false)
