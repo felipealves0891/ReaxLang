@@ -1,3 +1,4 @@
+using Reax.Core.Ast.Expressions;
 using Reax.Core.Locations;
 
 
@@ -12,7 +13,13 @@ public record WhileNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var condition = (BinaryNode)Condition;
+
+        while((bool)condition.Evaluation(context).Value)
+        {
+            var interpreter = context.CreateInterpreter(ToString(), Block.Block);
+            interpreter.Interpret();
+        }
     }
 
     public bool HasGuaranteedReturn()

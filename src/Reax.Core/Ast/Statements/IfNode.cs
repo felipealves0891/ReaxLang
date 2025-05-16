@@ -1,5 +1,6 @@
 using Reax.Core.Locations;
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Interfaces;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -14,7 +15,20 @@ public record IfNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var left = Condition.Left.GetValue(context);
+        var right = Condition.Right.GetValue(context);
+        var logical = (ILogicOperator)Condition.Operator;
+        var result = logical.Compare(left, right);
+        if(result)
+        {
+            var interpreter = context.CreateInterpreter(ToString(), True.Block);
+            interpreter.Interpret(rethrow: true);
+        }
+        else if(False is not null)
+        {
+            var interpreter = context.CreateInterpreter(ToString(), False.Block);
+            interpreter.Interpret(rethrow: true);
+        }
     }
 
     public bool HasGuaranteedReturn()

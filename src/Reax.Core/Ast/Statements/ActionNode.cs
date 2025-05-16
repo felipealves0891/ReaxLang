@@ -14,7 +14,6 @@ public record ActionNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
     }
 
     public bool HasGuaranteedReturn()

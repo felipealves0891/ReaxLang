@@ -68,10 +68,8 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error: "); 
-            if(ReaxEnvironment.Debug)
-                Console.WriteLine("Reax Error: {0}", ex.Message);
-
-            interpreter.PrintStackTrace();
+            Console.WriteLine("Reax Error: {0}", ex.Message);
+            Console.WriteLine(interpreter.PrintStackTrace());
         }
         finally
         {

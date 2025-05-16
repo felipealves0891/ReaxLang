@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Literals;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -14,7 +15,14 @@ public record ReturnSuccessNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        if (Expression is LiteralNode literal)
+            throw new ReturnSuccessException(literal);
+        
+        var interpreter = context.CreateInterpreter(ToString(), [Expression]);
+        interpreter.Interpret();
+
+        var output = interpreter.Output ?? throw new InvalidOperationException("Era esperado um retorno!");
+        throw new ReturnSuccessException(output);
     }
 
     public bool HasGuaranteedReturn()

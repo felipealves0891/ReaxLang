@@ -11,9 +11,9 @@ public record FunctionDeclarationNode(
     VarNode[] Parameters, 
     DataType SuccessType,
     DataType ErrorType,
-    SourceLocation Location) : StatementNode(Location), IControlFlowNode
+    SourceLocation Location) : StatementNode(Location), IControlFlowNode, IReaxDeclaration
 {
-    public override IReaxNode[] Children => Parameters.Concat(Block.Block).ToArray();
+    public override IReaxNode[] Children => Parameters.Cast<ReaxNode>().Concat(Block.Block.Cast<ReaxNode>()).ToArray();
     
     public DataType ResultSuccess => SuccessType;
 
@@ -21,7 +21,9 @@ public record FunctionDeclarationNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var interpreter = context.CreateInterpreter(ToString(), Block.Block, Parameters);
+        context.Declare(Identifier);
+        context.SetFunction(Identifier, interpreter);
     }
 
     public bool HasGuaranteedReturn()

@@ -4,7 +4,7 @@ using Reax.Core.Locations;
 namespace Reax.Core.Ast.Statements;
 
 [ExcludeFromCodeCoverage]
-public record ScriptNode : StatementNode
+public record ScriptNode : StatementNode, IReaxDeclaration
 {
     public ScriptNode(string identifier, ReaxNode[] nodes, SourceLocation Location) : base(Location)
     {
@@ -19,7 +19,11 @@ public record ScriptNode : StatementNode
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var interpreter = context.CreateInterpreter(Identifier, Nodes);
+        interpreter.Interpret();
+        
+        context.Declare(Identifier);
+        context.SetScript(Identifier, interpreter);
     }
 
     public override string ToString()

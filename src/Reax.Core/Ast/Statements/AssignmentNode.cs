@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Literals;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -16,7 +17,12 @@ public record AssignmentNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        if (Assigned is ExpressionNode expression)
+            context.SetVariable(Identifier.Identifier, expression.Evaluation(context));
+        else if (Assigned is LiteralNode literal)
+            context.SetVariable(Identifier.Identifier, literal);
+        else
+            throw new Exception("Tipo invalido para direita de uma atribuição, era esperado uma expressão ou um literal!");
     }
 
     public override string ToString()

@@ -21,7 +21,7 @@ public class InterpreterFunction : Function
 
     public override (LiteralNode? Success, LiteralNode? Error) Invoke(params ReaxNode[] parameters)
     {
-        _interpreter.Interpret(_identifier, parameters);
+        _interpreter.Interpret(_identifier, true, parameters);
         return (_interpreter.Output, _interpreter.Error);
     }
 }

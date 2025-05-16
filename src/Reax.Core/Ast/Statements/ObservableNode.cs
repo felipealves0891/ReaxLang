@@ -17,7 +17,9 @@ public record ObservableNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var identifier = Var.Identifier;
+        var interpreter = context.CreateInterpreter(ToString(), Block.Block);
+        context.SetObservable(identifier, interpreter, Condition);
     }
 
     public override string ToString()

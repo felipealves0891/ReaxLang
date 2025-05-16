@@ -31,11 +31,11 @@ public record CalculateNode(
 
     private LiteralNode CalculateChild(ReaxNode node, IReaxExecutionContext context) 
     {
-        if(node is CalculateNode calculate)
-            return calculate.Evaluation(context);
+        if (node is ExpressionNode expression)
+            return expression.Evaluation(context);
         else if (node is LiteralNode literal)
             return literal;
-        else 
+        else
             throw new InvalidOperationException("Não é possivel tratar o nó da operação!");
     }
 

@@ -18,7 +18,10 @@ public record FunctionCallNode(
         var function = context.GetFunction(Identifier);
         var parameters = Parameter.Select(x => x.GetValue(context)).ToArray();
         var (success, error) = function.Invoke(parameters);
-        return success ?? error ?? throw new Exception();
+        if (error is not null)
+            throw new ReturnErrorException(error);
+
+        return success ?? throw new Exception();
     }
 
     public override string ToString()

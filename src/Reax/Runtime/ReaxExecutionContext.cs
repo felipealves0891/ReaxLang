@@ -407,11 +407,15 @@ public class ReaxExecutionContext : IReaxExecutionContext
 
     public IReaxInterpreter CreateInterpreter(string name, ReaxNode[] nodes)
     {
-        return new ReaxInterpreter(name, nodes, this);
+        var interpreter = new ReaxInterpreter(name, nodes, this);
+        interpreter.Debug += ReaxDebugger.Debugger;
+        return interpreter;
     }
     
     public IReaxInterpreter CreateInterpreter(string name, ReaxNode[] nodes, VarNode[] parameters)
     {
-        return new ReaxInterpreter(name, nodes, this, parameters);
+        var interpreter = new ReaxInterpreter(name, nodes, this, parameters);
+        interpreter.Debug += ReaxDebugger.Debugger;
+        return interpreter;
     }
 }

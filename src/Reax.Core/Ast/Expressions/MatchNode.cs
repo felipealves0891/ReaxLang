@@ -22,15 +22,13 @@ public record MatchNode(
         if (result.Type == Success.Parameter.Type)
         {
             var successInterpreter = context.CreateInterpreter(Success.ToString(), [Success.Context], [Success.Parameter]);
-            successInterpreter.Debug += ReaxDebugger.Debugger;
-            successInterpreter.Interpret("Success", [result]);
+            successInterpreter.Interpret("Success", false, result);
             return successInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
         else if (result.Type == Error.Parameter.Type)
         {
             var errorInterpreter = context.CreateInterpreter(Error.ToString(), [Error.Context], [Error.Parameter]);
-            errorInterpreter.Interpret("Error", result);
-            errorInterpreter.Debug += ReaxDebugger.Debugger;
+            errorInterpreter.Interpret("Error", false, result);
             return errorInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
         else

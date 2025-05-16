@@ -1,3 +1,5 @@
+using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Literals;
 using Reax.Core.Locations;
 
 
@@ -13,7 +15,21 @@ public record ForNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var condition = (BinaryNode)Condition;
+
+        Declaration.Execute(context);
+        while((bool)condition.Evaluation(context).Value)
+        {
+            var interpreter = context.CreateInterpreter(ToString(), Block.Block);
+            interpreter.Interpret();
+
+            var value = context.GetVariable(Declaration.Identifier) as NumberNode;
+            if(value is null)
+                throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
+
+            var newValue = new NumberNode(((decimal)value.Value + 1).ToString(), Declaration.Location);
+            context.SetVariable(Declaration.Identifier, newValue);
+        }
     }
 
     public bool HasGuaranteedReturn()

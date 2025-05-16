@@ -9,13 +9,14 @@ namespace Reax.Core.Ast.Statements;
 public record ModuleNode(
     string identifier, 
     Dictionary<string, Function> functions, 
-    SourceLocation Location) : StatementNode(Location)
+    SourceLocation Location) : StatementNode(Location), IReaxDeclaration
 {
     public override IReaxNode[] Children => [];
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        context.Declare(identifier);
+        context.SetModule(identifier, functions);  
     }
 
     public override string ToString()

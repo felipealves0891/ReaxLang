@@ -12,7 +12,8 @@ public record ContextNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
+        var interpreter = context.CreateInterpreter(ToString(), Block);
+        interpreter.Interpret();
     }
 
     public bool HasGuaranteedReturn()

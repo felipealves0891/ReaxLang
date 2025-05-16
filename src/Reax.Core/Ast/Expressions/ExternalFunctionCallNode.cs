@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using Reax.Parser.Node;
 
 namespace Reax.Core.Ast.Expressions;
 
@@ -20,8 +21,11 @@ public record ExternalFunctionCallNode(
             var interpreter = context.GetScript(scriptName);
             var parameters = functionCall.Parameter.Select(x => x.GetValue(context)).ToArray();
             var identifier = functionCall.Identifier;
-            interpreter.ExecuteFunctionCall(new FunctionCallNode(identifier, parameters, Location));
-            return interpreter.Output ?? interpreter.Error ?? throw new Exception();
+            interpreter.ExecuteFunctionCall(functionCall);
+            if (interpreter.Error is not null)
+                throw new ReturnErrorException(interpreter.Error);
+
+            return interpreter.Output ?? new NullNode(Location);
         }
         else if(context.ModuleExists(scriptName)) 
         {
@@ -29,7 +33,10 @@ public record ExternalFunctionCallNode(
             var parameters = functionCall.Parameter.Select(x => x.GetValue(context)).ToArray();
             var identifier = functionCall.Identifier;
             var (success, error) = function.Invoke(parameters);
-            return success ?? error ?? throw new Exception();
+            if (error is not null)
+                throw new ReturnErrorException(error);
+
+            return success ?? new NullNode(Location);
         }
         else 
         {

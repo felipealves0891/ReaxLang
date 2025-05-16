@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "dotnet: build",
             "program": "${workspaceFolder}/src/Reax/bin/Debug/net9.0/Reax.dll",
-            "args": ["-d", "-b", "main.reax:1,5,15,20,30"],
+            "args": [],
             "cwd": "D:/Source/Scripts",
             "stopAtEntry": false,
             "console": "internalConsole"

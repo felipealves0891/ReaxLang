@@ -12,13 +12,12 @@ namespace Reax.Parser.Node;
 public record ScriptDeclarationNode(
     string Identifier, 
     SourceLocation Location) 
-    : StatementNode(Location)
+    : StatementNode(Location), IReaxDeclaration
 {
     public override IReaxNode[] Children => [];
 
     public override void Execute(IReaxExecutionContext context)
     {
-        throw new NotImplementedException();
     }
 
     public override string ToString()
