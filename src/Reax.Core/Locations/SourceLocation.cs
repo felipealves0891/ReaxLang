@@ -17,6 +17,6 @@ public struct SourceLocation
 
     public override string ToString()
     {
-        return $"{File}({Start.Line}:{Start.Column})";
+        return $"{File}({Start.Line}:{Start.Column}, {End.Line}:{End.Column})";
     }
 }

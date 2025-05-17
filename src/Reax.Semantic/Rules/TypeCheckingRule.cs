@@ -22,6 +22,8 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(FunctionDeclarationNode)] = ApplyFunctionDeclarationNode;
         Handlers[typeof(FunctionCallNode)] = ApplyFunctionCallNode;
         Handlers[typeof(ExternalFunctionCallNode)] = ApplyExternalFunctionCallNode;
+        Handlers[typeof(ForInNode)] = ApplyForInNode;
+        Handlers[typeof(ArrayNode)] = ApplyArrayNode;
     }
 
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
@@ -125,6 +127,36 @@ public class TypeCheckingRule : BaseRule
         }
 
         return ValidationResult.Success();
+    }
+
+    private ValidationResult ApplyForInNode(IReaxNode node)
+    {
+        var forIn = (ForInNode)node;
+        var typeDeclaration = forIn.Declaration.Type | DataType.ARRAY;
+        var typeItemArray = GetDataType(forIn.Array);
+
+        if (typeDeclaration == typeItemArray)
+            return ValidationResult.Success();
+        else
+            return ValidationResult.FailureIncompatibleTypes(
+                typeDeclaration, typeItemArray, forIn.Location);
+    }
+
+    private ValidationResult ApplyArrayNode(IReaxNode node)
+    {
+        var array = (ArrayNode)node;
+        DataType expected = GetDataType(array.FirstOrDefault(new NullNode(array.Location)));
+
+        var result = ValidationResult.Success();
+        foreach (var item in array)
+        {
+            var current = GetDataType(item);
+            if (expected != current)
+                result.Join(ValidationResult.FailureIncompatibleTypes(
+                    expected, current, item.Location));
+        }
+
+        return result;
     }
 
     private DataType GetDataType(ReaxNode node)
@@ -234,16 +266,7 @@ public class TypeCheckingRule : BaseRule
             return DataType.NONE;
 
         ReaxNode node = array.Literals.First();
-        DataType type = GetDataType(node);
-
-        foreach (var item in array)
-        {
-            var itemType = GetDataType(item);
-            if (type != itemType)
-                type = type | itemType;
-        }
-
-        return type | DataType.ARRAY;
+        return GetDataType(node) | DataType.ARRAY;
     }
 
     private DataType GetDataTypeByArrayItem(ArrayAccessNode arrayAccessNode)
