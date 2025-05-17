@@ -11,6 +11,8 @@ public class ReaxLexer
     private const byte CLOSE_PARENTHESIS = (byte)')';
     private const byte OPEN_BRACE = (byte)'{';
     private const byte CLOSE_BRACE = (byte)'}';
+    private const byte OPEN_BRACKET = (byte)'[';
+    private const byte CLOSE_BRACKET = (byte)']';
     private const byte COMMA = (byte)',';
     private const byte SEMICOLON = (byte)';';
     private const byte ASSIGNMENT = (byte)'=';
@@ -98,7 +100,11 @@ public class ReaxLexer
             return AdvanceAndReturn(TokenType.TYPING, _source.CurrentChar);
         if(_source.CurrentChar == PIPE)
             return AdvanceAndReturn(TokenType.PIPE, _source.CurrentChar);
-        if(_source.CurrentChar == HASHTAG)
+        if(_source.CurrentChar == OPEN_BRACKET)
+            return AdvanceAndReturn(TokenType.OPEN_BRACKET, _source.CurrentChar);
+        if(_source.CurrentChar == CLOSE_BRACKET)
+            return AdvanceAndReturn(TokenType.CLOSE_BRACKET, _source.CurrentChar);
+        if (_source.CurrentChar == HASHTAG)
             return Comment();
         if(_source.CurrentChar == NEWLINE && !_source.CanNext)
         {

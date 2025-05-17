@@ -1,3 +1,4 @@
+using Reax.Core.Debugger;
 using Reax.Lexer;
 using Reax.Lexer.Reader;
 using System.Linq;
@@ -35,6 +36,7 @@ public class ReaxLexerTest : BaseTest<ReaxLexer>
                 ["# apenas um comentario \n return value;", new TokenType[] {TokenType.RETURN, TokenType.IDENTIFIER, TokenType.SEMICOLON, TokenType.EOF}],
                 ["5 >= 1", new TokenType[] {TokenType.NUMBER_LITERAL, TokenType.COMPARISON, TokenType.NUMBER_LITERAL, TokenType.EOF}],
                 ["5 => 1", new TokenType[] {TokenType.NUMBER_LITERAL, TokenType.COMPARISON, TokenType.NUMBER_LITERAL, TokenType.EOF}],
+                ["[5, 10];", new TokenType[] { TokenType.OPEN_BRACKET, TokenType.NUMBER_LITERAL, TokenType.COMMA, TokenType.NUMBER_LITERAL, TokenType.CLOSE_BRACKET, TokenType.SEMICOLON, TokenType.EOF }],
                 ["\n\n\n\n", new TokenType[] {TokenType.EOF}],
             ];
         }
@@ -57,6 +59,7 @@ public class ReaxLexerTest : BaseTest<ReaxLexer>
 
     protected override ReaxLexer CreateTested()
     {
+        Logger.Enabled = false;
         return new ReaxLexer(_mockedReader);
     }
 }

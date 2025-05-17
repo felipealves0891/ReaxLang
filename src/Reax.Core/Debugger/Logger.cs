@@ -13,6 +13,42 @@ public enum LoggerLevel
 
 public sealed class Logger : IDisposable
 {
+    private readonly StreamWriter _writer;
+    private readonly object _locker = new();
+
+    public Logger()
+    {
+        try
+        {
+            var path = ReaxEnvironment.DirectoryRoot;
+            var filename = Path.Combine(path, "logs", $"{DateTime.Now.ToString("yyyy-MM-dd-HHmmss")}.log");
+            _writer = new StreamWriter(filename, true);
+        }
+        catch
+        {
+            _writer = new StreamWriter(new MemoryStream());    
+        }
+        
+    }
+
+    private void Log(string message, LoggerLevel level)
+    {
+        if (((int)level) >= ((int)Level))
+        {
+            lock (_locker)
+            {
+                _writer.WriteLine(message);
+            }
+
+        }
+    }
+
+    public void Dispose()
+    {
+        _writer.Flush();
+        _writer.Dispose();
+    }
+    
     private static Logger _instance = new Logger();
     public static bool Enabled = true;
     public static string FormatDate = "yyyy-MM-dd HH:mm:ss.ffffff";
@@ -73,23 +109,4 @@ public sealed class Logger : IDisposable
         _instance.Log(done, LoggerLevel.ERROR);
     }
 
-    private readonly StreamWriter _writer = new StreamWriter(Path.Combine(ReaxEnvironment.DirectoryRoot, "logs", $"{DateTime.Now.ToString("yyyy-MM-dd-HHmmss")}.log"), true);
-    private readonly object _locker = new();
-    
-    private void Log(string message, LoggerLevel level)
-    {
-        if (((int)level) >= ((int)Level))
-        {
-            lock (_locker) {
-                _writer.WriteLine(message);
-            }
-
-        }
-    }
-
-    public void Dispose()
-    {
-        _writer.Flush();
-        _writer.Dispose();
-    }
 }

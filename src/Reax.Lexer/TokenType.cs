@@ -19,6 +19,8 @@ public enum TokenType
     ELSE,
     OPEN_BRACE,
     CLOSE_BRACE,
+    OPEN_BRACKET,
+    CLOSE_BRACKET,
     TERM,
     FACTOR,
     ON,

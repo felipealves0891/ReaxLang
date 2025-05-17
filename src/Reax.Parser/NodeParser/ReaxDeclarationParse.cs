@@ -71,6 +71,13 @@ public class ReaxDeclarationParse : INodeParser
     private DataType GetDataType(ITokenSource source)
     {
         var dataType = source.CurrentToken.Type.ToDataType();
+        if (source.NextToken.Type is TokenType.OPEN_BRACKET)
+        {
+            source.Advance(TokenType.OPEN_BRACKET);
+            dataType = dataType | DataType.ARRAY;
+            source.Advance(TokenType.CLOSE_BRACKET);
+        }
+
         source.Advance([TokenType.ASSIGNMENT, TokenType.SEMICOLON]);
         return dataType;
     }

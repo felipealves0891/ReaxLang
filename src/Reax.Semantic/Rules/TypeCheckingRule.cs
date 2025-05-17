@@ -8,6 +8,8 @@ using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Statements;
 using Reax.Semantic.Contexts;
 using Reax.Core.Ast;
+using Reax.Core.Ast.Objects;
+using Reax.Core.Ast.Interfaces;
 
 namespace Reax.Semantic.Rules;
 
@@ -27,7 +29,7 @@ public class TypeCheckingRule : BaseRule
         var assignment = (AssignmentNode)node;
         var expected = GetDataType(assignment.Identifier);
         var current = GetDataType(assignment.Assigned);
-        if(current.HasFlag(expected))
+        if (current.HasFlag(expected))
             return ValidationResult.Success();
         else
             return ValidationResult.FailureIncompatibleTypes(expected, current, assignment.Location);
@@ -38,7 +40,7 @@ public class TypeCheckingRule : BaseRule
         var action = (ActionNode)node;
         var expected = action.Type;
         var current = GetDataType(action.Context);
-        if(current.HasFlag(expected))
+        if (current.HasFlag(expected))
             return ValidationResult.Success();
         else
             return ValidationResult.FailureIncompatibleTypes(expected, current, action.Location);
@@ -49,7 +51,7 @@ public class TypeCheckingRule : BaseRule
         var declarationNode = (FunctionDeclarationNode)node;
         var expected = declarationNode.SuccessType | declarationNode.ErrorType;
         var current = GetDataType(declarationNode.Block);
-        if((expected & current) == current)
+        if ((expected & current) == current)
             return ValidationResult.Success();
         else
             return ValidationResult.FailureIncompatibleTypes(declarationNode.SuccessType | declarationNode.ErrorType, current, declarationNode.Location);
@@ -61,7 +63,7 @@ public class TypeCheckingRule : BaseRule
         var symbol = Context.Resolve(call.Identifier);
         if (symbol is null)
             return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
-        
+
         var expectedParameters = Context.ResolveParameters(call.Identifier);
         var passedParameters = call.Parameter;
 
@@ -80,7 +82,7 @@ public class TypeCheckingRule : BaseRule
         var symbol = Context.Resolve(call.Identifier, external.scriptName);
         if (symbol is null)
             return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
-        
+
         var expectedParameters = Context.ResolveParameters(call.Identifier, external.scriptName);
         var passedParameters = call.Parameter;
 
@@ -91,31 +93,31 @@ public class TypeCheckingRule : BaseRule
             call.Identifier,
             external.scriptName);
     }
-    
+
     private ValidationResult ValidateParameters(
-        ReaxNode[] passedParameters, 
+        ReaxNode[] passedParameters,
         Symbol[] expectedParameters,
         SourceLocation location,
         string identifier,
-        string script) 
+        string script)
     {
         var requiredParameters = expectedParameters.Count(x => x.Category == SymbolCategory.PARAMETER);
-        if(passedParameters.Length > expectedParameters.Length || passedParameters.Length < requiredParameters)
+        if (passedParameters.Length > expectedParameters.Length || passedParameters.Length < requiredParameters)
             return ValidationResult.FailureInvalidFunctionCall_ParametersCount(
-                $"{script}.{identifier}", 
-                expectedParameters.Length, 
-                passedParameters.Length, 
+                $"{script}.{identifier}",
+                expectedParameters.Length,
+                passedParameters.Length,
                 location);
 
         for (int i = 0; i < passedParameters.Length; i++)
         {
             DataType passedType = GetDataType(passedParameters[i]);
-            if(!expectedParameters[i].Type.IsCompatatible(passedType))
+            if (!expectedParameters[i].Type.IsCompatatible(passedType))
                 return ValidationResult.FailureInvalidFunctionCall_InvalidParameter(
-                    $"{script}.{identifier}", 
+                    $"{script}.{identifier}",
                     expectedParameters[i].Identifier,
-                    expectedParameters[i].Type, 
-                    passedType, 
+                    expectedParameters[i].Type,
+                    passedType,
                     location);
         }
 
@@ -124,28 +126,30 @@ public class TypeCheckingRule : BaseRule
 
     private DataType GetDataType(ReaxNode node)
     {
-        if(node is BinaryNode)
+        if (node is BinaryNode)
             return DataType.BOOLEAN;
-        else if(node is CalculateNode)
+        else if (node is CalculateNode)
             return DataType.NUMBER;
-        else if(node is ExternalFunctionCallNode externalFunction)
+        else if (node is ExternalFunctionCallNode externalFunction)
             return GetDataTypeByIdentifier(externalFunction.functionCall.Identifier, externalFunction.scriptName);
-        else if(node is FunctionCallNode functionCall)
+        else if (node is FunctionCallNode functionCall)
             return GetDataTypeByIdentifier(functionCall.Identifier);
-        else if(node is VarNode var)
+        else if (node is VarNode var)
             return var.Type != DataType.NONE ? var.Type : GetDataTypeByIdentifier(var.Identifier);
-        else if(node is LiteralNode literal)
+        else if (node is LiteralNode literal)
             return literal.Type;
-        else if(node is MatchNode match)
+        else if (node is MatchNode match)
             return GetResultDataType(match);
-        else if(node is ContextNode contextNode)
+        else if (node is ContextNode contextNode)
             return GetDataByContextNode(contextNode);
-        else if(node is ReturnSuccessNode successNode)
+        else if (node is ReturnSuccessNode successNode)
             return GetDataTypeByReturn(successNode);
-        else if(node is ReturnErrorNode errorNode)
+        else if (node is ReturnErrorNode errorNode)
             return GetDataTypeByReturn(errorNode);
-        else if(node is IfNode ifNode)
+        else if (node is IfNode ifNode)
             return GetDataTypeByIf(ifNode);
+        else if (node is ArrayNode arrayNode)
+            return GetDataTypeByArray(arrayNode);
         else
             return DataType.NONE;
     }
@@ -153,15 +157,15 @@ public class TypeCheckingRule : BaseRule
     private DataType GetDataTypeByIdentifier(string identifier, string? script = null)
     {
         var symbol = Context.Resolve(identifier, script);
-        if(symbol is not null)
+        if (symbol is not null)
             return symbol.Type;
         else
             return DataType.NONE;
     }
 
-    private DataType GetResultDataType(MatchNode node) 
+    private DataType GetResultDataType(MatchNode node)
     {
-        if(node.Success.Type == node.Error.Type)
+        if (node.Success.Type == node.Error.Type)
             return node.Success.Type;
 
         return DataType.NONE;
@@ -173,9 +177,9 @@ public class TypeCheckingRule : BaseRule
         foreach (var item in node.Block)
         {
             var type = (DataType)GetDataType(item);
-            if(type != DataType.NONE)
+            if (type != DataType.NONE)
             {
-                if(returnType == DataType.NONE)
+                if (returnType == DataType.NONE)
                     returnType = type;
                 else
                     returnType = returnType | type;
@@ -185,25 +189,25 @@ public class TypeCheckingRule : BaseRule
         return returnType;
     }
 
-    private DataType GetDataTypeByReturn(ReturnSuccessNode successNode) 
+    private DataType GetDataTypeByReturn(ReturnSuccessNode successNode)
     {
-        if(successNode.Expression is ContextNode context)
+        if (successNode.Expression is ContextNode context)
             return GetDataByContextNode(context);
-        else if(successNode.Expression is VarNode var)
+        else if (successNode.Expression is VarNode var)
             return GetDataType(var);
-        else if(successNode.Expression is LiteralNode literal)
+        else if (successNode.Expression is LiteralNode literal)
             return literal.Type;
         else
             return DataType.NONE;
     }
 
-    private DataType GetDataTypeByReturn(ReturnErrorNode successNode) 
+    private DataType GetDataTypeByReturn(ReturnErrorNode successNode)
     {
-        if(successNode.Expression is ContextNode context)
+        if (successNode.Expression is ContextNode context)
             return GetDataByContextNode(context);
-        else if(successNode.Expression is VarNode var)
+        else if (successNode.Expression is VarNode var)
             return GetDataType(var);
-        else if(successNode.Expression is LiteralNode literal)
+        else if (successNode.Expression is LiteralNode literal)
             return literal.Type;
         else
             return DataType.NONE;
@@ -212,10 +216,28 @@ public class TypeCheckingRule : BaseRule
     private DataType GetDataTypeByIf(IfNode node)
     {
         var type = GetDataType(node.True);
-        if(node.False is null)
+        if (node.False is null)
             return type;
 
         type = type | GetDataType(node.False);
         return type;
     }
+
+    private DataType GetDataTypeByArray(ArrayNode array)
+    {
+        if (array.Literals.Length == 0)
+            return DataType.NONE;
+
+        ReaxNode node = array.Literals.First();
+        DataType type = GetDataType(node);
+
+        foreach (var item in array)
+        {
+            var itemType = GetDataType(item);
+            if (type != itemType)
+                type = type | itemType;
+        }
+
+        return type | DataType.ARRAY;
+    } 
 }

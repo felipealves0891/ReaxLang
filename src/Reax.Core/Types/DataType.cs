@@ -8,4 +8,6 @@ public enum DataType
     BOOLEAN = 1 << 2,
     NULL = 1 << 3,
     VOID = 1 << 4,
+    ARRAY = 1 << 5
+
 }
