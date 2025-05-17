@@ -2,6 +2,7 @@ using Reax.Core.Types;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast;
 using Reax.Core.Functions.Attributes;
+using Reax.Core.Ast.Interfaces;
 
 namespace Reax.Core.Functions.ConsoleFunctions;
 
@@ -16,7 +17,7 @@ namespace Reax.Core.Functions.ConsoleFunctions;
 ]
 public class WriterFunction : Function
 {
-    public override (LiteralNode? Success, LiteralNode? Error) Invoke(params ReaxNode[] parameters)
+    public override (IReaxValue? Success, IReaxValue? Error) Invoke(params IReaxValue[] parameters)
     {
         if(parameters.Length == 1)
             Console.WriteLine(parameters[0].ToString());

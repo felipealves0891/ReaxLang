@@ -1,9 +1,10 @@
 using System;
+using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 
 namespace Reax.Core;
 
 public interface IReaxExpression
 {
-    LiteralNode Evaluation(IReaxExecutionContext context);
+    IReaxValue Evaluation(IReaxExecutionContext context);
 }

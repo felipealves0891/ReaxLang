@@ -5,6 +5,7 @@ using Reax.Core.Ast.Literals;
 using Reax.Core.Functions;
 using Reax.Core.Ast;
 using Reax.Core;
+using Reax.Core.Ast.Interfaces;
 
 namespace Reax.Runtime.Functions;
 
@@ -19,7 +20,7 @@ public class InterpreterFunction : Function
         _identifier = identifier;
     }
 
-    public override (LiteralNode? Success, LiteralNode? Error) Invoke(params ReaxNode[] parameters)
+    public override (IReaxValue? Success, IReaxValue? Error) Invoke(params IReaxValue[] parameters)
     {
         _interpreter.Interpret(_identifier, true, parameters);
         return (_interpreter.Output, _interpreter.Error);

@@ -4,6 +4,7 @@ using Reax.Core.Locations;
 using Reax.Core.Ast.Statements;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Debugger;
+using Reax.Core.Ast.Interfaces;
 
 namespace Reax.Core.Ast.Expressions;
 
@@ -16,7 +17,7 @@ public record MatchNode(
 {
     public override IReaxNode[] Children => [Expression, Success, Error];
 
-    public override LiteralNode Evaluation(IReaxExecutionContext context)
+    public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
         var result = Expression.Evaluation(context);
         if (result.Type == Success.Parameter.Type)

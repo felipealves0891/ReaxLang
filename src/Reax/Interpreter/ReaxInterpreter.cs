@@ -57,8 +57,8 @@ public class ReaxInterpreter : IReaxInterpreter
     }
 
     public Action<DebuggerArgs>? Debug { get; set; }
-    public LiteralNode? Output { get; private set; }
-    public LiteralNode? Error { get; private set; }
+    public IReaxValue? Output { get; private set; }
+    public IReaxValue? Error { get; private set; }
     public string Name { get; private set; }
 
     public void Initialize() 
@@ -84,7 +84,7 @@ public class ReaxInterpreter : IReaxInterpreter
         _isInitialized = true;
     }
 
-    public void Interpret(string identifier, bool rethrow, params ReaxNode[] values) 
+    public void Interpret(string identifier, bool rethrow, params IReaxValue[] values) 
     {
         var parametersLength = _parameters.Keys.Count();
         if(values.Length != parametersLength)
@@ -123,14 +123,14 @@ public class ReaxInterpreter : IReaxInterpreter
             if (rethrow)
                 throw;
 
-            Output = success.Literal;
+            Output = success.Value;
         }
         catch (ReturnErrorException error)
         {
             if (rethrow)
                 throw;
                 
-            Error = error.Literal;
+            Error = error.Value;
         }
     }
 
@@ -165,11 +165,11 @@ public class ReaxInterpreter : IReaxInterpreter
         }
         catch (ReturnSuccessException ex)
         {
-            Output = ex.Literal;
+            Output = ex.Value;
         }
         catch (ReturnErrorException ex)
         {
-            Error = ex.Literal;
+            Error = ex.Value;
         }
     }
 

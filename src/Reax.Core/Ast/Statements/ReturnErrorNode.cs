@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
-using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 
 namespace Reax.Core.Ast.Statements;

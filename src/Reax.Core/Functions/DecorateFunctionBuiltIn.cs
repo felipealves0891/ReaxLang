@@ -2,6 +2,7 @@ using Reax.Core.Types;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast;
 using Reax.Core.Functions.Attributes;
+using Reax.Core.Ast.Interfaces;
 
 namespace Reax.Core.Functions;
 
@@ -16,7 +17,7 @@ public class DecorateFunctionBuiltIn : Function
         this.function = function;
     }
 
-    public override (LiteralNode? Success, LiteralNode? Error) Invoke(params ReaxNode[] parameters)
+    public override (IReaxValue? Success, IReaxValue? Error) Invoke(params IReaxValue[] parameters)
     {
         if(parameters.Length >= attribute.MinParametersCount && parameters.Length <= attribute.MaxParametersCount)
             return function.Invoke(parameters);

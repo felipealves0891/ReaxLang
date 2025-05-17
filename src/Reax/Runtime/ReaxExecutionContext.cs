@@ -19,7 +19,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
     private readonly ISet<Guid> _immutableKeys;
     private readonly ISet<Guid> _asyncKeys;
     private readonly IDictionary<string, Guid> _symbols;
-    private readonly IDictionary<Guid, LiteralNode> _variableContext;
+    private readonly IDictionary<Guid, IReaxValue> _variableContext;
     private readonly IDictionary<Guid, Function> _functionContext;
     private readonly IDictionary<Guid, IReaxInterpreter> _scriptContext;
     private readonly IDictionary<Guid, IReaxInterpreter> _bindContext;
@@ -31,7 +31,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
     public ReaxExecutionContext(string name)
     {
         _symbols = new ConcurrentDictionary<string, Guid>();
-        _variableContext = new ConcurrentDictionary<Guid, LiteralNode>();
+        _variableContext = new ConcurrentDictionary<Guid, IReaxValue>();
         _functionContext = new ConcurrentDictionary<Guid, Function>();
         _observableContext = new ConcurrentDictionary<Guid, IList<VariableObservable>>();
         _scriptContext = new ConcurrentDictionary<Guid, IReaxInterpreter>();
@@ -67,7 +67,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         if (isAsync) _asyncKeys.Add(key);
     }
 
-    public void DeclareImmutable(string identifier, LiteralNode node)
+    public void DeclareImmutable(string identifier, IReaxValue node)
     {
         var key = Guid.NewGuid();
         _symbols[identifier] = key;
@@ -83,7 +83,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         _symbols[identifier] = Guid.NewGuid();
     }
 
-    public void SetVariable(string identifier, LiteralNode value)
+    public void SetVariable(string identifier, IReaxValue value)
     {
         if (!_symbols.TryGetValue(identifier, out var key))
         {
@@ -187,7 +187,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         _bindContext[key] = interpreter;
     }
 
-    public LiteralNode GetVariable(string identifier)
+    public IReaxValue GetVariable(string identifier)
     {
         if (!_symbols.TryGetValue(identifier, out var key))
         {
@@ -210,7 +210,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         return value;
     }
 
-    public LiteralNode? GetBind(string identifier)
+    public IReaxValue? GetBind(string identifier)
     {
         if (!_symbols.TryGetValue(identifier, out var key))
         {
@@ -228,7 +228,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         return value.Output;
     }
 
-    private LiteralNode? GetParentBind(string identificar)
+    private IReaxValue? GetParentBind(string identificar)
     {
         try
         {
@@ -260,7 +260,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         return value;
     }
 
-    private LiteralNode? GetParentVariable(string identifier)
+    private IReaxValue? GetParentVariable(string identifier)
     {
         try
         {
@@ -375,7 +375,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
                 Type = GetIdentifierType(identifier),
                 Value = GetIdentifierType(identifier) switch
                 {
-                    "variable" => _variableContext[identifier].GetValue(this).ToString(),
+                    "variable" => _variableContext[identifier].ToString() ?? "",
                     "bind" => _bindContext[identifier].Output?.ToString() ?? "",
                     "function" => "function",
                     "module" => "module",

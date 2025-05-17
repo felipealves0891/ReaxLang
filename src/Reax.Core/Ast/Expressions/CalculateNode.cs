@@ -17,8 +17,8 @@ public record CalculateNode(
     public override LiteralNode Evaluation(IReaxExecutionContext context)
     {
         var op = (IArithmeticOperator)Operator;
-        var left = CalculateChild(Left, context).GetValue(context) as NumberNode;
-        var right = CalculateChild(Right, context).GetValue(context) as NumberNode;
+        var left = CalculateChild(Left, context) as NumberNode;
+        var right = CalculateChild(Right, context) as NumberNode;
 
         if(left is null)
             throw new InvalidOperationException($"Valor invalido para calculo '{left}'");
@@ -29,7 +29,7 @@ public record CalculateNode(
         return op.Calculate(left, right);
     }
 
-    private LiteralNode CalculateChild(ReaxNode node, IReaxExecutionContext context) 
+    private IReaxValue CalculateChild(ReaxNode node, IReaxExecutionContext context) 
     {
         if (node is ExpressionNode expression)
             return expression.Evaluation(context);

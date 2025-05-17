@@ -1,6 +1,7 @@
 using System;
 using Reax.Core.Ast;
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Parser.Node;
 using Reax.Runtime;
@@ -9,7 +10,7 @@ namespace Reax.Extensions;
 
 public static class ReaxNodeExtensions
 {
-    public static LiteralNode GetValue(this ReaxNode node, ReaxExecutionContext context) 
+    public static IReaxValue GetValue(this ReaxNode node, ReaxExecutionContext context) 
     {
         if(node is NumberNode number)
             return number;
@@ -26,7 +27,7 @@ public static class ReaxNodeExtensions
             throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
     }
 
-    private static (LiteralNode? Success, LiteralNode? Error) GetFunctionResult(FunctionCallNode functionCall, ReaxExecutionContext context)
+    private static (IReaxValue? Success, IReaxValue? Error) GetFunctionResult(FunctionCallNode functionCall, ReaxExecutionContext context)
     {
         var function = context.GetFunction(functionCall.Identifier);
         var parameters = functionCall.Parameter.Select(x => x.GetValue(context)).ToArray();

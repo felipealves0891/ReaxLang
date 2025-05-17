@@ -14,7 +14,7 @@ public record ExternalFunctionCallNode(
 {
     public override IReaxNode[] Children => [];
 
-    public override LiteralNode Evaluation(IReaxExecutionContext context)
+    public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
         if(context.ScriptExists(scriptName))
         {

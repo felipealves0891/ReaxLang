@@ -14,10 +14,10 @@ public record BinaryNode(
 {
     public override IReaxNode[] Children => [Left, Operator, Right];
 
-    public override LiteralNode Evaluation(IReaxExecutionContext context)
+    public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
         var left = Left is BinaryNode 
-                 ? new BooleanNode(((BinaryNode)Left).Evaluation(context).ToString(), Location) 
+                 ? new BooleanNode(((BinaryNode)Left).Evaluation(context).ToString() ?? "false", Location) 
                  : Left.GetValue(context);
 
         var right = Right is BinaryNode 
@@ -25,7 +25,7 @@ public record BinaryNode(
                  : Right.GetValue(context);
 
         var logical = (ILogicOperator)Operator;
-        return new BooleanNode(logical.Compare(left, right).ToString(), Operator.Location);
+        return new BooleanNode(logical.Compare((ReaxNode)left, (ReaxNode)right).ToString(), Operator.Location);
     }
 
     public override string ToString()

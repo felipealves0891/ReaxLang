@@ -20,12 +20,12 @@ public record AssignmentNode(
     {
         if (Assigned is ExpressionNode expression)
             context.SetVariable(Identifier.Identifier, expression.Evaluation(context));
-        else if (Assigned is LiteralNode literal)
-            context.SetVariable(Identifier.Identifier, literal);
-        else if (Assigned is ObjectNode @object)
-            context.SetVariable(Identifier.Identifier, @object);
+        else if (Assigned is VarNode var)
+            context.SetVariable(Identifier.Identifier, var.Evaluation(context));
+        else if (Assigned is IReaxValue value)
+            context.SetVariable(Identifier.Identifier, value);
         else
-            throw new Exception("Tipo invalido para direita de uma atribuição, era esperado uma expressão ou um literal!");
+            throw new Exception($"Tipo invalido para direita de uma atribuição {Assigned.GetType().Name}, era esperado uma expressão ou um literal!");
     }
 
     public override string ToString()

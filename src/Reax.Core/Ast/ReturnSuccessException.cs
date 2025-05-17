@@ -1,14 +1,15 @@
 using System;
+using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 
 namespace Reax.Core.Ast;
 
 public class ReturnSuccessException : Exception
 {
-    public ReturnSuccessException(LiteralNode literal)
+    public ReturnSuccessException(IReaxValue value)
     {
-        Literal = literal;
+        Value = value;
     }
 
-    public LiteralNode Literal { get; }
+    public IReaxValue Value { get; }
 }

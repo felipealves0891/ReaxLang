@@ -7,7 +7,7 @@ using Reax.Core.Ast.Literals;
 namespace Reax.Core.Ast.Expressions;
 
 [ExcludeFromCodeCoverage]
-public record VarNode : ExpressionNode, IReaxValue
+public record VarNode : ExpressionNode
 {
     public VarNode(
         string identifier, 
@@ -24,7 +24,7 @@ public record VarNode : ExpressionNode, IReaxValue
     public string Identifier { get; }
     public DataType Type { get; set; }
 
-    public override LiteralNode Evaluation(IReaxExecutionContext context)
+    public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
         return context.GetVariable(Identifier);
     }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Immutable;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Locations;
+using Reax.Core.Types;
 
 namespace Reax.Core.Ast.Objects;
 
@@ -9,8 +10,8 @@ public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Locati
     : ObjectNode(Location), IReaxValue, IEnumerable<ReaxNode>
 {
     public override IReaxNode[] Children => Literals.ToArray();
-
     public object Value => Literals.ToArray();
+    public DataType Type => DataType.ARRAY;
 
     public ReaxNode this[int i] => Literals[i];
 

@@ -18,7 +18,7 @@ public record IfNode(
         var left = Condition.Left.GetValue(context);
         var right = Condition.Right.GetValue(context);
         var logical = (ILogicOperator)Condition.Operator;
-        var result = logical.Compare(left, right);
+        var result = logical.Compare((ReaxNode)left, (ReaxNode)right);
         if(result)
         {
             var interpreter = context.CreateInterpreter(ToString(), True.Block);

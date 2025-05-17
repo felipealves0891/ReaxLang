@@ -13,7 +13,7 @@ public record FunctionCallNode(
 {
     public override IReaxNode[] Children => Parameter;
 
-    public override LiteralNode Evaluation(IReaxExecutionContext context)
+    public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
         var function = context.GetFunction(Identifier);
         var parameters = Parameter.Select(x => x.GetValue(context)).ToArray();
