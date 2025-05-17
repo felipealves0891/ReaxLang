@@ -38,6 +38,7 @@ public class ReaxLexerTest : BaseTest<ReaxLexer>
                 ["5 => 1", new TokenType[] {TokenType.NUMBER_LITERAL, TokenType.COMPARISON, TokenType.NUMBER_LITERAL, TokenType.EOF}],
                 ["[5, 10];", new TokenType[] { TokenType.OPEN_BRACKET, TokenType.NUMBER_LITERAL, TokenType.COMMA, TokenType.NUMBER_LITERAL, TokenType.CLOSE_BRACKET, TokenType.SEMICOLON, TokenType.EOF }],
                 ["\n\n\n\n", new TokenType[] {TokenType.EOF}],
+                ["for controle: int in [0]", new TokenType[] {TokenType.FOR, TokenType.IDENTIFIER, TokenType.TYPING, TokenType.INT_TYPE, TokenType.IN, TokenType.OPEN_BRACKET, TokenType.NUMBER_LITERAL, TokenType.CLOSE_BRACKET, TokenType.EOF}],
             ];
         }
     }

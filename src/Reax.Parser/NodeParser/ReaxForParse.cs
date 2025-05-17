@@ -8,6 +8,7 @@ using Reax.Core.Ast.Operations;
 using Reax.Core.Ast.Statements;
 using Reax.Parser.Extensions;
 using Reax.Core.Ast;
+using Reax.Parser.Helper;
 
 namespace Reax.Parser.NodeParser;
 
@@ -23,32 +24,71 @@ public class ReaxForParse : INodeParser
         source.Advance(TokenType.IDENTIFIER);
         var identifierControl = source.CurrentToken;
         source.Advance(TokenType.TYPING);
-        source.Advance([TokenType.FLOAT_TYPE, TokenType.LONG_TYPE, TokenType.INT_TYPE]);
+        source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken;
+
+        if (source.NextToken.Type == TokenType.IN)
+            return ParseIn(source, identifierControl, dataType);
+        else
+            return ParseTo(source, identifierControl, dataType);
+    }
+
+    private ReaxNode ParseTo(ITokenSource source, Token identifierControl, Token dataType)
+    {
         source.Advance(TokenType.ASSIGNMENT);
         source.Advance(TokenType.NUMBER_LITERAL);
         var initialValue = source.CurrentToken;
         source.Advance(TokenType.TO);
 
         var declaration = new DeclarationNode(
-            identifierControl.Source, 
-            false, 
-            false, 
+            identifierControl.Source,
+            false,
+            false,
             dataType.Type.ToDataType(),
-            new AssignmentNode(new VarNode(identifierControl.Source, DataType.NUMBER, identifierControl.Location), initialValue.ToReaxValue(), initialValue.Location), 
+            new AssignmentNode(new VarNode(identifierControl.Source, DataType.NUMBER, identifierControl.Location), initialValue.ToReaxValue(), initialValue.Location),
             identifierControl.Location);
-            
+
         source.Advance(TokenType.NUMBER_LITERAL);
 
         var limitValue = source.CurrentToken;
         var condition = new BinaryNode(
-            identifierControl.ToReaxValue(), 
-            new ComparisonNode("<", identifierControl.Location), 
+            identifierControl.ToReaxValue(),
+            new ComparisonNode("<", identifierControl.Location),
             limitValue.ToReaxValue(),
             identifierControl.Location);
-        
+
         source.Advance(TokenType.OPEN_BRACE);
         var block = (ContextNode)source.NextBlock();
         return new ForNode(declaration, condition, block, declaration.Location);
     }
+
+    private ReaxNode ParseIn(ITokenSource source, Token identifierControl, Token dataType)
+    {
+        source.Advance(TokenType.IN);
+        source.Advance([TokenType.IDENTIFIER, TokenType.OPEN_BRACKET]);
+        var array = GetArray(source);
+        var declaration = new DeclarationNode(
+            identifierControl.Source,
+            false,
+            false,
+            dataType.Type.ToDataType(),
+            null,
+            identifierControl.Location);
+
+        source.Advance(TokenType.OPEN_BRACE);
+        var block = (ContextNode)source.NextBlock();
+        return new ForInNode(declaration, array, block, declaration.Location);
+    }
+
+    private ReaxNode GetArray(ITokenSource source)
+    {
+        var start = source.CurrentToken;
+        if (source.CurrentToken.Type == TokenType.IDENTIFIER)
+            return new VarNode(source.CurrentToken.Source, DataType.NONE, source.CurrentToken.Location);
+
+        var arrayParse = new ReaxArrayParse();
+        return arrayParse.Parse(source)
+            ?? throw new InvalidOperationException($"{start.Source} - Era esperado um array no for in!");
+    }
+
 }

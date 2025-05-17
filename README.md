@@ -77,9 +77,16 @@ if meuNumero > 5 {
 }
 ```
 
-### Estrutura de repetições For
+### Estrutura de repetições For To
 ```
 for controle: int = 0 to 100 {
+	meuNumero = calculate.sum(meuNumero,1);
+}
+```
+
+### Estrutura de repetições For In
+```
+for controle: int in [3, 2, 1, 0] {
 	meuNumero = calculate.sum(meuNumero,1);
 }
 ```

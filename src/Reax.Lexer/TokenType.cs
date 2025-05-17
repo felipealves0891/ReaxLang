@@ -32,6 +32,7 @@ public enum TokenType
     WHEN,
     FOR,
     TO,
+    IN,
     WHILE,
     AND,
     OR,

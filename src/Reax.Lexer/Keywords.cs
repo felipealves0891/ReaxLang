@@ -26,6 +26,8 @@ public static class Keywords
     
     public static byte[] TO => [(byte)'t', (byte)'o'];
 
+    public static byte[] IN => [(byte)'i', (byte)'n'];
+
     public static byte[] WHILE => [(byte)'w', (byte)'h', (byte)'i', (byte)'l', (byte)'e'];
 
     public static byte[] AND => [(byte)'a', (byte)'n', (byte)'d'];
@@ -77,6 +79,7 @@ public static class Keywords
         if (WHEN.SequenceEqual(chars)) return TokenType.WHEN;
         if (FOR.SequenceEqual(chars)) return TokenType.FOR;
         if (TO.SequenceEqual(chars)) return TokenType.TO;
+        if (IN.SequenceEqual(chars)) return TokenType.IN;
         if (WHILE.SequenceEqual(chars)) return TokenType.WHILE;
         if (AND.SequenceEqual(chars)) return TokenType.AND;
         if (OR.SequenceEqual(chars)) return TokenType.OR;
