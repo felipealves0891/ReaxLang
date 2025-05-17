@@ -97,7 +97,7 @@ public class ReaxLexer
         if(_source.CurrentChar == DOT)
             return AdvanceAndReturn(TokenType.ACCESS, _source.CurrentChar);
         if(_source.CurrentChar == COLON)
-            return AdvanceAndReturn(TokenType.TYPING, _source.CurrentChar);
+            return AdvanceAndReturn(TokenType.COLON, _source.CurrentChar);
         if(_source.CurrentChar == PIPE)
             return AdvanceAndReturn(TokenType.PIPE, _source.CurrentChar);
         if(_source.CurrentChar == OPEN_BRACKET)

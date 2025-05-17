@@ -44,7 +44,7 @@ public enum TokenType
     CONST,
     ASYNC,
     BIND,
-    TYPING,
+    COLON,
     PIPE,
     SUCCESS,
     ERROR,

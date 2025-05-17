@@ -23,7 +23,7 @@ public class ReaxForParse : INodeParser
     {
         source.Advance(TokenType.IDENTIFIER);
         var identifierControl = source.CurrentToken;
-        source.Advance(TokenType.TYPING);
+        source.Advance(TokenType.COLON);
         source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken;
 

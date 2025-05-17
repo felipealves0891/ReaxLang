@@ -63,7 +63,7 @@ public class ReaxDeclarationParse : INodeParser
     private Token GetIdentifier(ITokenSource source) 
     {
         var identifier = source.CurrentToken;
-        source.Advance([TokenType.TYPING]);
+        source.Advance([TokenType.COLON]);
         source.Advance(Token.DataTypes);
         return identifier;        
     }
