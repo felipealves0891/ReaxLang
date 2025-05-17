@@ -58,18 +58,20 @@ public sealed class RunCommand : Command<RunCommand.Settings>
 
         }
 
-        var interpreter = ReaxCompiler.Compile(settings.ComputedScript);
-
+        IReaxInterpreter interpreter = null!;
+        
         try
         {
-            
+            interpreter = ReaxCompiler.Compile(settings.ComputedScript);
             interpreter.Interpret();   
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error: "); 
             Console.WriteLine("Reax Error: {0}", ex.Message);
-            Console.WriteLine(interpreter.PrintStackTrace());
+            
+            if (interpreter is not null)
+                Console.WriteLine(interpreter.PrintStackTrace());
         }
         finally
         {

@@ -5,6 +5,7 @@ using Reax.Parser.Extensions;
 using Reax.Parser.Node;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast;
+using Reax.Parser.Helper;
 
 namespace Reax.Parser.NodeParser;
 
@@ -18,41 +19,15 @@ public class ReaxExternalFunctionCallParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         var scriptName = source.CurrentToken;
-        source.Advance();
-        source.Advance();
+        source.Advance(TokenType.ACCESS);
+        source.Advance(TokenType.IDENTIFIER);
         var identifier = source.CurrentToken;
+        source.Advance(TokenType.OPEN_PARENTHESIS);
+        var parameters = ParameterHelper.GetCallParameters(source);
         source.Advance();
-        if(source.CurrentToken.Type != TokenType.OPEN_PARENTHESIS)
-            throw new InvalidOperationException($"Era esperado um abre parenteses '(' na linha {source.CurrentToken.Row}!");
-        
-        source.Advance();
-        var parameters = new List<ReaxNode>();
-        while(source.CurrentToken.Type != TokenType.CLOSE_PARENTHESIS)
-        {
-            if(source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type == TokenType.OPEN_PARENTHESIS)
-                parameters.Add(functionCall(source));
-            else if(source.CurrentToken.IsReaxValue())
-                parameters.Add(source.CurrentToken.ToReaxValue());
-            else if(source.CurrentToken.Type != TokenType.COMMA)
-                throw new InvalidOperationException($"Token invalido '{source.CurrentToken}' na linha {source.CurrentToken.Row}.");
-
-            source.Advance();
-        }
-        source.Advance();
-
-        if(!source.EndOfTokens)
-            source.Advance();
-
         return new ExternalFunctionCallNode(
             scriptName.Source, 
             new FunctionCallNode(identifier.Source, parameters.ToArray(), identifier.Location),
             identifier.Location);
-    }
-
-    private ReaxNode functionCall(ITokenSource source) 
-    {
-        var location = source.CurrentToken.Location;
-        var parser = new ReaxFunctionCallParse();
-        return parser.Parse(source) ?? throw new InvalidOperationException($"{location} - Era esperado uma função!");
     }
 }

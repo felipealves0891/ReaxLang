@@ -29,7 +29,10 @@ public class TypeCheckingRule : BaseRule
         var assignment = (AssignmentNode)node;
         var expected = GetDataType(assignment.Identifier);
         var current = GetDataType(assignment.Assigned);
-        if (current.HasFlag(expected))
+
+        if (current.HasFlag(expected) && assignment.Assigned is ExpressionNode)
+            return ValidationResult.Success();
+        else if (expected == current && assignment.Assigned is ObjectNode or LiteralNode)
             return ValidationResult.Success();
         else
             return ValidationResult.FailureIncompatibleTypes(expected, current, assignment.Location);
@@ -150,6 +153,8 @@ public class TypeCheckingRule : BaseRule
             return GetDataTypeByIf(ifNode);
         else if (node is ArrayNode arrayNode)
             return GetDataTypeByArray(arrayNode);
+        else if (node is ArrayAccessNode arrayItem)
+            return GetDataTypeByArrayItem(arrayItem);
         else
             return DataType.NONE;
     }
@@ -239,5 +244,19 @@ public class TypeCheckingRule : BaseRule
         }
 
         return type | DataType.ARRAY;
-    } 
+    }
+
+    private DataType GetDataTypeByArrayItem(ArrayAccessNode arrayAccessNode)
+    {
+        var symbol = Context.Resolve(arrayAccessNode.Array.Identifier);
+        if (symbol is null)
+            return DataType.NONE;
+
+        if (symbol.Type.HasFlag(DataType.STRING))
+            return DataType.STRING;
+        else if (symbol.Type.HasFlag(DataType.NUMBER))
+            return DataType.NUMBER;
+        else
+            return DataType.NONE;
+    }
 }

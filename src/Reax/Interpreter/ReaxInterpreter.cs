@@ -103,13 +103,11 @@ public class ReaxInterpreter : IReaxInterpreter
     public void Interpret(bool rethrow = false)
     {
         Initialize();
-        Logger.LogInterpreter($"################################### Start {Name} ###################################");
         foreach (var node in _nodes)
         {
             ProcessNode(node, rethrow);
             if ((Output is not null and not NullNode) || (Error is not null and not NullNode)) break;
         }
-        Logger.LogInterpreter($"#################################### END  {Name} ###################################");
     }
 
     private void ProcessNode(ReaxNode node, bool rethrow = false)

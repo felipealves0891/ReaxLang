@@ -3,11 +3,7 @@
 
 Reax é uma linguagem de programação reativa e estática com sintaxe simples, foco em legibilidade e execução orientada a eventos. Ela permite que você escreva código expressivo com reações automáticas a mudanças de estado.
 
-  
-
 ### Por que usar a Reax?
-
-  
 
 - Sintaxe intuitiva e expressiva
 
@@ -26,6 +22,13 @@ Reax é uma linguagem de programação reativa e estática com sintaxe simples, 
 
 ```
 let contador: int = 0;
+```
+
+### Declarando arrays
+
+```
+let meuArray: int[] = [3, 2, 1, 0];
+let item = int = meuArray[0]; # ira retornar o numeral 3 póis é o indice 0 
 ```
 
 ### Constantes são variáveis imutáveis, podendo manter a segurança sem o medo de imprevistos

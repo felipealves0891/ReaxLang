@@ -22,7 +22,7 @@ public class InterpreterFunction : Function
 
     public override (IReaxValue? Success, IReaxValue? Error) Invoke(params IReaxValue[] parameters)
     {
-        _interpreter.Interpret(_identifier, true, parameters);
+        _interpreter.Interpret(_identifier, false, parameters);
         return (_interpreter.Output, _interpreter.Error);
     }
 }

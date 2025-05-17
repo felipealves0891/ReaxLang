@@ -40,8 +40,7 @@ public class ReaxCompiler
             Console.WriteLine(results.Message);
             Environment.Exit(-1);
         }
-            
-
+        
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast.ToArray());
     }

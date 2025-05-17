@@ -6,6 +6,7 @@ using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Operations;
 using Reax.Core.Ast;
+using Reax.Core.Types;
 
 namespace Reax.Parser.Helper;
 
@@ -42,7 +43,7 @@ public class ExpressionHelper
     }
 
     private Token Peek() => _pos < _tokens.Length ? _tokens[_pos] : new Token(TokenType.EOF, (byte)' ', "", -1, -1);
-    private Token Consume() => _tokens[_pos++];
+    private Token Consume() => _pos + 1 <= _tokens.Length ? _tokens[_pos++] : new Token(TokenType.EOF, (byte)' ', "", -1, -1);
 
     private ReaxNode ParseExpression() 
     {
@@ -108,26 +109,34 @@ public class ExpressionHelper
         Consume();
 
         var peek = Peek();
-        if(peek.Type == TokenType.ACCESS)
+        if (peek.Type == TokenType.OPEN_BRACKET)
         {
             Consume();
-            var functionCall = (FunctionCallNode)Parse(Peek()); 
+            var variable = new VarNode(token.Source, DataType.NONE, token.Location);
+            var expression = ParseExpression();
+            return new ArrayAccessNode(variable, expression, expression.Location); 
+        }
+        else if (peek.Type == TokenType.ACCESS)
+        {
+            Consume();
+            var functionCall = (FunctionCallNode)Parse(Peek());
             return new ExternalFunctionCallNode(token.Source, functionCall, token.Location);
         }
-        else if(peek.Type == TokenType.OPEN_PARENTHESIS)
+        else if (peek.Type == TokenType.OPEN_PARENTHESIS)
         {
             Consume();
             var identifier = token;
             var listParameters = new List<ReaxNode>();
 
-            while(Peek().Type != TokenType.CLOSE_PARENTHESIS && Peek().Type != TokenType.EOF)
+            while (Peek().Type != TokenType.CLOSE_PARENTHESIS && Peek().Type != TokenType.EOF)
             {
-                if(Peek().Type != TokenType.COMMA)
+                if (Peek().Type != TokenType.COMMA)
                     listParameters.Add(ParseValue());
 
                 Consume();
             }
-            
+
+            Consume();
             return new FunctionCallNode(identifier.Source, listParameters.ToArray(), identifier.Location);
         }
         else

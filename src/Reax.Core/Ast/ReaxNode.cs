@@ -12,12 +12,14 @@ public abstract record ReaxNode(SourceLocation Location) : IReaxNode
 
     public IReaxValue GetValue(IReaxExecutionContext context) 
     {
-        if(this is LiteralNode number)
+        if (this is ExpressionNode expression)
+            return expression.Evaluation(context);
+        else if (this is LiteralNode number)
             return number;
-        else if(this is VarNode variable)
+        else if (this is VarNode variable)
             return context.GetVariable(variable.Identifier);
-        else if(this is FunctionCallNode functionCall)
-            return (GetFunctionResult(functionCall, context).Success 
+        else if (this is FunctionCallNode functionCall)
+            return (GetFunctionResult(functionCall, context).Success
                  ?? GetFunctionResult(functionCall, context).Error) ?? new NullNode(Location);
         else
             throw new InvalidOperationException("Não foi possivel identificar o tipo da variavel!");
