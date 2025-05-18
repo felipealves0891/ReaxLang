@@ -7,6 +7,7 @@ using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Operations;
 using Reax.Core.Ast;
 using Reax.Core.Types;
+using Reax.Core.Ast.Objects.Structs;
 
 namespace Reax.Parser.Helper;
 
@@ -114,13 +115,20 @@ public class ExpressionHelper
             Consume();
             var variable = new VarNode(token.Source, DataType.NONE, token.Location);
             var expression = ParseExpression();
-            return new ArrayAccessNode(variable, expression, expression.Location); 
+            return new ArrayAccessNode(variable, expression, expression.Location);
         }
         else if (peek.Type == TokenType.ACCESS)
         {
             Consume();
             var functionCall = (FunctionCallNode)Parse(Peek());
             return new ExternalFunctionCallNode(token.Source, functionCall, token.Location);
+        }
+        else if (peek.Type == TokenType.ARROW)
+        {
+            var obj = token;
+            Consume();
+            var property = (VarNode)Parse(Peek());
+            return new StructFieldAccessNode(obj.Source, property.Identifier, obj.Location);
         }
         else if (peek.Type == TokenType.OPEN_PARENTHESIS)
         {

@@ -46,6 +46,7 @@ public class ReaxForParse : INodeParser
             false,
             dataType.Type.ToDataType(),
             new AssignmentNode(new VarNode(identifierControl.Source, DataType.NUMBER, identifierControl.Location), initialValue.ToReaxValue(), initialValue.Location),
+            null,
             identifierControl.Location);
 
         source.Advance(TokenType.NUMBER_LITERAL);
@@ -72,6 +73,7 @@ public class ReaxForParse : INodeParser
             false,
             false,
             dataType.Type.ToDataType(),
+            null,
             null,
             identifierControl.Location);
 

@@ -10,6 +10,7 @@ using Reax.Semantic.Contexts;
 using Reax.Core.Ast;
 using Reax.Core.Ast.Objects;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Objects.Structs;
 
 namespace Reax.Semantic.Rules;
 
@@ -24,7 +25,7 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(ExternalFunctionCallNode)] = ApplyExternalFunctionCallNode;
         Handlers[typeof(ForInNode)] = ApplyForInNode;
         Handlers[typeof(ArrayNode)] = ApplyArrayNode;
-        Handlers[typeof(StructInstanceNode)] = ApplyStructInstanceNode;
+        Handlers[typeof(StructInstanceNode)] = ApplyStructInstanceNode;        
     }
 
     private ValidationResult ApplyStructInstanceNode(IReaxNode node)
@@ -236,8 +237,24 @@ public class TypeCheckingRule : BaseRule
             return GetDataTypeByArrayItem(arrayItem);
         else if (node is StructInstanceNode)
             return DataType.STRUCT;
+        else if (node is StructFieldAccessNode fieldAccessNode)
+            return GetDataTypeByProperty(fieldAccessNode);
         else
             return DataType.NONE;
+    }
+
+    private DataType GetDataTypeByProperty(StructFieldAccessNode fieldAccessNode)
+    {
+        var symbol = Context.Resolve(fieldAccessNode.Identifier);
+        if (symbol is null || symbol.ParentIdentifier is null)
+            return DataType.NONE;
+
+        var properties = Context.ResolveChildren(symbol.ParentIdentifier);
+        var property = properties.FirstOrDefault(x => x.Identifier == fieldAccessNode.Property && x.Category == SymbolCategory.PROPERTY);
+        if (property is null)
+            return DataType.NONE;
+        else
+            return property.Type;
     }
 
     private DataType GetDataTypeByIdentifier(string identifier, string? script = null)

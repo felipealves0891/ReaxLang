@@ -7,6 +7,7 @@ using Reax.Semantic.Contexts;
 using Reax.Core.Ast;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Functions;
+using Reax.Core.Ast.Objects;
 
 namespace Reax.Semantic.Rules;
 
@@ -29,18 +30,18 @@ public class SymbolRule : BaseRule
         var declaration = (DeclarationNode)node;
         if (declaration.Immutable)
         {
-            var symbol = Symbol.CreateConst(declaration.Identifier, declaration.Type, declaration.Location);
+            var symbol = Symbol.CreateConst(declaration.Identifier, declaration.Type, declaration.Location, declaration.ComplexType);
             return Context.Declare(symbol);
         }
 
         if (declaration.Async)
         {
-            var symbol = Symbol.CreateLetAsync(declaration.Identifier, declaration.Type, declaration.Location);
+            var symbol = Symbol.CreateLetAsync(declaration.Identifier, declaration.Type, declaration.Location, declaration.ComplexType);
             return Context.Declare(symbol);
         }
         else
         {
-            var symbol = Symbol.CreateLet(declaration.Identifier, declaration.Type, declaration.Location);
+            var symbol = Symbol.CreateLet(declaration.Identifier, declaration.Type, declaration.Location, declaration.ComplexType);
             return Context.Declare(symbol);
         }
 
@@ -166,7 +167,4 @@ public class SymbolRule : BaseRule
 
         return result;
     }
-
-
-    
 }

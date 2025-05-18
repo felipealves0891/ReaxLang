@@ -8,7 +8,6 @@ namespace Reax.Core.Ast.Objects.Structs;
 public record StructFieldAccessNode(
     string Identifier,
     string Property,
-    ReaxNode Node,
     SourceLocation Location) 
     : ExpressionNode(Location)
 {
