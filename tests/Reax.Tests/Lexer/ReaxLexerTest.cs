@@ -39,6 +39,8 @@ public class ReaxLexerTest : BaseTest<ReaxLexer>
                 ["[5, 10];", new TokenType[] { TokenType.OPEN_BRACKET, TokenType.NUMBER_LITERAL, TokenType.COMMA, TokenType.NUMBER_LITERAL, TokenType.CLOSE_BRACKET, TokenType.SEMICOLON, TokenType.EOF }],
                 ["\n\n\n\n", new TokenType[] {TokenType.EOF}],
                 ["for controle: int in [0]", new TokenType[] {TokenType.FOR, TokenType.IDENTIFIER, TokenType.COLON, TokenType.INT_TYPE, TokenType.IN, TokenType.OPEN_BRACKET, TokenType.NUMBER_LITERAL, TokenType.CLOSE_BRACKET, TokenType.EOF}],
+                ["struct Lang { name: string }", new TokenType[] {TokenType.STRUCT, TokenType.IDENTIFIER, TokenType.OPEN_BRACE, TokenType.IDENTIFIER, TokenType.COLON, TokenType.STRING_TYPE, TokenType.CLOSE_BRACE, TokenType.EOF}],
+                ["let p: @Pessoal;", new TokenType[] {TokenType.LET, TokenType.IDENTIFIER, TokenType.COLON, TokenType.AT, TokenType.IDENTIFIER, TokenType.SEMICOLON, TokenType.EOF}],
             ];
         }
     }

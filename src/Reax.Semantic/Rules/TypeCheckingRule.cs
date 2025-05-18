@@ -24,6 +24,53 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(ExternalFunctionCallNode)] = ApplyExternalFunctionCallNode;
         Handlers[typeof(ForInNode)] = ApplyForInNode;
         Handlers[typeof(ArrayNode)] = ApplyArrayNode;
+        Handlers[typeof(StructInstanceNode)] = ApplyStructInstanceNode;
+    }
+
+    private ValidationResult ApplyStructInstanceNode(IReaxNode node)
+    {
+        var instance = (StructInstanceNode)node;
+        var result = ValidationResult.Success();
+
+        var symbol = Context.Resolve(instance.Name);
+        if (symbol is null)
+            result.Join(ValidationResult.FailureSymbolUndeclared(instance.Name, instance.Location));
+
+        result.Join(ApplyStructInstanceNodeValidateProperties(instance));
+        return result;
+
+    }
+
+    private ValidationResult ApplyStructInstanceNodeValidateProperties(
+        StructInstanceNode instance)
+    {
+        var result = ValidationResult.Success();
+        var symbolProperties = Context.ResolveChildren(instance.Name);
+        foreach (var value in instance.FieldValues)
+        {
+            var symbolProperty = symbolProperties.FirstOrDefault(x => x.Identifier == value.Key);
+            if (symbolProperty is null)
+            {
+                result.Join(
+                    ValidationResult.FailureSymbolUndeclared(
+                        $"{instance.Name}.{value.Key}",
+                        instance.Location));
+
+                continue;
+            }
+
+            var expectedType = symbolProperty.Type;
+            var currentType = GetDataType(value.Value);
+            if (expectedType != currentType)
+                result.Join(
+                    ValidationResult.FailureIncompatibleTypes(
+                        expectedType,
+                        currentType,
+                        value.Value.Location));
+
+        }
+        
+        return result;
     }
 
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
@@ -69,7 +116,7 @@ public class TypeCheckingRule : BaseRule
         if (symbol is null)
             return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
 
-        var expectedParameters = Context.ResolveParameters(call.Identifier);
+        var expectedParameters = Context.ResolveChildren(call.Identifier);
         var passedParameters = call.Parameter;
 
         return ValidateParameters(
@@ -88,7 +135,7 @@ public class TypeCheckingRule : BaseRule
         if (symbol is null)
             return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
 
-        var expectedParameters = Context.ResolveParameters(call.Identifier, external.scriptName);
+        var expectedParameters = Context.ResolveChildren(call.Identifier, external.scriptName);
         var passedParameters = call.Parameter;
 
         return ValidateParameters(
@@ -187,6 +234,8 @@ public class TypeCheckingRule : BaseRule
             return GetDataTypeByArray(arrayNode);
         else if (node is ArrayAccessNode arrayItem)
             return GetDataTypeByArrayItem(arrayItem);
+        else if (node is StructInstanceNode)
+            return DataType.STRUCT;
         else
             return DataType.NONE;
     }

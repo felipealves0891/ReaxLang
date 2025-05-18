@@ -337,7 +337,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
 
     }
 
-    public Function? GetParentModule(string identifier, string functionName)
+    private Function? GetParentModule(string identifier, string functionName)
     {
         try
         {

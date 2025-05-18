@@ -29,6 +29,5 @@ public interface IReaxExecutionContext
     Function GetFunction(string identifier);
     IReaxInterpreter GetScript(string identifier);
     Function GetModule(string identifier, string functionName);
-    Function? GetParentModule(string identifier, string functionName);
     IEnumerable<DebuggerModel> Debug();
 }

@@ -54,6 +54,8 @@ public static class Keywords
 
     public static byte[] MATCH => [(byte)'m', (byte)'a', (byte)'t', (byte)'c', (byte)'h'];
 
+    public static byte[] STRUCT => [(byte)'s', (byte)'t', (byte)'r', (byte)'u', (byte)'c', (byte)'t'];
+
     public static byte[] BOOLEAN_TYPE = [(byte)'b', (byte)'o', (byte)'o', (byte)'l'];
 
     public static byte[] FLOAT_TYPE = [(byte)'f', (byte)'l', (byte)'o', (byte)'a', (byte)'t'];
@@ -93,6 +95,7 @@ public static class Keywords
         if (SUCCESS.SequenceEqual(chars)) return TokenType.SUCCESS;
         if (ERROR.SequenceEqual(chars)) return TokenType.ERROR;
         if (MATCH.SequenceEqual(chars)) return TokenType.MATCH;
+        if (STRUCT.SequenceEqual(chars)) return TokenType.STRUCT;
         if (BOOLEAN_TYPE.SequenceEqual(chars)) return TokenType.BOOLEAN_TYPE;
         if (FLOAT_TYPE.SequenceEqual(chars)) return TokenType.FLOAT_TYPE;
         if (INT_TYPE.SequenceEqual(chars)) return TokenType.INT_TYPE;
