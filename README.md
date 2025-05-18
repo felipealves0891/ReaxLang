@@ -31,6 +31,27 @@ let meuArray: int[] = [3, 2, 1, 0];
 let item = int = meuArray[0]; # ira retornar o numeral 3 póis é o indice 0 
 ```
 
+### Declarando structs
+
+```
+struct Pessoa {
+	nome: string,
+	idade: int
+}
+```
+
+Atenção ao caracter (@) arroba para indicar que é um tipo complexo
+```
+let pessoa: @Pessoa = {
+	nome: 'Felipe',
+	idade: 33
+}
+```
+
+```
+console.writer(pessoa->nome);
+```
+
 ### Constantes são variáveis imutáveis, podendo manter a segurança sem o medo de imprevistos
 ```
 const limite: int = 10;
