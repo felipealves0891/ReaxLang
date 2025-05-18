@@ -48,6 +48,7 @@ let pessoa: @Pessoa = {
 }
 ```
 
+Acessando uma propriedade do objeto
 ```
 console.writer(pessoa->nome);
 ```
