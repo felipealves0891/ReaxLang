@@ -1,7 +1,6 @@
 using Reax.Interpreter;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Interfaces;
-using Reax.Extensions;
 using Reax.Core;
 using Reax.Core.Ast;
 

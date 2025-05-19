@@ -8,7 +8,7 @@ namespace Reax.Core.Ast.Objects.Structs;
 public record StructFieldAccessNode(
     string Identifier,
     string Property,
-    SourceLocation Location) 
+    SourceLocation Location)
     : ExpressionNode(Location)
 {
     public override IReaxNode[] Children => [];
@@ -18,5 +18,10 @@ public record StructFieldAccessNode(
         var variable = context.GetVariable(Identifier);
         var obj = (StructInstanceNode)variable;
         return obj.FieldValues[Property].GetValue(context);
+    }
+
+    public override string ToString()
+    {
+        return $"{Identifier}->{Property}";
     }
 }

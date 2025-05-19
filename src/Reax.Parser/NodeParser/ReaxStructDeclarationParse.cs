@@ -28,15 +28,21 @@ public class ReaxStructDeclarationParse : INodeParser
             var propertyName = source.CurrentToken;
             source.Advance(TokenType.COLON);
             source.Advance(Token.DataTypes);
-            var propertyType = source.CurrentToken;
+            var propertyType = source.CurrentToken.Type.ToDataType();
+            if (source.NextToken.Type == TokenType.OPEN_BRACKET)
+            {
+                source.Advance(TokenType.OPEN_BRACKET);
+                propertyType = propertyType | Core.Types.DataType.ARRAY;
+                source.Advance(TokenType.CLOSE_BRACKET);
+            }
 
             properties.Add(new StructFieldNode(
                 propertyName.Source,
-                propertyType.Type.ToDataType(),
+                propertyType,
                 new SourceLocation(
                     propertyName.File,
                     propertyName.Location.Start,
-                    propertyType.Location.End)));
+                    propertyName.Location.End)));
 
             source.Advance([TokenType.COMMA, TokenType.CLOSE_BRACE]);
         }

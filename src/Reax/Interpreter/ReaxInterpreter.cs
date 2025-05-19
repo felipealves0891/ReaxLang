@@ -12,8 +12,6 @@ using Reax.Runtime;
 using Reax.Runtime.Functions;
 using System.Text;
 using Reax.Core.Ast;
-using Reax.Extensions;
-using Reax.Core.Functions;
 using Reax.Core;
 using System.Runtime.CompilerServices;
 

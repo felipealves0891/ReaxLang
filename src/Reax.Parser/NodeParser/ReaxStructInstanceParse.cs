@@ -29,7 +29,7 @@ public class ReaxStructInstanceParse : INodeParser
             var identifier = source.CurrentToken;
             source.Advance(TokenType.COLON);
             source.Advance();
-            var value = ExpressionHelper.Parser(NextToComma(source));
+            var value = GetValue(source);
             fieldValues.Add(identifier.Source, value);
         }
         while (source.CurrentToken.Type != TokenType.CLOSE_BRACE);
@@ -44,12 +44,24 @@ public class ReaxStructInstanceParse : INodeParser
                 source.CurrentToken.Location.End));
     }
 
+    private ReaxNode GetValue(ITokenSource source)
+    {
+        if (source.CurrentToken.Type != TokenType.OPEN_BRACKET)
+            return ExpressionHelper.Parser(NextToComma(source));
+
+        var array = ArrayHelper.Parse(source);
+        source.Advance([TokenType.COMMA, TokenType.CLOSE_BRACE]);
+        return array;
+    }
+
     private IEnumerable<Token> NextToComma(ITokenSource source)
     {
-        while (source.CurrentToken.Type != TokenType.COMMA && source.CurrentToken.Type != TokenType.CLOSE_BRACE)
+        while (source.CurrentToken.Type != TokenType.COMMA
+            && source.CurrentToken.Type != TokenType.CLOSE_BRACE)
         {
             yield return source.CurrentToken;
             source.Advance();
-        }            
+        }
     }
+    
 }

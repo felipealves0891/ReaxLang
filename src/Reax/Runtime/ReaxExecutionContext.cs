@@ -8,7 +8,6 @@ using Reax.Core.Ast.Literals;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Observables;
 using Reax.Core.Functions;
-using Reax.Extensions;
 using Reax.Core;
 using Reax.Core.Ast;
 

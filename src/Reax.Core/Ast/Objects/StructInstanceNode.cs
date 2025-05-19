@@ -9,11 +9,11 @@ namespace Reax.Core.Ast.Objects;
 public record StructInstanceNode(
     string Name,
     Dictionary<string, ReaxNode> FieldValues,
-    SourceLocation Location) : ObjectNode(Location), IReaxValue
+    SourceLocation Location) : ObjectNode(Location)
 {
     public override IReaxNode[] Children => FieldValues.Values.Cast<IReaxNode>().ToArray();
-    public object Value => FieldValues;
-    public DataType Type => DataType.STRUCT;
+    public override object Value => FieldValues;
+    public override DataType Type => DataType.STRUCT;
 
     public override string ToString()
     {        

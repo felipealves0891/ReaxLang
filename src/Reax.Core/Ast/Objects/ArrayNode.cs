@@ -7,11 +7,11 @@ using Reax.Core.Types;
 namespace Reax.Core.Ast.Objects;
 
 public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Location)
-    : ObjectNode(Location), IReaxValue, IEnumerable<ReaxNode>
+    : ObjectNode(Location), IEnumerable<ReaxNode>
 {
     public override IReaxNode[] Children => Literals.ToArray();
-    public object Value => Literals.ToArray();
-    public DataType Type => DataType.ARRAY;
+    public override object Value => Literals.ToArray();
+    public override DataType Type => DataType.ARRAY;
 
     public ReaxNode this[int i] => Literals[i];
 

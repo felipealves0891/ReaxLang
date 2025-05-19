@@ -337,13 +337,10 @@ public class TypeCheckingRule : BaseRule
 
     private DataType GetDataTypeByArrayItem(ArrayAccessNode arrayAccessNode)
     {
-        var symbol = Context.Resolve(arrayAccessNode.Array.Identifier);
-        if (symbol is null)
-            return DataType.NONE;
-
-        if (symbol.Type.HasFlag(DataType.STRING))
+        var expectedType = GetDataType(arrayAccessNode.Array);
+        if (expectedType.HasFlag(DataType.STRING))
             return DataType.STRING;
-        else if (symbol.Type.HasFlag(DataType.NUMBER))
+        else if (expectedType.HasFlag(DataType.NUMBER))
             return DataType.NUMBER;
         else
             return DataType.NONE;
