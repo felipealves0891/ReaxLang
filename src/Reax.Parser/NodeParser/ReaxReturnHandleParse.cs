@@ -22,7 +22,7 @@ public class ReaxReturnHandleParse : INodeParser
         source.Advance([TokenType.SUCCESS, TokenType.ERROR]);
         var resultBranch = source.CurrentToken.Type;
         source.Advance();
-        var statement = source.NextStatement().ToArray();
+        var statement = source.NextExpression().ToArray();
 
         ReaxNode result;
         if(statement.Length == 1)

@@ -28,7 +28,7 @@ public class ReaxObservableParse : INodeParser
         if(source.CurrentToken.Type == TokenType.WHEN)
         {
             source.Advance();    
-            var statement = source.NextStatement();
+            var statement = source.NextExpression();
             condition = ExpressionHelper.ParserBinary(statement.ToArray());
         }
 

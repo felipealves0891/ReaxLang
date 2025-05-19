@@ -66,7 +66,7 @@ public class ReaxParser : ITokenSource
         throw new Exception($"Token invalido na linha {CurrentToken.Row}: {CurrentToken}");
     }
 
-    public IEnumerable<Token> NextStatement() 
+    public IEnumerable<Token> NextExpression() 
     {
         while(true)
         {

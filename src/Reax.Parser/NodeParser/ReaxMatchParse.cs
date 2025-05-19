@@ -19,7 +19,7 @@ public class ReaxMatchParse : INodeParser
     {
         var location = source.CurrentToken.Location;
         source.Advance();
-        ReaxNode expression = ExpressionHelper.Parser(source.NextStatement());
+        ReaxNode expression = ExpressionHelper.Parser(source.NextExpression());
         
         ActionNode? success = null;
         ActionNode? error = null;
@@ -54,7 +54,7 @@ public class ReaxMatchParse : INodeParser
         if(source.CurrentToken.Type == TokenType.ARROW)
         {
             source.Advance();
-            var value = ExpressionHelper.Parser(source.NextStatement());
+            var value = ExpressionHelper.Parser(source.NextExpression());
             expression = new ReturnSuccessNode(value, value.Location);
         }
         else if(source.CurrentToken.Type == TokenType.OPEN_BRACE)

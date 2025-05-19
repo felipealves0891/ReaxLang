@@ -18,7 +18,7 @@ public class ReaxArithmeticOperationParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        var statement = source.NextStatement();
+        var statement = source.NextExpression();
         var node = ExpressionHelper.Parser(statement.ToArray());
         
         if(node is null)

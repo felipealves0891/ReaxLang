@@ -18,7 +18,7 @@ public class ReaxIfNodeParse : INodeParser
     public ReaxNode? Parse(ITokenSource source)
     {
         source.Advance();
-        var statement = source.NextStatement().ToArray();
+        var statement = source.NextExpression().ToArray();
         var condition = ExpressionHelper.ParserBinary(statement);
         var @true = (ContextNode)source.NextBlock();
         ContextNode? @else = null;

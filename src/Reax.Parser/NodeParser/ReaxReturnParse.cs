@@ -25,7 +25,7 @@ public class ReaxReturnParse : INodeParser
     {
         var location = source.CurrentToken.Location;
         source.Advance();
-        var statement = source.NextStatement().ToArray();
+        var statement = source.NextExpression().ToArray();
 
         ReaxNode result;
         

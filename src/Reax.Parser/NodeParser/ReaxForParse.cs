@@ -91,7 +91,7 @@ public class ReaxForParse : INodeParser
             return new VarNode(source.CurrentToken.Source, DataType.NONE, source.CurrentToken.Location);
 
         if (source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type == TokenType.ARROW)
-            return ExpressionHelper.Parser(source.NextStatement());
+            return ExpressionHelper.Parser(source.NextExpression());
 
         var arrayParse = new ReaxArrayParse();
         return arrayParse.Parse(source)
