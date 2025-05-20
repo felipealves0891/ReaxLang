@@ -17,20 +17,11 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         [Description("Caso não seja passado o script a ser executado, sera assumido que o main.reax sera executado.")]
         [CommandArgument(0, "[script]")]
         public string? Script { get; set; }
-        
-        [Description("Execução com debug ativo.")]
-        [CommandOption("-d|--debug")]
-        [DefaultValue(false)]
-        public bool Debug { get; set; }
 
-        [Description("Caminho para arquivo de configurações.")]
-        [CommandOption("-c|--configuration")]
-        public string? PathConfigurations { get; set; }
-        
-        [Description("Os break points devem ser no formato 'arquivo.reax:10,25,32'")]
-        [CommandOption("-b|--breakPoints")]
-        public string? BreakPoints { get; set; }
-
+        [Description("Define o nivel de log. Trace=-2, Debug=-1, Info=0, Error=1, None=2")]
+        [CommandOption("-l|--loglevel")]
+        [DefaultValue(1)]
+        public int LogLevel { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -41,6 +32,11 @@ public sealed class RunCommand : Command<RunCommand.Settings>
             return ValidationResult.Error($"Script não encontrado: {settings.ComputedScript}");
         }
 
+        if (settings.LogLevel < -2 || settings.LogLevel > 2)
+        { 
+            return ValidationResult.Error($"Log Level invalido: Trace=-2, Debug=-1, Info=0, Error=1, None=2");
+        }
+
         return base.Validate(context, settings);
     }
     
@@ -49,14 +45,7 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         var fileInfo = new FileInfo(settings.ComputedScript);
 
         ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
-        ReaxEnvironment.Debug = settings.Debug;
-        if(ReaxEnvironment.Debug) 
-        {
-            Console.WriteLine("--MODO DEBUG ATIVO!\n");
-            SetBreakPoints(settings.BreakPoints);
-            ReaxDebugger.Start(ReaxEnvironment.BreakPoints);
-
-        }
+        Logger.Level = (LoggerLevel)settings.LogLevel;
 
         IReaxInterpreter interpreter = null!;
         
@@ -73,27 +62,8 @@ public sealed class RunCommand : Command<RunCommand.Settings>
             if (interpreter is not null)
                 Console.WriteLine(interpreter.PrintStackTrace());
         }
-        finally
-        {
-            ReaxDebugger.Done();
-        }
 
         return 0;
         
     }
-
-    private void SetBreakPoints(string? bp)
-    {
-        if(string.IsNullOrEmpty(bp))
-            return;
-
-        var options = bp.Split(':');
-        if(options.Length != 2)
-            return;
-
-        var filename = options[0];
-        var lines = options[1].Split(',').Select(x => int.Parse(x)).ToArray();
-        ReaxEnvironment.BreakPoints[filename] = new HashSet<int>(lines);
-    }
-
 }

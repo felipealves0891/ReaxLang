@@ -28,6 +28,9 @@ public class ReaxImportModuleParse : INodeParser
             throw new InvalidOperationException("Era esperado o encerramento da expressão!");
 
         source.Advance();
+        if (_builtInRegistry.Exists(identifier.Source))
+            return new NullNode(identifier.Location);
+
         var functions = _builtInRegistry.Get(identifier.Source);        
         var node = new ModuleNode(identifier.Source, functions, identifier.Location);
         return node;

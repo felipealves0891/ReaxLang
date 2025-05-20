@@ -10,7 +10,6 @@ namespace Reax.Core;
 
 public interface IReaxInterpreter
 {
-    Action<DebuggerArgs>? Debug { get; set; }
     IReaxValue? Output { get; }
     IReaxValue? Error { get; }
 

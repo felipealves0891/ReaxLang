@@ -31,9 +31,14 @@ public record ForInNode(
         if (Array is VarNode var)
             return (ArrayNode)context.GetVariable(var.Identifier);
         else if (Array is StructFieldAccessNode structFieldAccess)
-            return (ArrayNode)structFieldAccess.Evaluation(context);   
+            return (ArrayNode)structFieldAccess.Evaluation(context);
         else
             return (ArrayNode)Array;
-            
+
+    }
+
+    public override string ToString()
+    {
+        return $"for {Declaration.Identifier}:{Declaration.Type} in {Array} {{}}";
     }
 }
