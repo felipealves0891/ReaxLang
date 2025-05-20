@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using Reax.Core;
 using Reax.Core.Debugger;
 using Reax.Interpreter;
@@ -42,26 +43,40 @@ public sealed class RunCommand : Command<RunCommand.Settings>
     
     public override int Execute(CommandContext context, Settings settings)
     {
+        TimeSpan buildTime = TimeSpan.Zero;
+        TimeSpan runTime = TimeSpan.Zero;
         var fileInfo = new FileInfo(settings.ComputedScript);
 
         ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
         Logger.Level = (LoggerLevel)settings.LogLevel;
 
         IReaxInterpreter interpreter = null!;
-        
+        Stopwatch stopwatch = new Stopwatch();
+
         try
         {
+            stopwatch.Start();
             interpreter = ReaxCompiler.Compile(settings.ComputedScript);
-            interpreter.Interpret();   
+            buildTime = stopwatch.Elapsed;
+            interpreter.Interpret();
+            runTime = stopwatch.Elapsed - buildTime;
+            stopwatch.Stop();
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error: "); 
+            if (stopwatch.IsRunning)
+                stopwatch.Stop();
+
+            Logger.LogError(ex, "Error: ");
             Console.WriteLine("Reax Error: {0}", ex.Message);
-            
+
             if (interpreter is not null)
                 Console.WriteLine(interpreter.PrintStackTrace());
         }
+
+        Console.WriteLine("\nBuild Time: {0}", buildTime);
+        Console.WriteLine("Run Time: {0}", runTime);
+        Console.WriteLine("Total Time: {0}", stopwatch.Elapsed);
 
         return 0;
         
