@@ -19,14 +19,12 @@ public class ReaxInterpreterBuilder
             return ReaxEnvironment.MainInterpreter;
 
         ReaxEnvironment.MainInterpreter = new ReaxInterpreter(nodes);
-        ReaxEnvironment.MainInterpreter.Debug += ReaxDebugger.Debugger;
         return ReaxEnvironment.MainInterpreter;
     }
 
     public ReaxInterpreter BuildScript(ReaxNode[] nodes) 
     {
         var interpreter = new ReaxInterpreter(Name, nodes);
-        interpreter.Debug += ReaxDebugger.Debugger;
         return interpreter;
     }
 }

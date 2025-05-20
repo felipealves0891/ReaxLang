@@ -10,6 +10,7 @@ using Reax.Semantic.Contexts;
 using Reax.Core.Ast;
 using Reax.Core.Ast.Objects;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Ast.Objects.Structs;
 
 namespace Reax.Semantic.Rules;
 
@@ -24,6 +25,53 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(ExternalFunctionCallNode)] = ApplyExternalFunctionCallNode;
         Handlers[typeof(ForInNode)] = ApplyForInNode;
         Handlers[typeof(ArrayNode)] = ApplyArrayNode;
+        Handlers[typeof(StructInstanceNode)] = ApplyStructInstanceNode;        
+    }
+
+    private ValidationResult ApplyStructInstanceNode(IReaxNode node)
+    {
+        var instance = (StructInstanceNode)node;
+        var result = ValidationResult.Success();
+
+        var symbol = Context.Resolve(instance.Name);
+        if (symbol is null)
+            result.Join(ValidationResult.FailureSymbolUndeclared(instance.Name, instance.Location));
+
+        result.Join(ApplyStructInstanceNodeValidateProperties(instance));
+        return result;
+
+    }
+
+    private ValidationResult ApplyStructInstanceNodeValidateProperties(
+        StructInstanceNode instance)
+    {
+        var result = ValidationResult.Success();
+        var symbolProperties = Context.ResolveChildren(instance.Name);
+        foreach (var value in instance.FieldValues)
+        {
+            var symbolProperty = symbolProperties.FirstOrDefault(x => x.Identifier == value.Key);
+            if (symbolProperty is null)
+            {
+                result.Join(
+                    ValidationResult.FailureSymbolUndeclared(
+                        $"{instance.Name}.{value.Key}",
+                        instance.Location));
+
+                continue;
+            }
+
+            var expectedType = symbolProperty.Type;
+            var currentType = GetDataType(value.Value);
+            if (expectedType != currentType)
+                result.Join(
+                    ValidationResult.FailureIncompatibleTypes(
+                        expectedType,
+                        currentType,
+                        value.Value.Location));
+
+        }
+        
+        return result;
     }
 
     private ValidationResult ApplyAssignmentNode(IReaxNode node)
@@ -69,7 +117,7 @@ public class TypeCheckingRule : BaseRule
         if (symbol is null)
             return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
 
-        var expectedParameters = Context.ResolveParameters(call.Identifier);
+        var expectedParameters = Context.ResolveChildren(call.Identifier);
         var passedParameters = call.Parameter;
 
         return ValidateParameters(
@@ -88,7 +136,7 @@ public class TypeCheckingRule : BaseRule
         if (symbol is null)
             return ValidationResult.FailureSymbolUndeclared(call.Identifier, call.Location);
 
-        var expectedParameters = Context.ResolveParameters(call.Identifier, external.scriptName);
+        var expectedParameters = Context.ResolveChildren(call.Identifier, external.scriptName);
         var passedParameters = call.Parameter;
 
         return ValidateParameters(
@@ -187,8 +235,26 @@ public class TypeCheckingRule : BaseRule
             return GetDataTypeByArray(arrayNode);
         else if (node is ArrayAccessNode arrayItem)
             return GetDataTypeByArrayItem(arrayItem);
+        else if (node is StructInstanceNode)
+            return DataType.STRUCT;
+        else if (node is StructFieldAccessNode fieldAccessNode)
+            return GetDataTypeByProperty(fieldAccessNode);
         else
             return DataType.NONE;
+    }
+
+    private DataType GetDataTypeByProperty(StructFieldAccessNode fieldAccessNode)
+    {
+        var symbol = Context.Resolve(fieldAccessNode.Identifier);
+        if (symbol is null || symbol.ParentIdentifier is null)
+            return DataType.NONE;
+
+        var properties = Context.ResolveChildren(symbol.ParentIdentifier);
+        var property = properties.FirstOrDefault(x => x.Identifier == fieldAccessNode.Property && x.Category == SymbolCategory.PROPERTY);
+        if (property is null)
+            return DataType.NONE;
+        else
+            return property.Type;
     }
 
     private DataType GetDataTypeByIdentifier(string identifier, string? script = null)
@@ -271,13 +337,10 @@ public class TypeCheckingRule : BaseRule
 
     private DataType GetDataTypeByArrayItem(ArrayAccessNode arrayAccessNode)
     {
-        var symbol = Context.Resolve(arrayAccessNode.Array.Identifier);
-        if (symbol is null)
-            return DataType.NONE;
-
-        if (symbol.Type.HasFlag(DataType.STRING))
+        var expectedType = GetDataType(arrayAccessNode.Array);
+        if (expectedType.HasFlag(DataType.STRING))
             return DataType.STRING;
-        else if (symbol.Type.HasFlag(DataType.NUMBER))
+        else if (expectedType.HasFlag(DataType.NUMBER))
             return DataType.NUMBER;
         else
             return DataType.NONE;

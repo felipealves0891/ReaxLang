@@ -18,16 +18,6 @@ public class ReaxExternalFunctionCallParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        var scriptName = source.CurrentToken;
-        source.Advance(TokenType.ACCESS);
-        source.Advance(TokenType.IDENTIFIER);
-        var identifier = source.CurrentToken;
-        source.Advance(TokenType.OPEN_PARENTHESIS);
-        var parameters = ParameterHelper.GetCallParameters(source);
-        source.Advance();
-        return new ExternalFunctionCallNode(
-            scriptName.Source, 
-            new FunctionCallNode(identifier.Source, parameters.ToArray(), identifier.Location),
-            identifier.Location);
+        return ExpressionHelper.Parser(source.NextExpression());
     }
 }

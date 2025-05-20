@@ -20,7 +20,7 @@ public class ReaxExpressionParser : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        var statement = source.NextStatement();
+        var statement = source.NextExpression();
         return ExpressionHelper.Parser(statement.ToArray());
     }
 }

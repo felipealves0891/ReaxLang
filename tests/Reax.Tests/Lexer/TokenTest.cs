@@ -32,9 +32,10 @@ public class TokenTest
         TokenType.BOOLEAN_TYPE,
         TokenType.FLOAT_TYPE,
         TokenType.INT_TYPE,
-        TokenType.LONG_TYPE, 
-        TokenType.STRING_TYPE, 
-        TokenType.VOID_TYPE
+        TokenType.LONG_TYPE,
+        TokenType.STRING_TYPE,
+        TokenType.VOID_TYPE,
+        TokenType.AT
         ]));
     }
 }

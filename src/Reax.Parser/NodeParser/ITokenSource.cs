@@ -12,7 +12,7 @@ public interface ITokenSource
     public Token CurrentToken { get; }
     public Token NextToken { get; }
     public ReaxNode? NextNode();
-    IEnumerable<Token> NextStatement();
+    IEnumerable<Token> NextExpression();
     ReaxNode NextBlock();
     void Advance();
     void Advance(TokenType expectedType);

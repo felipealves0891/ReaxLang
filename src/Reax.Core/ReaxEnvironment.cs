@@ -9,5 +9,4 @@ public static class ReaxEnvironment
     public static IReaxInterpreter? MainInterpreter { get; set; }
     public static string DirectoryRoot { get; set; } = Environment.CurrentDirectory;
     public static Dictionary<string, ScriptNode> ImportedFiles { get; set; } = new();
-    public static IDictionary<string, ISet<int>> BreakPoints = new Dictionary<string, ISet<int>>();
 }

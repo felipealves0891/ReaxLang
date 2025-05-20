@@ -23,7 +23,7 @@ public class ReaxForParse : INodeParser
     {
         source.Advance(TokenType.IDENTIFIER);
         var identifierControl = source.CurrentToken;
-        source.Advance(TokenType.TYPING);
+        source.Advance(TokenType.COLON);
         source.Advance(Token.DataTypes);
         var dataType = source.CurrentToken;
 
@@ -46,6 +46,7 @@ public class ReaxForParse : INodeParser
             false,
             dataType.Type.ToDataType(),
             new AssignmentNode(new VarNode(identifierControl.Source, DataType.NUMBER, identifierControl.Location), initialValue.ToReaxValue(), initialValue.Location),
+            null,
             identifierControl.Location);
 
         source.Advance(TokenType.NUMBER_LITERAL);
@@ -73,9 +74,12 @@ public class ReaxForParse : INodeParser
             false,
             dataType.Type.ToDataType(),
             null,
+            null,
             identifierControl.Location);
 
-        source.Advance(TokenType.OPEN_BRACE);
+        if(source.NextToken.Type == TokenType.OPEN_BRACE)
+            source.Advance(TokenType.OPEN_BRACE);
+            
         var block = (ContextNode)source.NextBlock();
         return new ForInNode(declaration, array, block, declaration.Location);
     }
@@ -83,12 +87,14 @@ public class ReaxForParse : INodeParser
     private ReaxNode GetArray(ITokenSource source)
     {
         var start = source.CurrentToken;
-        if (source.CurrentToken.Type == TokenType.IDENTIFIER)
+        if (source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type != TokenType.ARROW)
             return new VarNode(source.CurrentToken.Source, DataType.NONE, source.CurrentToken.Location);
+
+        if (source.CurrentToken.Type == TokenType.IDENTIFIER && source.NextToken.Type == TokenType.ARROW)
+            return ExpressionHelper.Parser(source.NextExpression());
 
         var arrayParse = new ReaxArrayParse();
         return arrayParse.Parse(source)
             ?? throw new InvalidOperationException($"{start.Source} - Era esperado um array no for in!");
     }
-
 }

@@ -1,6 +1,6 @@
 namespace Reax.Lexer;
 
-public enum TokenType 
+public enum TokenType
 {
     EOF = -1,
     UNKNOW,
@@ -44,7 +44,7 @@ public enum TokenType
     CONST,
     ASYNC,
     BIND,
-    TYPING,
+    COLON,
     PIPE,
     SUCCESS,
     ERROR,
@@ -54,5 +54,7 @@ public enum TokenType
     LONG_TYPE,
     STRING_TYPE,
     VOID_TYPE,
-    MATCH
+    MATCH,
+    STRUCT,
+    AT
 } 

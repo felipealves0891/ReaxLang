@@ -13,6 +13,7 @@ public record DeclarationNode(
     bool Async, 
     DataType Type,
     AssignmentNode? Assignment, 
+    string? ComplexType,
     SourceLocation Location) : StatementNode(Location), IReaxDeclaration
 {
     public override IReaxNode[] Children => Assignment is not null ? [Assignment] : [];

@@ -19,10 +19,6 @@ public class ReaxFunctionCallParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        Token identifier = source.CurrentToken;
-        source.Advance(TokenType.OPEN_PARENTHESIS);
-        ReaxNode[] values = ParameterHelper.GetCallParameters(source).ToArray();
-        source.Advance();
-        return new FunctionCallNode(identifier.Source, values, identifier.Location);
+        return ExpressionHelper.Parser(source.NextExpression());
     }
 }

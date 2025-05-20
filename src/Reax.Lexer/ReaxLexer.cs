@@ -29,6 +29,7 @@ public class ReaxLexer
     private const byte HASHTAG = (byte)'#';
     private const byte NEWLINE = (byte)'\n';
     private const byte UNDERSCORE = (byte)'_';
+    private const byte AT = (byte)'@';
 
 
     private readonly IReader _source;
@@ -97,13 +98,15 @@ public class ReaxLexer
         if(_source.CurrentChar == DOT)
             return AdvanceAndReturn(TokenType.ACCESS, _source.CurrentChar);
         if(_source.CurrentChar == COLON)
-            return AdvanceAndReturn(TokenType.TYPING, _source.CurrentChar);
+            return AdvanceAndReturn(TokenType.COLON, _source.CurrentChar);
         if(_source.CurrentChar == PIPE)
             return AdvanceAndReturn(TokenType.PIPE, _source.CurrentChar);
         if(_source.CurrentChar == OPEN_BRACKET)
             return AdvanceAndReturn(TokenType.OPEN_BRACKET, _source.CurrentChar);
         if(_source.CurrentChar == CLOSE_BRACKET)
             return AdvanceAndReturn(TokenType.CLOSE_BRACKET, _source.CurrentChar);
+        if(_source.CurrentChar == AT)
+            return AdvanceAndReturn(TokenType.AT, _source.CurrentChar);
         if (_source.CurrentChar == HASHTAG)
             return Comment();
         if(_source.CurrentChar == NEWLINE && !_source.CanNext)

@@ -12,8 +12,6 @@ using Reax.Runtime;
 using Reax.Runtime.Functions;
 using System.Text;
 using Reax.Core.Ast;
-using Reax.Extensions;
-using Reax.Core.Functions;
 using Reax.Core;
 using System.Runtime.CompilerServices;
 
@@ -56,7 +54,6 @@ public class ReaxInterpreter : IReaxInterpreter
         _parameters = new Dictionary<int, ReaxNode>();
     }
 
-    public Action<DebuggerArgs>? Debug { get; set; }
     public IReaxValue? Output { get; private set; }
     public IReaxValue? Error { get; private set; }
     public string Name { get; private set; }
@@ -144,8 +141,7 @@ public class ReaxInterpreter : IReaxInterpreter
         else if (node is LiteralNode literal and not IReaxDeclaration)
             Output = literal;
 
-        if(ReaxEnvironment.Debug)
-            OnDebug(node.Location);
+        if(ReaxEnvironment.Debug){}
 
         Logger.LogInterpreter($"Removendo {node} a stack!");
         StackTrace.TryPop(out var nodeOut);
@@ -169,11 +165,6 @@ public class ReaxInterpreter : IReaxInterpreter
         {
             Error = ex.Value;
         }
-    }
-
-    private void OnDebug(SourceLocation location)
-    {
-        Debug?.Invoke(new DebuggerArgs(_context.Debug(), PrintStackTrace(), location));
     }
 
     public string PrintStackTrace() {

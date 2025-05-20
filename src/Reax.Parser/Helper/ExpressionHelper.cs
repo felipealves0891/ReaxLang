@@ -7,6 +7,8 @@ using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Operations;
 using Reax.Core.Ast;
 using Reax.Core.Types;
+using Reax.Core.Ast.Objects.Structs;
+using Reax.Core.Locations;
 
 namespace Reax.Parser.Helper;
 
@@ -36,7 +38,7 @@ public class ExpressionHelper
     {
         var helper = new ExpressionHelper(tokens);
         var result = helper.ParseExpression();
-        if(result is BinaryNode binary)
+        if (result is BinaryNode binary)
             return binary;
         else
             return new BinaryNode(result, new EqualityNode("==", result.Location), new BooleanNode("true", result.Location), result.Location);
@@ -45,16 +47,16 @@ public class ExpressionHelper
     private Token Peek() => _pos < _tokens.Length ? _tokens[_pos] : new Token(TokenType.EOF, (byte)' ', "", -1, -1);
     private Token Consume() => _pos + 1 <= _tokens.Length ? _tokens[_pos++] : new Token(TokenType.EOF, (byte)' ', "", -1, -1);
 
-    private ReaxNode ParseExpression() 
+    private ReaxNode ParseExpression()
     {
         var value = ParsePrefered();
 
-        while(Peek().Type == TokenType.COMPARISON || Peek().Type == TokenType.EQUALITY || Peek().Type == TokenType.TERM)
+        while (Peek().Type == TokenType.COMPARISON || Peek().Type == TokenType.EQUALITY || Peek().Type == TokenType.TERM)
         {
             var op = Consume();
             var right = ParsePrefered();
 
-            if(op.Type == TokenType.TERM)  
+            if (op.Type == TokenType.TERM)
                 value = new CalculateNode(value, op.ToArithmeticOperator(), right, op.Location);
             else
                 value = new BinaryNode(value, op.ToLogicOperator(), right, op.Location);
@@ -63,10 +65,10 @@ public class ExpressionHelper
         return value;
     }
 
-    private ReaxNode ParsePrefered() 
+    private ReaxNode ParsePrefered()
     {
         var value = ParseValue();
-        while(Peek().Type == TokenType.FACTOR)
+        while (Peek().Type == TokenType.FACTOR)
         {
             var op = Consume();
             var right = ParseValue();
@@ -75,25 +77,25 @@ public class ExpressionHelper
         return value;
     }
 
-    private ReaxNode ParseValue() 
+    private ReaxNode ParseValue()
     {
         var token = Peek();
-        if(token.IsReaxValue())
+        if (token.IsReaxValue())
         {
-            return Parse(token);    
+            return Parse(token);
         }
-        else if(token.ReadOnlySource.SequenceEqual([(byte)'-']))
+        else if (token.ReadOnlySource.SequenceEqual([(byte)'-']))
         {
             var unary = Consume();
             var value = Consume().AppendAtBeginning(unary);
             return value.ToReaxValue();
         }
-        else if(token.Type == TokenType.OPEN_PARENTHESIS)
+        else if (token.Type == TokenType.OPEN_PARENTHESIS)
         {
             Consume();
             var node = ParseExpression();
             var peek = Peek();
-            if (peek.Type != TokenType.CLOSE_PARENTHESIS) 
+            if (peek.Type != TokenType.CLOSE_PARENTHESIS)
                 throw new InvalidOperationException("Esperado ')'");
             Consume();
             return node;
@@ -104,7 +106,7 @@ public class ExpressionHelper
         }
     }
 
-    private ReaxNode Parse(Token token) 
+    private ReaxNode Parse(Token token)
     {
         Consume();
 
@@ -114,13 +116,17 @@ public class ExpressionHelper
             Consume();
             var variable = new VarNode(token.Source, DataType.NONE, token.Location);
             var expression = ParseExpression();
-            return new ArrayAccessNode(variable, expression, expression.Location); 
+            return new ArrayAccessNode(variable, expression, expression.Location);
         }
         else if (peek.Type == TokenType.ACCESS)
         {
             Consume();
             var functionCall = (FunctionCallNode)Parse(Peek());
             return new ExternalFunctionCallNode(token.Source, functionCall, token.Location);
+        }
+        else if (peek.Type == TokenType.ARROW)
+        {
+            return ParseStructureFieldAccess(token);
         }
         else if (peek.Type == TokenType.OPEN_PARENTHESIS)
         {
@@ -143,6 +149,31 @@ public class ExpressionHelper
         {
             return token.ToReaxValue();
         }
+    }
+
+    private ReaxNode ParseStructureFieldAccess(Token instance)
+    {
+        Consume();
+        var property = Consume();
+
+        var structFieldAccessNode
+            = new StructFieldAccessNode(
+                instance.Source,
+                property.Source,
+                new SourceLocation(
+                    instance.File,
+                    instance.Location.Start,
+                    property.Location.End));
+        
+        if (Peek().Type == TokenType.OPEN_BRACKET)
+        {
+            Consume();
+            var array = ParseExpression();
+            return new ArrayAccessNode(structFieldAccessNode, array, structFieldAccessNode.Location);
+        }
+
+        Consume();
+        return structFieldAccessNode;
     }
 
 }

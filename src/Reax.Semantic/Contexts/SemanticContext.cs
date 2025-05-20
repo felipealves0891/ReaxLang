@@ -9,7 +9,7 @@ namespace Reax.Semantic.Contexts;
 public class SemanticContext : ISemanticContext
 {
     private readonly ConcurrentStack<ConcurrentDictionary<string, Symbol>> _symbolsTable;
-    private readonly ConcurrentStack<ConcurrentDictionary<string, HashSet<Symbol>>> _parametersTabe;
+    private readonly ConcurrentStack<ConcurrentDictionary<string, HashSet<Symbol>>> _childrenTabe;
     private readonly ConcurrentDictionary<Reference, HashSet<Reference>> _references;
     private readonly ValidationResult _validationReferences;
     private readonly ConcurrentStack<Reference> _from;
@@ -18,22 +18,22 @@ public class SemanticContext : ISemanticContext
     public SemanticContext()
     {
         _symbolsTable = new();
-        _parametersTabe = new();
+        _childrenTabe = new();
         _scripts = new();
         _from = new();
         _references = new();
         _validationReferences = ValidationResult.Success();
 
         _symbolsTable.Push(new());
-        _parametersTabe.Push(new());
+        _childrenTabe.Push(new());
         _scripts.Push("main");        
     }
 
     public ConcurrentDictionary<string, Symbol> CurrentSymbolTable => 
         _symbolsTable.TryPeek(out var result) ? result : throw new Exception();
 
-    public ConcurrentDictionary<string, HashSet<Symbol>> CurrentParametersTable => 
-        _parametersTabe.TryPeek(out var result) ? result : throw new Exception();
+    public ConcurrentDictionary<string, HashSet<Symbol>> CurrentChildrenTable => 
+        _childrenTabe.TryPeek(out var result) ? result : throw new Exception();
 
     public string CurrentScript => 
         _scripts.TryPeek(out var name) ? name : string.Empty;
@@ -45,8 +45,8 @@ public class SemanticContext : ISemanticContext
     {
         var identifier = GetIdentifier(symbol.Identifier);
 
-        if(symbol.Category is SymbolCategory.PARAMETER or SymbolCategory.PARAMETER_OPTIONAL)
-            return DeclareParameters(symbol);
+        if(symbol.Category is SymbolCategory.PARAMETER or SymbolCategory.PARAMETER_OPTIONAL or SymbolCategory.PROPERTY)
+            return DeclareChild(symbol);
         
         if(CurrentSymbolTable.ContainsKey(identifier))
             return ValidationResult.FailureSymbolAlreadyDeclared(identifier, symbol.Location);
@@ -55,34 +55,34 @@ public class SemanticContext : ISemanticContext
         return ValidationResult.Success();    
     }
 
-    private ValidationResult DeclareParameters(Symbol symbol)
+    private ValidationResult DeclareChild(Symbol symbol)
     {
         if(symbol.ParentIdentifier is null)
-                throw new InvalidOperationException("Todo simbolo da categoria de parametro deve conter o identificador do pai");
+                throw new InvalidOperationException($"Todo simbolo da categoria de {symbol.Category} deve conter o identificador do pai");
 
         var identifier = GetIdentifier(symbol.ParentIdentifier);
 
-        if(!CurrentParametersTable.ContainsKey(identifier)) 
-            CurrentParametersTable[identifier] = new HashSet<Symbol>();
+        if(!CurrentChildrenTable.ContainsKey(identifier)) 
+            CurrentChildrenTable[identifier] = new HashSet<Symbol>();
         
-        var isAlreadyDeclared =  CurrentParametersTable[identifier].Any(x => x.Identifier == symbol.Identifier);
+        var isAlreadyDeclared =  CurrentChildrenTable[identifier].Any(x => x.Identifier == symbol.Identifier);
         if(isAlreadyDeclared)
             return ValidationResult.FailureSymbolAlreadyDeclared(symbol.Identifier, symbol.Location);
 
-        CurrentParametersTable[identifier].Add(symbol);
+        CurrentChildrenTable[identifier].Add(symbol);
         return ValidationResult.Success();
     }
 
     public IDisposable EnterScope()
     {
         _symbolsTable.Push(new());
-        _parametersTabe.Push(new());
+        _childrenTabe.Push(new());
         return new ExiterScope(ExitScope);
     }
 
     public void ExitScope()
     {
-        _parametersTabe.TryPop(out var _);
+        _childrenTabe.TryPop(out var _);
         _symbolsTable.TryPop(out var _);
     }
 
@@ -101,20 +101,19 @@ public class SemanticContext : ISemanticContext
         return null;
     }
 
-    public Symbol[] ResolveParameters(string identifier, string? script = null)
+    public Symbol[] ResolveChildren(string identifier, string? script = null)
     {
         var internalIdentifier = GetIdentifier(identifier, script);
-        if(CurrentParametersTable.ContainsKey(internalIdentifier))
-            return CurrentParametersTable[internalIdentifier].ToArray();
+        if(CurrentChildrenTable.ContainsKey(internalIdentifier))
+            return CurrentChildrenTable[internalIdentifier].ToArray();
         
-        foreach (var table in _parametersTabe)
+        foreach (var table in _childrenTabe)
         {
             if(table.TryGetValue(internalIdentifier, out var symbolOfParent))
                 return symbolOfParent.ToArray();
         }
 
         return [];
-
     }
 
     public IDisposable EnterScript(string name)

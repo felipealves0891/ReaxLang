@@ -14,6 +14,7 @@ public static class TokenTypeExtensions
             TokenType.LONG_TYPE => DataType.NUMBER,
             TokenType.STRING_TYPE => DataType.STRING,
             TokenType.VOID_TYPE => DataType.VOID,
+            TokenType.AT => DataType.STRUCT,
             _ => throw new InvalidDataException("Tipo de dado invalido:")
         };
     }

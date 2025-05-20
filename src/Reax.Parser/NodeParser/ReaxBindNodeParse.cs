@@ -19,7 +19,7 @@ public class ReaxBindNodeParse : INodeParser
     {
         source.Advance(expectedType: TokenType.IDENTIFIER);
         var identifier = source.CurrentToken;
-        source.Advance(expectedType: TokenType.TYPING);
+        source.Advance(expectedType: TokenType.COLON);
         source.Advance();
         var dataType = source.CurrentToken;
         source.Advance(expectedType: TokenType.ARROW);

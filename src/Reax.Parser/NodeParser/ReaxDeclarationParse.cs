@@ -22,50 +22,54 @@ public class ReaxDeclarationParse : INodeParser
         var immutable = IsImmutable(source);
         var identifier = GetIdentifier(source);
         var dataType = GetDataType(source);
-           
-        if(source.CurrentToken.Type == TokenType.SEMICOLON)
+        var complexType = GetComplexType(source, dataType);
+
+        source.Advance([TokenType.ASSIGNMENT, TokenType.SEMICOLON]);
+        if (source.CurrentToken.Type == TokenType.SEMICOLON)
         {
             source.Advance();
-            return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, null, identifier.Location);
+            return new DeclarationNode(identifier.Source, immutable, isAsync, dataType, null, complexType, identifier.Location);
         }
 
-        source.Advance();
-        if(source.NextToken.Type == TokenType.SEMICOLON)
+        if (dataType != DataType.STRUCT)
+            source.Advance();
+
+        if (source.NextToken.Type == TokenType.SEMICOLON)
         {
-            var value = new AssignmentNode(new VarNode(identifier.Source, dataType, identifier.Location), source.CurrentToken.ToReaxValue(), source.CurrentToken.Location); 
+            var value = new AssignmentNode(new VarNode(identifier.Source, dataType, identifier.Location), source.CurrentToken.ToReaxValue(), source.CurrentToken.Location);
             source.Advance(TokenType.SEMICOLON);
             source.Advance();
-            return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
+            return new DeclarationNode(identifier.Source, immutable, isAsync, dataType, value, complexType, identifier.Location);
         }
-        else 
+        else
         {
             var assigned = source.NextNode() ?? new NullNode(identifier.Location);
             var value = new AssignmentNode(new VarNode(identifier.Source, dataType, identifier.Location), assigned, assigned.Location);
-            return new DeclarationNode(identifier.Source, immutable,  isAsync, dataType, value, identifier.Location);
+            return new DeclarationNode(identifier.Source, immutable, isAsync, dataType, value, complexType, identifier.Location);
         }
-        
+
     }
 
     private bool IsAsync(ITokenSource source)
     {
         var isAsync = source.CurrentToken.Type == TokenType.ASYNC;
-        if(isAsync) source.Advance([TokenType.LET]);
+        if (isAsync) source.Advance([TokenType.LET]);
         return isAsync;
     }
 
-    private bool IsImmutable(ITokenSource source) 
+    private bool IsImmutable(ITokenSource source)
     {
         var immutable = source.CurrentToken.Type == TokenType.CONST;
         source.Advance([TokenType.IDENTIFIER]);
         return immutable;
     }
 
-    private Token GetIdentifier(ITokenSource source) 
+    private Token GetIdentifier(ITokenSource source)
     {
         var identifier = source.CurrentToken;
-        source.Advance([TokenType.TYPING]);
+        source.Advance([TokenType.COLON]);
         source.Advance(Token.DataTypes);
-        return identifier;        
+        return identifier;
     }
 
     private DataType GetDataType(ITokenSource source)
@@ -78,8 +82,17 @@ public class ReaxDeclarationParse : INodeParser
             source.Advance(TokenType.CLOSE_BRACKET);
         }
 
-        source.Advance([TokenType.ASSIGNMENT, TokenType.SEMICOLON]);
         return dataType;
+    }
+
+    private string? GetComplexType(ITokenSource source, DataType dataType)
+    {
+        if (dataType == DataType.STRUCT && source.NextToken.Type is TokenType.IDENTIFIER)
+        {
+            source.Advance(TokenType.IDENTIFIER);
+            return source.CurrentToken.Source;
+        }
+        return null;
     }
 
 }

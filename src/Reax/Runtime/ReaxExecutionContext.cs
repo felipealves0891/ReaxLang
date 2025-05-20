@@ -8,7 +8,6 @@ using Reax.Core.Ast.Literals;
 using Reax.Runtime.Functions;
 using Reax.Runtime.Observables;
 using Reax.Core.Functions;
-using Reax.Extensions;
 using Reax.Core;
 using Reax.Core.Ast;
 
@@ -65,6 +64,8 @@ public class ReaxExecutionContext : IReaxExecutionContext
         var key = Guid.NewGuid();
         _symbols[identifier] = key;
         if (isAsync) _asyncKeys.Add(key);
+
+        Logger.LogRuntime($"{identifier}({key}) is async {isAsync}");
     }
 
     public void DeclareImmutable(string identifier, IReaxValue node)
@@ -73,18 +74,23 @@ public class ReaxExecutionContext : IReaxExecutionContext
         _symbols[identifier] = key;
         _immutableKeys.Add(key);
         _variableContext[key] = node;
+        Logger.LogRuntime($"{identifier}({key}) = {node}");
     }
 
     public void Declare(string identifier)
     {
         if (_symbols.ContainsKey(identifier))
             throw new InvalidOperationException($"O simbolo '{identifier}' já foi declarado!");
-
-        _symbols[identifier] = Guid.NewGuid();
+        
+        var key = Guid.NewGuid();
+        _symbols[identifier] = key;
+        Logger.LogRuntime($"{identifier}({key})");
     }
 
     public void SetVariable(string identifier, IReaxValue value)
     {
+        
+        Logger.LogRuntime($"{identifier} = {value}");
         if (!_symbols.TryGetValue(identifier, out var key))
         {
             if (_parentContext is not null && _parentContext._symbols.TryGetValue(identifier, out var parentKey))
@@ -109,6 +115,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
         if (!_observableContext.TryGetValue(key, out var observables))
             return;
 
+        Logger.LogRuntime($"{key}");
         if (_asyncKeys.Contains(key))
         {
             var result = Parallel.ForEach(observables, observable =>
@@ -129,6 +136,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
             throw new InvalidOperationException($"{_name}: Função '{identifier}' não declarada!");
 
         _functionContext[key] = new InterpreterFunction(identifier, value);
+        Logger.LogRuntime($"{identifier}({key})");
     }
 
     public void SetFunction(string identifier, Function value)
@@ -337,7 +345,7 @@ public class ReaxExecutionContext : IReaxExecutionContext
 
     }
 
-    public Function? GetParentModule(string identifier, string functionName)
+    private Function? GetParentModule(string identifier, string functionName)
     {
         try
         {
@@ -352,70 +360,15 @@ public class ReaxExecutionContext : IReaxExecutionContext
         }
     }
 
-    public IEnumerable<DebuggerModel> Debug()
-    {
-        if (_parentContext is not null)
-        {
-            foreach (var item in _parentContext.Debug())
-            {
-                yield return item;
-            }
-        }
-
-        foreach (var name in _symbols.Keys)
-        {
-            var identifier = _symbols[name];
-            yield return new DebuggerModel
-            {
-                Name = name,
-                Async = _asyncKeys.Contains(identifier).ToString(),
-                Immutable = _immutableKeys.Contains(identifier).ToString(),
-                Bind = _bindContext.ContainsKey(identifier).ToString(),
-                Context = _name,
-                Type = GetIdentifierType(identifier),
-                Value = GetIdentifierType(identifier) switch
-                {
-                    "variable" => _variableContext[identifier].ToString() ?? "",
-                    "bind" => _bindContext[identifier].Output?.ToString() ?? "",
-                    "function" => "function",
-                    "module" => "module",
-                    "observable" => "observable",
-                    "script" => "script",
-                    _ => "undefined"
-                }
-            };
-        }
-    }
-
-    private string GetIdentifierType(Guid guid)
-    {
-        if (_variableContext.ContainsKey(guid))
-            return "variable";
-        else if (_bindContext.ContainsKey(guid))
-            return "bind";
-        else if (_functionContext.ContainsKey(guid))
-            return "function";
-        else if (_moduleContext.ContainsKey(guid))
-            return "module";
-        else if (_observableContext.ContainsKey(guid))
-            return "observable";
-        else if (_scriptContext.ContainsKey(guid))
-            return "script";
-        else
-            return "none";
-    }
-
     public IReaxInterpreter CreateInterpreter(string name, ReaxNode[] nodes)
     {
         var interpreter = new ReaxInterpreter(name, nodes, this);
-        interpreter.Debug += ReaxDebugger.Debugger;
         return interpreter;
     }
     
     public IReaxInterpreter CreateInterpreter(string name, ReaxNode[] nodes, VarNode[] parameters)
     {
         var interpreter = new ReaxInterpreter(name, nodes, this, parameters);
-        interpreter.Debug += ReaxDebugger.Debugger;
         return interpreter;
     }
 }

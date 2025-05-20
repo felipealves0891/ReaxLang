@@ -16,6 +16,6 @@ public class ReaxArrayAccessParse : INodeParser
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        return ExpressionHelper.Parser(source.NextStatement());
+        return ExpressionHelper.Parser(source.NextExpression());
     }
 }
