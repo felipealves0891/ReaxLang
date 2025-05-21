@@ -9,9 +9,7 @@ public static class TokenTypeExtensions
         return type switch 
         {
             TokenType.BOOLEAN_TYPE => DataType.BOOLEAN,
-            TokenType.FLOAT_TYPE => DataType.NUMBER,
-            TokenType.INT_TYPE => DataType.NUMBER,
-            TokenType.LONG_TYPE => DataType.NUMBER,
+            TokenType.NUMBER_TYPE => DataType.NUMBER,
             TokenType.STRING_TYPE => DataType.STRING,
             TokenType.VOID_TYPE => DataType.VOID,
             TokenType.AT => DataType.STRUCT,

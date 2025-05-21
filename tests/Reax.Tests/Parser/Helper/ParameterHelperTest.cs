@@ -16,7 +16,7 @@ public class ParameterHelperTest : BaseTest<ParameterHelper>
             new Token(TokenType.OPEN_PARENTHESIS, (byte)' ', "", 0, 0),
             new Token(TokenType.IDENTIFIER, (byte)'m', "", 0, 0),
             new Token(TokenType.IDENTIFIER, (byte)'m', "", 0, 0),
-            new Token(TokenType.INT_TYPE, (byte)' ', "", 0, 0),
+            new Token(TokenType.NUMBER_TYPE, (byte)' ', "", 0, 0),
             new Token(TokenType.CLOSE_PARENTHESIS, (byte)' ', "", 0, 0),
         ]);
 

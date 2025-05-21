@@ -7,9 +7,7 @@ public struct Token
 {
     public static TokenType[] DataTypes = [
         TokenType.BOOLEAN_TYPE,
-        TokenType.FLOAT_TYPE,
-        TokenType.INT_TYPE,
-        TokenType.LONG_TYPE,
+        TokenType.NUMBER_TYPE,
         TokenType.STRING_TYPE,
         TokenType.VOID_TYPE,
         TokenType.AT

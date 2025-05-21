@@ -8,9 +8,7 @@ public class TokenTypeExtensionsTest
 {
     [Theory]
     [InlineData(TokenType.BOOLEAN_TYPE, DataType.BOOLEAN)]
-    [InlineData(TokenType.FLOAT_TYPE, DataType.NUMBER)]
-    [InlineData(TokenType.INT_TYPE, DataType.NUMBER)]
-    [InlineData(TokenType.LONG_TYPE, DataType.NUMBER)]
+    [InlineData(TokenType.NUMBER_TYPE, DataType.NUMBER)]
     [InlineData(TokenType.STRING_TYPE, DataType.STRING)]
     [InlineData(TokenType.VOID_TYPE, DataType.VOID)]
     public void ToDataType_ShouldReturnCorrectDataType(TokenType tokenType, DataType expectedDataType)
