@@ -6,6 +6,7 @@ public enum TokenType
     UNKNOW,
     SEMICOLON,
     IDENTIFIER,
+    NATIVE_IDENTIFIER,
     ASSIGNMENT,
     OPEN_PARENTHESIS,
     COMMA,
@@ -54,5 +55,9 @@ public enum TokenType
     VOID_TYPE,
     MATCH,
     STRUCT,
-    AT
+    AT,
+    USE,
+    OF,
+    AS
+
 } 

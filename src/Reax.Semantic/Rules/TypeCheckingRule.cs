@@ -25,7 +25,7 @@ public class TypeCheckingRule : BaseRule
         Handlers[typeof(ExternalFunctionCallNode)] = ApplyExternalFunctionCallNode;
         Handlers[typeof(ForInNode)] = ApplyForInNode;
         Handlers[typeof(ArrayNode)] = ApplyArrayNode;
-        Handlers[typeof(StructInstanceNode)] = ApplyStructInstanceNode;        
+        Handlers[typeof(StructInstanceNode)] = ApplyStructInstanceNode;
     }
 
     private ValidationResult ApplyStructInstanceNode(IReaxNode node)
@@ -70,7 +70,7 @@ public class TypeCheckingRule : BaseRule
                         value.Value.Location));
 
         }
-        
+
         return result;
     }
 
@@ -239,6 +239,8 @@ public class TypeCheckingRule : BaseRule
             return DataType.STRUCT;
         else if (node is StructFieldAccessNode fieldAccessNode)
             return GetDataTypeByProperty(fieldAccessNode);
+        else if (node is UseInstanceNode useInstance)
+            return useInstance.Type;
         else
             return DataType.NONE;
     }
@@ -345,4 +347,5 @@ public class TypeCheckingRule : BaseRule
         else
             return DataType.NONE;
     }
+
 }

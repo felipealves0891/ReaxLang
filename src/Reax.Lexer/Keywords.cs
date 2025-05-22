@@ -64,6 +64,12 @@ public static class Keywords
 
     public static byte[] VOID_TYPE = [(byte)'v', (byte)'o', (byte)'i', (byte)'d'];
 
+    public static byte[] USE = [(byte)'u', (byte)'s', (byte)'e'];
+
+    public static byte[] OF = [(byte)'o', (byte)'f'];
+
+    public static byte[] AS = [(byte)'a', (byte)'s'];
+
     public static TokenType IsKeyword(byte[] chars)
     {
         if (LET.SequenceEqual(chars)) return TokenType.LET;
@@ -96,6 +102,10 @@ public static class Keywords
         if (NUMBER_TYPE.SequenceEqual(chars)) return TokenType.NUMBER_TYPE;
         if (STRING_TYPE.SequenceEqual(chars)) return TokenType.STRING_TYPE;
         if (VOID_TYPE.SequenceEqual(chars)) return TokenType.VOID_TYPE;
+        if (USE.SequenceEqual(chars)) return TokenType.USE;
+        if (OF.SequenceEqual(chars)) return TokenType.OF;
+        if (AS.SequenceEqual(chars)) return TokenType.AS;
+        if (char.IsUpper((char)chars[0])) return TokenType.NATIVE_IDENTIFIER;
         return TokenType.IDENTIFIER;
     }
     

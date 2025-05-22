@@ -12,7 +12,17 @@ public record NumberNode(
     string Source, 
     SourceLocation Location) : LiteralNode(Source, Location)
 {
-    public override object Value => decimal.Parse(Source);
+    public override object Value
+    {
+        get
+        {
+            if (Source.IndexOf('.') == -1)
+                return int.Parse(Source);
+            else
+                return decimal.Parse(Source);
+        }
+    }
+
     public override DataType Type => DataType.NUMBER;
     public override IReaxNode[] Children => [];
 

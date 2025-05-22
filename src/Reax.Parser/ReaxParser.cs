@@ -126,6 +126,6 @@ public class ReaxParser : ITokenSource
     {
         Advance();
         if(!type.Contains(CurrentToken.Type))
-            throw new InvalidOperationException($"{CurrentToken.Location} - {CurrentToken.Source} Token invalido! Era esperado o token {type}, mas o atual é {CurrentToken.Type}!");
+            throw new InvalidOperationException($"{CurrentToken.Location} - {CurrentToken.Source} Token invalido! Era esperado o token {string.Join(" ou ", type)}, mas o atual é {CurrentToken.Type}!");
     }
 }

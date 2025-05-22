@@ -36,7 +36,7 @@ public class ParameterHelper
         return parameters;
     }
 
-    public static IEnumerable<ReaxNode> GetCallParameters(ITokenSource source)
+    public static IEnumerable<ReaxNode> GetCallParameters(ITokenSource source, bool validateEndExpression = true)
     {
         var parameters = new List<ReaxNode>();
         if (source.CurrentToken.Type != TokenType.OPEN_PARENTHESIS)
@@ -63,7 +63,11 @@ public class ParameterHelper
             source.Advance();
         }
 
-        source.Advance(TokenType.SEMICOLON);
+        if (validateEndExpression)
+            source.Advance(TokenType.SEMICOLON);
+        else 
+            source.Advance();
+            
         return parameters;
     }
 }
