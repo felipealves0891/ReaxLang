@@ -13,7 +13,6 @@ public record UseInstanceNode(
     string Member,
     ReaxNode[] Arguments,
     ReaxNode Target,
-    DataType Type,
     SourceLocation Location) : ExpressionNode(Location)
 {
     public override IReaxNode[] Children => [.. Arguments, Target];
@@ -29,16 +28,11 @@ public record UseInstanceNode(
         if (nativeMember is null)
             return new NullNode(Location);
 
-        
         var result = TypeResolverHelper.InvokeMember(nativeTarget, nativeMember, parameters);
         if (result is null)
             return new NullNode(Location);
 
-        var resultText = result.ToString();
-        if (resultText is null)
-            return new NullNode(Location);
-
-        return TypeResolverHelper.CastToReax(result, resultText, Type, Location);
+        return new NativeValueNode(result);
     }
 
     private static object GetNativeTarget(IReaxExecutionContext context, ReaxNode Target)
@@ -49,7 +43,6 @@ public record UseInstanceNode(
             return expression.Evaluation(context).Value;
         else
             throw new InvalidOperationException("Target é invalido para chamada nativa");
-
     }
 
     public override string ToString()

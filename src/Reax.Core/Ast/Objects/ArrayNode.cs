@@ -14,6 +14,7 @@ public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Locati
     public override DataType Type => DataType.ARRAY;
 
     public ReaxNode this[int i] => Literals[i];
+    public int Length = Literals.Length;
 
     public IEnumerator<ReaxNode> GetEnumerator()
     {

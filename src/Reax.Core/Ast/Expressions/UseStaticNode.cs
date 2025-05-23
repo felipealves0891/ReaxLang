@@ -2,6 +2,7 @@ using System;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Objects;
 using Reax.Core.Locations;
+using Reax.Core.Types;
 using Reax.Parser.Node;
 
 namespace Reax.Core.Ast.Expressions;

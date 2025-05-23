@@ -18,8 +18,7 @@ public static class TypeResolverHelper
             return null;
 
         typeName = typeName.Trim().ToLowerInvariant();
-
-        return typeName switch
+        var type = typeName switch
         {
             "int" or "int32" => typeof(int),
             "long" or "int64" => typeof(long),
@@ -35,6 +34,14 @@ public static class TypeResolverHelper
             "object" => typeof(object),
             _ => Type.GetType(typeName, throwOnError: false, ignoreCase: true)
         };
+
+        if (type is not null)
+            return type;
+
+        return AppDomain.CurrentDomain
+                     .GetAssemblies()
+                     .SelectMany(a => a.GetTypes())
+                     .FirstOrDefault(t => t.Name.Equals(typeName, StringComparison.InvariantCultureIgnoreCase));
     }
 
     public static MemberInfo? GetMemberInfo(Type type, string memberName, Type[]? parameterTypes)

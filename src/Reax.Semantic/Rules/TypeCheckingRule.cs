@@ -239,8 +239,8 @@ public class TypeCheckingRule : BaseRule
             return DataType.STRUCT;
         else if (node is StructFieldAccessNode fieldAccessNode)
             return GetDataTypeByProperty(fieldAccessNode);
-        else if (node is UseInstanceNode useInstance)
-            return useInstance.Type;
+        else if (node is NativeCallNode native)
+            return native.Type;
         else
             return DataType.NONE;
     }
