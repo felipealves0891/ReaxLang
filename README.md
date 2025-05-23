@@ -175,7 +175,7 @@ const meuValorImutavel: string = 'Sempre assim'; # uma constante e um comentári
 ### Chamadas a metodos e propriedades Nativas do .Net
 > Podemos fazer chamadas nativas do C# usando a palavra chava  ```use```, para indicar o membro ( propriedade ou metodo), sendo obrigatorio o uso do PascalCase ```ToString()``` ou ```Length```
 
-> Após a indicar o Membro a ser invocado, podemos indicar a instancia usando a palavra chave ```in```, isso ira indivar para o Reax que deve chamar o membro do ```use``` no proximo identificador,
+> Após a indicar o Membro a ser invocado, podemos indicar a instancia usando a palavra chave ```in```, assim dizemos para o Reax que deve chamar o membro do ```use``` no proximo identificador,
 podendo ser um referencia Reax ou nativo do C#.
 
 > Para ulizar um valor nativo do C#, por exemplo a propriedade Now do DateTime, podemos usar a palavra chave ```of``` após a instancia indicada no ```in```, para expecificarmos o tipo nativo do C#.
@@ -183,8 +183,9 @@ podendo ser um referencia Reax ou nativo do C#.
 > Precisamos adicionar a palavra chave ```as``` com o tipo que esperamos receber, assim indicamos ao Reax o resultado da operação sera um valor do tipo especificado
 
 #### Atenção
-O Reax diferencia uma chamada a instancia do C# para uma variavel interna pela escripta, exemplo:
+O Reax diferencia uma chamada a instancia do C# para uma variavel interna pela escrita, exemplo:
 > ... ```in``` datetime # O identificador camel case é traduzido como uma variavel Reax
+
 > ... ```in``` Datetime # O identificador pascal case é traduzido como um Membro C#
 
 ```
