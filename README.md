@@ -171,3 +171,35 @@ let minhaDivisao: int = match calculate.divider(50, 0) {
 ```
 const meuValorImutavel: string = 'Sempre assim'; # uma constante e um comentário
 ```
+
+### Chamadas a metodos e propriedades Nativas do .Net
+> Podemos fazer chamadas nativas do C# usando a palavra chava  ```use```, para indicar o membro ( propriedade ou metodo), sendo obrigatorio o uso do PascalCase ```ToString()``` ou ```Length```
+
+> Após a indicar o Membro a ser invocado, podemos indicar a instancia usando a palavra chave ```in```, isso ira indivar para o Reax que deve chamar o membro do ```use``` no proximo identificador,
+podendo ser um referencia Reax ou nativo do C#.
+
+> Para ulizar um valor nativo do C#, por exemplo a propriedade Now do DateTime, podemos usar a palavra chave ```of``` após a instancia indicada no ```in```, para expecificarmos o tipo nativo do C#.
+
+> Precisamos adicionar a palavra chave ```as``` com o tipo que esperamos receber, assim indicamos ao Reax o resultado da operação sera um valor do tipo especificado
+
+#### Atenção
+O Reax diferencia uma chamada a instancia do C# para uma variavel interna pela escripta, exemplo:
+> ... ```in``` datetime # O identificador camel case é traduzido como uma variavel Reax
+> ... ```in``` Datetime # O identificador pascal case é traduzido como um Membro C#
+
+```
+let myArray: string[] = ['C#', 'Js', 'Rx'];
+const count: number = use Length in myArray as number;
+```
+ou
+```
+let datetime: string = use ToString('yyyy-MM-dd') in Now of DateTime as string;
+```
+ou
+```
+datetime = use Substring(0, 2) in datetime as string;
+```
+ou
+```
+let day: number = use Day in Now of Datetime as number;
+```
