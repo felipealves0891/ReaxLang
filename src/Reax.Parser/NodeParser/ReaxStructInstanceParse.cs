@@ -13,16 +13,16 @@ public class ReaxStructInstanceParse : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
-        return current.Type == TokenType.ASSIGNMENT
-            && next.Type == TokenType.OPEN_BRACE;
+        return (before.Type == TokenType.IDENTIFIER && current.Type == TokenType.ASSIGNMENT && next.Type == TokenType.OPEN_BRACE)
+            || (before.Type == TokenType.ASSIGNMENT && current.Type == TokenType.IDENTIFIER && next.Type == TokenType.OPEN_BRACE);
     }
 
     public ReaxNode? Parse(ITokenSource source)
     {
-        var name = source.BeforeToken;
+        Token name = GetName(source);
         source.Advance(TokenType.OPEN_BRACE);
-        var fieldValues = new Dictionary<string, ReaxNode>();
 
+        var fieldValues = new Dictionary<string, ReaxNode>();
         do
         {
             source.Advance(TokenType.IDENTIFIER);
@@ -42,6 +42,14 @@ public class ReaxStructInstanceParse : INodeParser
                 name.File,
                 name.Location.Start,
                 source.CurrentToken.Location.End));
+    }
+
+    private Token GetName(ITokenSource source)
+    { 
+        if (source.CurrentToken.Type == TokenType.IDENTIFIER)
+            return source.CurrentToken;
+        
+        return source.BeforeToken;
     }
 
     private ReaxNode GetValue(ITokenSource source)

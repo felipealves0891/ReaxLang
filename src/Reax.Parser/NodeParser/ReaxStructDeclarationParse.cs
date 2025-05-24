@@ -29,6 +29,7 @@ public class ReaxStructDeclarationParse : INodeParser
             source.Advance(TokenType.COLON);
             source.Advance(Token.DataTypes);
             var propertyType = source.CurrentToken.Type.ToDataType();
+            
             if (source.NextToken.Type == TokenType.OPEN_BRACKET)
             {
                 source.Advance(TokenType.OPEN_BRACKET);

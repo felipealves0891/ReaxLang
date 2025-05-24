@@ -60,7 +60,7 @@ public class ReaxLexer
         if(_source.EndOfFile)
             return new Token(TokenType.EOF, (byte)' ', _source.FileName, _source.Position, _source.Line);
 
-        if(char.IsLetter((char)_source.CurrentChar)) 
+        if(char.IsLetter((char)_source.CurrentChar) || _source.CurrentChar == UNDERSCORE) 
             return GetIdentifierOrKeyword();
         if(char.IsDigit((char)_source.CurrentChar)) 
             return GetDigit();

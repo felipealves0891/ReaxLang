@@ -42,10 +42,16 @@ struct Pessoa {
 
 Atenção ao caracter (@) arroba para indicar que é um tipo complexo
 ```
-let pessoa: @Pessoa = {
+let umaPessoa: @pessoa = {
 	nome: 'Felipe',
 	idade: 33
 }
+
+umaPessoa = pessoa {
+	nome: 'Felipe',
+	idade: 34
+}
+
 ```
 
 Acessando uma propriedade do objeto
