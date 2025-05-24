@@ -78,6 +78,12 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         Console.WriteLine("Run Time: {0}", runTime);
         Console.WriteLine("Total Time: {0}", stopwatch.Elapsed);
 
+    
+        Process currentProcess = Process.GetCurrentProcess();
+        long memoryUsage = currentProcess.WorkingSet64;
+        double memoryUsageInMB = memoryUsage / (1024.0 * 1024.0);
+        Console.WriteLine($"Memory Usage: {memoryUsageInMB:F2} MB");
+        
         return 0;
         
     }
