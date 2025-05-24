@@ -19,6 +19,17 @@ public record ModuleNode(
         context.SetModule(identifier, functions);  
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(identifier);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"import module {identifier};";

@@ -40,6 +40,20 @@ public record IfNode(
         return hasGuaranteedReturn && True.HasGuaranteedReturn();
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Condition.Serialize(writer);
+        True.Serialize(writer);
+        if (False is not null)
+            False.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         var elseText = False is null ? "" : "else {}";

@@ -15,8 +15,25 @@ public record StructInstanceNode(
     public override object Value => FieldValues;
     public override DataType Type => DataType.STRUCT;
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Name);
+        writer.Write(FieldValues.Count);
+        foreach (var field in FieldValues)
+        {
+            writer.Write(field.Key);
+            field.Value.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
+    
     public override string ToString()
-    {        
+    {
         return $"{Name} {{}}";
     }
 }

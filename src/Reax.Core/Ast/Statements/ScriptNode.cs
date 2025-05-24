@@ -26,6 +26,22 @@ public record ScriptNode : StatementNode, IReaxDeclaration
         context.SetScript(Identifier, interpreter);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        writer.Write(Nodes.Length);
+        foreach (var node in Nodes)
+        {
+            node.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"import script {Identifier};";

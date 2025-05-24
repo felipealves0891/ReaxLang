@@ -24,6 +24,22 @@ public record FunctionCallNode(
         return success ?? throw new Exception();
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        writer.Write(Parameter.Length);
+        foreach (var param in Parameter)
+        {
+            param.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"{Identifier}({string.Join(',', Parameter.Select(x => x.ToString()))});";

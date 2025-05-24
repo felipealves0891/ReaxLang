@@ -24,6 +24,17 @@ public record NumberNode(
         }
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Source);
+        base.Serialize(writer);
+    }
+
     public override DataType Type => DataType.NUMBER;
     public override IReaxNode[] Children => [];
 

@@ -38,6 +38,19 @@ public record ForNode(
         return Block.HasGuaranteedReturn();
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Declaration.Serialize(writer);
+        Condition.Serialize(writer);
+        Block.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"for {Declaration} to {Condition} {{...}}";

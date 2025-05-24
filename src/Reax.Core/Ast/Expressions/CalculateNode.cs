@@ -39,6 +39,19 @@ public record CalculateNode(
             throw new InvalidOperationException("Não é possivel tratar o nó da operação!");
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Left.Serialize(writer);
+        Operator.Serialize(writer);
+        Right.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"{Left} {Operator} {Right}";

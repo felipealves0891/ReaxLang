@@ -28,6 +28,17 @@ public record ReturnErrorNode(
         return true;
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Expression.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"return error {Expression}";

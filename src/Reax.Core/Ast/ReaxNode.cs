@@ -9,9 +9,21 @@ namespace Reax.Core.Ast;
 
 public abstract record ReaxNode(SourceLocation Location) : IReaxNode
 {
+    protected const byte ACK = 0x06;
+
     public abstract IReaxNode[] Children { get; }
 
-    public IReaxValue GetValue(IReaxExecutionContext context) 
+    public virtual void Serialize(BinaryWriter writer)
+    {
+        writer.Write(Location.File);
+        writer.Write(Location.Start.Line);
+        writer.Write(Location.Start.Column);
+        writer.Write(Location.End.Line);
+        writer.Write(Location.End.Column);
+        writer.Write(ACK);
+    }
+
+    public IReaxValue GetValue(IReaxExecutionContext context)
     {
         if (this is ExpressionNode expression)
             return expression.Evaluation(context);

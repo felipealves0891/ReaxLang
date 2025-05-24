@@ -21,6 +21,21 @@ public record ContextNode(
         return Block.Any(x => x is IBranchFlowNode control ? control.HasGuaranteedReturn() : false);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Block.Length);
+        foreach (var node in Block)
+        {
+            node.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return "{...}";

@@ -27,6 +27,18 @@ public record WhileNode(
         return Block.HasGuaranteedReturn();
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Condition.Serialize(writer);
+        Block.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"while {Condition} {{...}}";

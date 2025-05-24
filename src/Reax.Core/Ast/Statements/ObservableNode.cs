@@ -22,9 +22,23 @@ public record ObservableNode(
         context.SetObservable(identifier, interpreter, Condition);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Var.Serialize(writer);
+        Block.Serialize(writer);
+        if (Condition is not null)
+            Condition.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
-        var when = Condition is null ? "" : $"when {Condition} "; 
+        var when = Condition is null ? "" : $"when {Condition} ";
         return $"on {Var} {when} {{...}}";
     }
 }

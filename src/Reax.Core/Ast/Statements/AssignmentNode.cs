@@ -28,6 +28,18 @@ public record AssignmentNode(
             throw new Exception($"Tipo invalido para direita de uma atribuição {Assigned.GetType().Name}, era esperado uma expressão ou um literal!");
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Identifier.Serialize(writer);
+        Assigned.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"{Identifier} = {Assigned};";

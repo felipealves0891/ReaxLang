@@ -25,6 +25,19 @@ public record BindNode(
         context.SetBind(Identifier, interpreter);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        Node.Serialize(writer);
+        writer.Write((int)Type);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"bind {Identifier}: {Type} -> {{...}}";

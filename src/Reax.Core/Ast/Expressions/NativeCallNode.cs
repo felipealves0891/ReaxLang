@@ -30,6 +30,18 @@ public record NativeCallNode(
             Location);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Node.Serialize(writer);
+        writer.Write(((int)Type));
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"{Node} as {Type}";

@@ -45,6 +45,23 @@ public record UseInstanceNode(
             throw new InvalidOperationException("Target é invalido para chamada nativa");
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Member);
+        writer.Write(Arguments.Length);
+        foreach (var arg in Arguments)
+        {
+            arg.Serialize(writer);
+        }
+        Target.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         var parameters = string.Join(',', Arguments.Select(x => x.ToString()));

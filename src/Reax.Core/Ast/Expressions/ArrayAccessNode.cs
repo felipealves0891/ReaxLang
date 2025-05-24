@@ -13,7 +13,7 @@ public record ArrayAccessNode(ReaxNode Array, ReaxNode Expression, SourceLocatio
     public override IReaxNode[] Children => [Array, Expression];
 
     public override IReaxValue Evaluation(IReaxExecutionContext context)
-    {        
+    {
         var array = GetArray(context);
         var index = GetIndex(context);
         return array[index].GetValue(context);
@@ -42,5 +42,17 @@ public record ArrayAccessNode(ReaxNode Array, ReaxNode Expression, SourceLocatio
     public override string ToString()
     {
         return $"{Array}[{Expression}]";
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Array.Serialize(writer);
+        Expression.Serialize(writer);
+        base.Serialize(writer);
     }
 }

@@ -15,6 +15,17 @@ public record BooleanNode(
     public override DataType Type => DataType.BOOLEAN;
     public override IReaxNode[] Children => [];
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Source);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"{Source.ToLower()}";

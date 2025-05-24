@@ -44,6 +44,18 @@ public record ExternalFunctionCallNode(
         }
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(scriptName);
+        functionCall.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         var parameters = functionCall.Parameter.Select(x => x.ToString());

@@ -37,6 +37,19 @@ public record ForInNode(
 
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Declaration.Serialize(writer);
+        Array.Serialize(writer);
+        Context.Serialize(writer);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"for {Declaration.Identifier}:{Declaration.Type} in {Array} {{}}";

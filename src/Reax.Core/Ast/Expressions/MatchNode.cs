@@ -35,6 +35,19 @@ public record MatchNode(
         else
             throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
     }
+    
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Expression.Serialize(writer);
+        Success.Serialize(writer);
+        Error.Serialize(writer);
+        base.Serialize(writer);
+    }
 
     public override string ToString()
     {

@@ -24,6 +24,19 @@ public record ActionNode(
             return false;
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Parameter.Serialize(writer);
+        Context.Serialize(writer);
+        writer.Write((int)Type);
+        base.Serialize(writer);
+    }
+    
     public override string ToString()
     {
         return $"({Parameter}){Type} -> {{...}}";

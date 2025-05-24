@@ -31,6 +31,25 @@ public record FunctionDeclarationNode(
         return Block.HasGuaranteedReturn();
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        Block.Serialize(writer);
+        writer.Write(Parameters.Length);
+        foreach (var param in Parameters)
+        {
+            param.Serialize(writer);
+        }
+        writer.Write((int)SuccessType);
+        writer.Write((int)ErrorType);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         var param = string.Join(',', Parameters.Select(x => x.ToString()));

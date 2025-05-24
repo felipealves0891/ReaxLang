@@ -40,13 +40,32 @@ public record DeclarationNode(
         }
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        writer.Write(Immutable);
+        writer.Write(Async);
+        writer.Write((int)Type);
+        if(Assignment is not null)
+            Assignment.Serialize(writer);
+        else
+            writer.Write((byte)0); // Indicate no assignment
+        writer.Write(ComplexType ?? string.Empty);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         var asc = Async ? "async " : "";
         var mut = Immutable ? "const" : "let";
-        if(Assignment is not null)
+        if (Assignment is not null)
             return $"{asc}{mut} {Identifier}: {Type} = {Assignment};";
-        else 
+        else
             return $"{asc}{mut} {Identifier}: {Type};";
     }
 }

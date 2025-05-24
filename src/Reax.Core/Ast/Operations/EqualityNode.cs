@@ -25,6 +25,17 @@ public record EqualityNode(
             return !x.Value.Equals(y.Value);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Operator);
+        base.Serialize(writer);
+    }
+    
     public override string ToString()
     {
         return Operator.ToString();

@@ -15,6 +15,17 @@ public record StringNode(
     public override DataType Type => DataType.STRING;
     public override IReaxNode[] Children => [];
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Source);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"'{Source}'";

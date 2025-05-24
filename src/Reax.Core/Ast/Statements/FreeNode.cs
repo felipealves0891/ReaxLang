@@ -14,4 +14,20 @@ public record FreeNode(string Identifier, SourceLocation Location)
         if (!context.Remove(Identifier))
             Logger.LogRuntime($"Não foi possivel remover o identificador {Identifier}!");
     }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        base.Serialize(writer);
+    }
+
+    public override string ToString()
+    {
+        return $"free {Identifier};";
+    }
 }

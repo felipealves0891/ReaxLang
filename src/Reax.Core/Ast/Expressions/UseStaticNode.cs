@@ -33,6 +33,23 @@ public record UseStaticNode(
         return new NativeValueNode(result);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Member);
+        writer.Write(TypeName);
+        writer.Write(Arguments.Length);
+        foreach (var arg in Arguments)
+        {
+            arg.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $" {Member} of {TypeName}";

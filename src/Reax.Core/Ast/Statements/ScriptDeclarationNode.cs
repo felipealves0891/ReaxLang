@@ -20,6 +20,17 @@ public record ScriptDeclarationNode(
     {
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        base.Serialize(writer);
+    }
+
     public override string ToString()
     {
         return $"script {Identifier};";

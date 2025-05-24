@@ -9,12 +9,27 @@ namespace Reax.Core.Ast.Objects;
 public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Location)
     : ObjectNode(Location), IEnumerable<ReaxNode>
 {
+    public ReaxNode this[int i] => Literals[i];
+
     public override IReaxNode[] Children => Literals.ToArray();
     public override object Value => Literals.ToArray();
     public override DataType Type => DataType.ARRAY;
-
-    public ReaxNode this[int i] => Literals[i];
     public int Length = Literals.Length;
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Literals.Length);
+        foreach (var literal in Literals)
+        {
+            literal.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
 
     public IEnumerator<ReaxNode> GetEnumerator()
     {
