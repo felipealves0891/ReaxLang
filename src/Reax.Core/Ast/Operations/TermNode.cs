@@ -12,10 +12,13 @@ public record TermNode(
 
     public NumberNode Calculate(NumberNode x, NumberNode y)
     {
-        return Operator switch 
+        var left = Convert.ToDecimal(x.Value);
+        var rigth = Convert.ToDecimal(y.Value);
+
+        return Operator switch
         {
-            "+" => new NumberNode(((decimal)x.Value + (decimal)y.Value).ToString(), x.Location),
-            "-" => new NumberNode(((decimal)x.Value - (decimal)y.Value).ToString(), x.Location),
+            "+" => new NumberNode((left + rigth).ToString(), x.Location),
+            "-" => new NumberNode((left - rigth).ToString(), x.Location),
             _ => throw new InvalidOperationException("Operador invalido!")
         };
     }

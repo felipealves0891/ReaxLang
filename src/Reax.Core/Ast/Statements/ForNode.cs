@@ -27,7 +27,8 @@ public record ForNode(
             if(value is null)
                 throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
 
-            var newValue = new NumberNode(((decimal)value.Value + 1).ToString(), Declaration.Location);
+            var intValue = Convert.ToInt32(value.Value) + 1;
+            var newValue = new NumberNode(intValue.ToString(), Declaration.Location);
             context.SetVariable(Declaration.Identifier, newValue);
         }
     }

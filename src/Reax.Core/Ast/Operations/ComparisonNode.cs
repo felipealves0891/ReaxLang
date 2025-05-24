@@ -12,17 +12,17 @@ public record ComparisonNode(
 
     public bool Compare(ReaxNode x, ReaxNode y)
     {
-        var left = (NumberNode)x;
-        var rigth = (NumberNode)y;
+        var left = Convert.ToDecimal(((NumberNode)x).Value);
+        var rigth = Convert.ToDecimal(((NumberNode)y).Value);
 
         if(Operator == "<")
-            return (decimal)left.Value < (decimal)rigth.Value;
+            return left < rigth;
         else if(Operator == ">")
-            return (decimal)left.Value > (decimal)rigth.Value;
+            return left > rigth;
         else if(Operator == "<=")
-            return (decimal)left.Value <= (decimal)rigth.Value;
+            return left <= rigth;
         else if(Operator == ">=")
-            return (decimal)left.Value > (decimal)rigth.Value;
+            return left > rigth;
         else
             throw new InvalidOperationException($"Operador de comparação invalido: {Operator}");
     }

@@ -12,14 +12,17 @@ public record FactorNode(
 
     public NumberNode Calculate(NumberNode x, NumberNode y)
     {
-        return Operator switch 
+        var left = Convert.ToDecimal(x.Value);
+        var rigth = Convert.ToDecimal(y.Value);
+
+        return Operator switch
         {
-            "*" => new NumberNode(((decimal)x.Value * (decimal)y.Value).ToString(), Location),
-            "/" => new NumberNode(((decimal)x.Value / (decimal)y.Value).ToString(), Location),
+            "*" => new NumberNode((left * rigth).ToString(), Location),
+            "/" => new NumberNode((left / rigth).ToString(), Location),
             _ => throw new InvalidOperationException("Operador invalido!")
         };
     }
-
+    
     public override string ToString()
     {
         return Operator.ToString();

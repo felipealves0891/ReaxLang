@@ -4,6 +4,7 @@ using Reax.Core.Locations;
 using Reax.Core.Types;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using System.Numerics;
 
 namespace Reax.Core.Ast.Literals;
 
@@ -16,7 +17,7 @@ public record NumberNode(
     {
         get
         {
-            if (Source.IndexOf('.') == -1)
+            if (Source.IndexOf('.') == -1 && Source.IndexOf(',') == -1)
                 return int.Parse(Source);
             else
                 return decimal.Parse(Source);

@@ -29,4 +29,9 @@ public record NativeCallNode(
             Type,
             Location);
     }
+
+    public override string ToString()
+    {
+        return $"{Node} as {Type}";
+    }
 }
