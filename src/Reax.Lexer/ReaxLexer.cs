@@ -31,7 +31,6 @@ public class ReaxLexer
     private const byte UNDERSCORE = (byte)'_';
     private const byte AT = (byte)'@';
 
-
     private readonly IReader _source;
 
     public ReaxLexer(IReader source)

@@ -58,6 +58,7 @@ public enum TokenType
     AT,
     USE,
     OF,
-    AS
+    AS,
+    FREE
 
 } 

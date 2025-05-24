@@ -218,6 +218,23 @@ public class SemanticContext : ISemanticContext
                     .ToArray();
     }
 
+    public bool Remove(string identifier, string? script = null)
+    {
+        var internalIdentifier = GetIdentifier(identifier, script);
+        var removed = false;
+
+        if (CurrentSymbolTable.ContainsKey(internalIdentifier))
+            removed = CurrentSymbolTable.TryRemove(internalIdentifier, out _);
+
+        foreach (var scope in _symbolsTable)
+        {
+            if (scope.ContainsKey(internalIdentifier))
+                removed = removed || scope.TryRemove(internalIdentifier, out _);
+        }
+
+        return removed;
+    }
+
     private class ExiterScope : IDisposable
     {
         private readonly Action _disposable;

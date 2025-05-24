@@ -23,6 +23,17 @@ public class SymbolRule : BaseRule
         Handlers[typeof(ActionNode)] = ApplyActionNode;
         Handlers[typeof(ModuleNode)] = ApplyModuleNode;
         Handlers[typeof(StructDeclarationNode)] = ApplyStructDeclarationNode;
+        Handlers[typeof(FreeNode)] = ApplyFreeNode;
+    }
+
+    private ValidationResult ApplyFreeNode(IReaxNode node)
+    {
+        var free = (FreeNode)node;
+        var clean = Context.Remove(free.Identifier);
+        if (clean)
+            return ValidationResult.Success();
+        else
+            return ValidationResult.FailureSymbolUndeclared(free.Identifier, free.Location);
     }
 
     private ValidationResult ApplyDeclarationNode(IReaxNode node)

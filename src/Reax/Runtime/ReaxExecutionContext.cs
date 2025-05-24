@@ -360,6 +360,32 @@ public class ReaxExecutionContext : IReaxExecutionContext
         }
     }
 
+    public bool Remove(string identifier)
+    {
+        if (!_symbols.ContainsKey(identifier))
+            return false;
+
+        var symbol = _symbols[identifier];
+        var removed = false;
+        if (_variableContext.Remove(symbol))
+            removed = true;
+        if (_functionContext.Remove(symbol))
+            removed = true;
+        if (_scriptContext.Remove(symbol))
+            removed = true;
+        if (_bindContext.Remove(symbol))
+            removed = true;
+        if (_moduleContext.Remove(symbol))
+            removed = true;
+        if (_observableContext.Remove(symbol))
+            removed = true;
+
+        _immutableKeys.Remove(symbol);
+        _asyncKeys.Remove(symbol);
+        _symbols.Remove(identifier);
+        return removed;
+    }
+
     public IReaxInterpreter CreateInterpreter(string name, ReaxNode[] nodes)
     {
         var interpreter = new ReaxInterpreter(name, nodes, this);
@@ -371,4 +397,5 @@ public class ReaxExecutionContext : IReaxExecutionContext
         var interpreter = new ReaxInterpreter(name, nodes, this, parameters);
         return interpreter;
     }
+
 }

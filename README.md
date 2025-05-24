@@ -204,3 +204,14 @@ ou
 ```
 let day: number = use Day in Now of Datetime as number;
 ```
+
+### Descartando identificadors
+Desta forma a variavel, funções, scripts e modulos seram descartadas
+
+```
+free meuValorImutavel;
+```
+ou
+```
+free minhaFuncao;
+```

@@ -28,19 +28,19 @@ public sealed class RunCommand : Command<RunCommand.Settings>
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
         var fileInfo = new FileInfo(settings.ComputedScript);
-        if(!fileInfo.Exists)
+        if (!fileInfo.Exists)
         {
             return ValidationResult.Error($"Script não encontrado: {settings.ComputedScript}");
         }
 
         if (settings.LogLevel < -2 || settings.LogLevel > 2)
-        { 
+        {
             return ValidationResult.Error($"Log Level invalido: Trace=-2, Debug=-1, Info=0, Error=1, None=2");
         }
 
         return base.Validate(context, settings);
     }
-    
+
     public override int Execute(CommandContext context, Settings settings)
     {
         TimeSpan buildTime = TimeSpan.Zero;
@@ -53,13 +53,17 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         IReaxInterpreter interpreter = null!;
         Stopwatch stopwatch = new Stopwatch();
 
+        double memoryUsageInMB = 0;
+
         try
         {
             stopwatch.Start();
             interpreter = ReaxCompiler.Compile(settings.ComputedScript);
+            var memoryUsageBefore = GetMemoryUsage();
             buildTime = stopwatch.Elapsed;
             interpreter.Interpret();
             runTime = stopwatch.Elapsed - buildTime;
+            memoryUsageInMB = GetMemoryUsage() - memoryUsageBefore;
             stopwatch.Stop();
         }
         catch (Exception ex)
@@ -78,13 +82,16 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         Console.WriteLine("Run Time: {0}", runTime);
         Console.WriteLine("Total Time: {0}", stopwatch.Elapsed);
 
-    
-        Process currentProcess = Process.GetCurrentProcess();
-        long memoryUsage = currentProcess.WorkingSet64;
-        double memoryUsageInMB = memoryUsage / (1024.0 * 1024.0);
+        
         Console.WriteLine($"Memory Usage: {memoryUsageInMB:F2} MB");
-        
+
         return 0;
-        
+
+    }
+    
+    private double GetMemoryUsage()
+    {
+        Process currentProcess = Process.GetCurrentProcess();
+        return currentProcess.WorkingSet64 / (1024.0 * 1024.0);
     }
 }

@@ -24,6 +24,7 @@ public interface IReaxExecutionContext
     void SetScript(string identifier, IReaxInterpreter interpreter);
     void SetModule(string identifier, Dictionary<string, Function> functions);
     void SetBind(string identifier, IReaxInterpreter interpreter);
+    bool Remove(string identifier);
     IReaxValue GetVariable(string identifier);
     IReaxValue? GetBind(string identifier);
     Function GetFunction(string identifier);
