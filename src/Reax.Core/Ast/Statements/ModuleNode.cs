@@ -15,8 +15,12 @@ public record ModuleNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        context.Declare(identifier);
         context.SetModule(identifier, functions);  
+    }
+
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.Declare(identifier);
     }
 
     public override string ToString()

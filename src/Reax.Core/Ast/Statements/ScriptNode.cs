@@ -21,9 +21,12 @@ public record ScriptNode : StatementNode, IReaxDeclaration
     {
         var interpreter = context.CreateInterpreter(Identifier, Nodes);
         interpreter.Interpret();
-        
-        context.Declare(Identifier);
         context.SetScript(Identifier, interpreter);
+    }
+
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.Declare(Identifier);
     }
 
     public override string ToString()

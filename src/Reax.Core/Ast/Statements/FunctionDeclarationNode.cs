@@ -19,10 +19,14 @@ public record FunctionDeclarationNode(
 
     public DataType ResultError => ErrorType;
 
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.Declare(Identifier);
+    }
+
     public override void Execute(IReaxExecutionContext context)
     {
         var interpreter = context.CreateInterpreter(ToString(), Block.Block, Parameters);
-        context.Declare(Identifier);
         context.SetFunction(Identifier, interpreter);
     }
 

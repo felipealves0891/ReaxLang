@@ -21,8 +21,12 @@ public record BindNode(
     public override void Execute(IReaxExecutionContext context)
     {
         var interpreter = context.CreateInterpreter($"bind->{Identifier}", [Node.Assigned]);
-        context.Declare(Identifier);
         context.SetBind(Identifier, interpreter);
+    }
+
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.Declare(Identifier);
     }
 
     public override string ToString()
