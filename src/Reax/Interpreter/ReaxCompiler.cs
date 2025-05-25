@@ -31,7 +31,7 @@ public class ReaxCompiler
         var ast = ReaxBinSerializer.TryLoadAstIfHashMatches(filename);
         if (ast is not null && !_reprocessing)
         {
-            Debug.WriteLine("Using cached AST for: " + filename);
+            Logger.LogAnalize("Using cached AST for: " + filename);
             return ast;
         }
 
