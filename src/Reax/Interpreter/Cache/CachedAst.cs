@@ -18,6 +18,7 @@ public class CachedAst
 
     public CachedAst(BinaryReader reader)
     {
+        LastModified = DateTime.FromBinary(reader.ReadInt64());
         var length = reader.ReadInt32();
         Data = new ReaxNode[length];
         for (var i = 0; i < length; i++)
@@ -29,6 +30,7 @@ public class CachedAst
 
     public void Serialize(BinaryWriter writer)
     {
+        writer.Write(LastModified.ToBinary());
         writer.Write(Data.Length);
         foreach (var node in Data)
             node.Serialize(writer);

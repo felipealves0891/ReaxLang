@@ -21,49 +21,30 @@ public class ReaxCompiler
 
     public static IReaxInterpreter Compile(string filename)
     {
-        var ast = ReaxBinSerializer.TryLoadAstIfHashMatches(filename);
-        if (ast is not null && !_reprocessing)
-        {
-            Debug.WriteLine("Using cached AST for: " + filename);
-            return new ReaxInterpreterBuilder()
-                .BuildMain(ast);
-        }
-
-        ast = GetNodes(filename);
-        RunAnalyzeSemantic(ast);    
-        ReaxBinSerializer.SerializeAstToBinary(filename, ast);
+        var ast = GetNodes(filename);
         return new ReaxInterpreterBuilder()
                 .BuildMain(ast);
     }
 
-    public static ReaxInterpreter CompileScript(string script, string filename)
-    {
-        var ast = ReaxBinSerializer.TryLoadAstIfHashMatches(filename);
-        if (ast is not null)
-        {
-            Debug.WriteLine("Using cached AST for script: " + filename);
-            _reprocessing = true;
-            return new ReaxInterpreterBuilder(script)
-                .BuildScript(ast);
-        }
-
-        ast = GetNodes(filename);
-        RunAnalyzeSemantic(ast);
-
-        ReaxBinSerializer.SerializeAstToBinary(filename, ast);
-        return new ReaxInterpreterBuilder(script)
-                .BuildScript(ast);
-    }
-
     private static ReaxNode[] GetNodes(string filename)
     {
+        var ast = ReaxBinSerializer.TryLoadAstIfHashMatches(filename);
+        if (ast is not null && !_reprocessing)
+        {
+            Debug.WriteLine("Using cached AST for: " + filename);
+            return ast;
+        }
+
         var reader = new ReaxStreamReader(filename);
         var lexer = new ReaxLexer(reader);
         var tokens = lexer.Tokenize().ToArray();
 
         var parser = new ReaxParser(tokens, GetNodes);
-        var ast = parser.Parse().ToArray();
-
+        ast = parser.Parse().ToArray();
+        
+        RunAnalyzeSemantic(ast);    
+        ReaxBinSerializer.SerializeAstToBinary(filename, ast);
+        
         return ast;
     }
 
