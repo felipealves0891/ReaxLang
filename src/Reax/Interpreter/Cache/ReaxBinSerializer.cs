@@ -53,12 +53,9 @@ public static class ReaxBinSerializer
         var sourceCode = File.ReadAllText(filename);
         if (CalculateHash(sourceCode) != sourceHash)
             return null;
-
-        var payloadSize = br.ReadInt32();
-        var payload = br.ReadBytes(payloadSize);
-        var json = Encoding.UTF8.GetString(payload);
-
-        return JsonSerializer.Deserialize<ReaxNode[]>(json);
+            
+        var cachedAst = new CachedAst(br);        
+        return cachedAst.Data;
     }
 
     private static string GetOutputFilePath(string filename)
