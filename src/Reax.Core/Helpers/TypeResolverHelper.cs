@@ -138,8 +138,9 @@ public static class TypeResolverHelper
             DataType.STRING => new StringNode(resultText, location),
             DataType.NUMBER => new NumberNode(resultText, location),
             DataType.BOOLEAN => new BooleanNode(resultText, location),
-            DataType.ARRAY => new ArrayNode(GetLiterals(result, location), location),
-            _ => new NullNode(location),
+            _ => reaxType.HasFlag(DataType.ARRAY)
+               ? new ArrayNode(GetLiterals(result, location), location) 
+               : new NullNode(location),
         };
     }
     

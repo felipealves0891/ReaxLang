@@ -109,10 +109,17 @@ public class ReaxUseInstanceParse : INodeParser
     {
         var dataType = DataType.NONE;
         if (source.CurrentToken.Type == TokenType.AS)
-        { 
+        {
             source.Advance(Token.DataTypes);
-            dataType = source.CurrentToken.Type.ToDataType();   
+            dataType = source.CurrentToken.Type.ToDataType();
+            if (source.NextToken.Type == TokenType.OPEN_BRACKET)
+            {
+                dataType = dataType | DataType.ARRAY;
+                source.Advance(TokenType.OPEN_BRACKET);
+                source.Advance(TokenType.CLOSE_BRACKET);
+            }        
         }
+
         return dataType;
     }
 }
