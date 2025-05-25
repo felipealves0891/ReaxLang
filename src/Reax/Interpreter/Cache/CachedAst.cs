@@ -1,5 +1,6 @@
 using System;
 using Reax.Core.Ast;
+using Reax.Core.Ast.Statements;
 using Reax.Core.Debugger;
 using Reax.Core.Helpers;
 
@@ -33,6 +34,25 @@ public class CachedAst
         writer.Write(LastModified.ToBinary());
         writer.Write(Data.Length);
         foreach (var node in Data)
-            node.Serialize(writer);
+        {
+            if (node is ScriptNode scriptNode)
+            {
+                var fileRef = GetFileRef(scriptNode);
+                fileRef.Serialize(writer);
+            }
+            else
+            {
+                node.Serialize(writer);
+            }
+        }
+
+    }
+
+    private FileRef GetFileRef(ScriptNode scriptNode)
+    {
+        return new FileRef(
+            scriptNode.Filename,
+            scriptNode.Identifier,
+            scriptNode.Location);
     }
 }

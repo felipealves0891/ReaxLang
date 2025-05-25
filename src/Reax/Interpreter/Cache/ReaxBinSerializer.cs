@@ -34,6 +34,12 @@ public static class ReaxBinSerializer
         cached.Serialize(bw);
     }
 
+    public static string ContentHash(string filename)
+    {
+        var sourceCode = File.ReadAllText(filename);
+        return CalculateHash(sourceCode);
+    }
+
     public static ReaxNode[]? TryLoadAstIfHashMatches(string filename)
     {
         var outputFile = GetOutputFilePath(filename);
@@ -67,9 +73,7 @@ public static class ReaxBinSerializer
             return cachedAst.Data;
         }
         catch (System.Exception ex)
-        {
-            if(File.Exists(outputFile))
-                File.Delete(outputFile); // Remove corrupted file                
+        {                
             Logger.LogError(ex, "Failed to load CachedAst from binary reader.");
             return null;
         }

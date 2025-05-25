@@ -26,7 +26,7 @@ public class ReaxCompiler
                 .BuildMain(ast);
     }
 
-    private static ReaxNode[] GetNodes(string filename)
+    public static ReaxNode[] GetNodes(string filename)
     {
         var ast = ReaxBinSerializer.TryLoadAstIfHashMatches(filename);
         if (ast is not null && !_reprocessing)
