@@ -2,6 +2,7 @@ using System;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Objects;
 using Reax.Core.Ast.Objects.Structs;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Statements;
@@ -48,6 +49,15 @@ public record ForInNode(
         Array.Serialize(writer);
         Context.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    public static new ForInNode Deserialize(BinaryReader reader)
+    {
+        var declaration = BinaryDeserializerHelper.Deserialize<DeclarationNode>(reader);
+        var array = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var context = BinaryDeserializerHelper.Deserialize<ContextNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new ForInNode(declaration, array, context, location);
     }
 
     public override string ToString()

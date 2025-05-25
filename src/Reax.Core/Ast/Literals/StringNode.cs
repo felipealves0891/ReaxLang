@@ -26,6 +26,13 @@ public record StringNode(
         base.Serialize(writer);
     }
 
+    public static new StringNode Deserialize(BinaryReader reader)
+    {
+        var source = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new StringNode(source, location);
+    }
+
     public override string ToString()
     {
         return $"'{Source}'";

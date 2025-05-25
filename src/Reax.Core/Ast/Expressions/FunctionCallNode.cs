@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 
 namespace Reax.Core.Ast.Expressions;
 
@@ -38,6 +39,19 @@ public record FunctionCallNode(
             param.Serialize(writer);
         }
         base.Serialize(writer);
+    }
+    
+    public static new FunctionCallNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var parameterCount = reader.ReadInt32();
+        var parameters = new ReaxNode[parameterCount];
+
+        for (int i = 0; i < parameterCount; i++)
+            parameters[i] = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+
+        var location = ReaxNode.Deserialize(reader);
+        return new FunctionCallNode(identifier, parameters, location);
     }
 
     public override string ToString()

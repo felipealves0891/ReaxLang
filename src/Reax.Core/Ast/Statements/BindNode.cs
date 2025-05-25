@@ -5,6 +5,7 @@ using Reax.Core.Types;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Statements;
 using Reax.Core.Debugger;
+using Reax.Core.Helpers;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -36,6 +37,15 @@ public record BindNode(
         Node.Serialize(writer);
         writer.Write((int)Type);
         base.Serialize(writer);
+    }
+
+    public static new BindNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var node = BinaryDeserializerHelper.Deserialize<AssignmentNode>(reader);
+        var type = (DataType)reader.ReadInt32();
+        var location = ReaxNode.Deserialize(reader);
+        return new BindNode(identifier, node, type, location);
     }
 
     public override string ToString()

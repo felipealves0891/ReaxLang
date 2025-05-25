@@ -1,6 +1,7 @@
 using System;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 
@@ -30,6 +31,21 @@ public record StructInstanceNode(
             field.Value.Serialize(writer);
         }
         base.Serialize(writer);
+    }
+
+    public static new StructInstanceNode Deserialize(BinaryReader reader)
+    {
+        var name = reader.ReadString();
+        var fieldCount = reader.ReadInt32();
+        var fieldValues = new Dictionary<string, ReaxNode>(fieldCount);
+        for (var i = 0; i < fieldCount; i++)
+        {
+            var key = reader.ReadString();
+            var value = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+            fieldValues[key] = value;
+        }
+        var location = ReaxNode.Deserialize(reader);
+        return new StructInstanceNode(name, fieldValues, location);
     }
     
     public override string ToString()

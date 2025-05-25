@@ -20,7 +20,16 @@ public abstract record ReaxNode(SourceLocation Location) : IReaxNode
         writer.Write(Location.Start.Column);
         writer.Write(Location.End.Line);
         writer.Write(Location.End.Column);
-        writer.Write(ACK);
+    }
+    
+    public static SourceLocation Deserialize(BinaryReader reader)
+    {
+        var file = reader.ReadString();
+        var startLine = reader.ReadInt32();
+        var startColumn = reader.ReadInt32();
+        var endLine = reader.ReadInt32();
+        var endColumn = reader.ReadInt32();
+        return new SourceLocation(file, new Position(startLine, startColumn), new Position(endLine, endColumn));
     }
 
     public IReaxValue GetValue(IReaxExecutionContext context)

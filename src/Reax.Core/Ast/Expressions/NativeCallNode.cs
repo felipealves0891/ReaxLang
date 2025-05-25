@@ -2,6 +2,7 @@ using System;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Objects;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 
@@ -40,6 +41,14 @@ public record NativeCallNode(
         Node.Serialize(writer);
         writer.Write(((int)Type));
         base.Serialize(writer);
+    }
+
+    public static new NativeCallNode Deserialize(BinaryReader reader)
+    {
+        var node = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var type = (DataType)reader.ReadInt32();
+        var location = ReaxNode.Deserialize(reader);
+        return new NativeCallNode(node, type, location);
     }
 
     public override string ToString()

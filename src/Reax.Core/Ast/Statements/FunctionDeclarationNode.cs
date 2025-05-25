@@ -1,4 +1,5 @@
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 
@@ -48,6 +49,22 @@ public record FunctionDeclarationNode(
         writer.Write((int)SuccessType);
         writer.Write((int)ErrorType);
         base.Serialize(writer);
+    }
+
+    public static new FunctionDeclarationNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var block = BinaryDeserializerHelper.Deserialize<ContextNode>(reader);
+        var paramCount = reader.ReadInt32();
+        var parameters = new VarNode[paramCount];
+        for (var i = 0; i < paramCount; i++)
+        {
+            parameters[i] = BinaryDeserializerHelper.Deserialize<VarNode>(reader);
+        }
+        var successType = (DataType)reader.ReadInt32();
+        var errorType = (DataType)reader.ReadInt32();
+        var location = ReaxNode.Deserialize(reader);
+        return new FunctionDeclarationNode(identifier, block, parameters, successType, errorType, location);
     }
 
     public override string ToString()

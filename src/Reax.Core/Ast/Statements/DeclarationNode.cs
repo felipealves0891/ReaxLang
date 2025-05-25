@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 
@@ -50,13 +51,31 @@ public record DeclarationNode(
         writer.Write(Identifier);
         writer.Write(Immutable);
         writer.Write(Async);
-        writer.Write((int)Type);
-        if(Assignment is not null)
+        var type = (int)Type;
+        writer.Write(type);
+
+        writer.Write(Assignment is not null ? (byte)1 : (byte)0);
+        if (Assignment is not null)
             Assignment.Serialize(writer);
-        else
-            writer.Write((byte)0); // Indicate no assignment
+        
         writer.Write(ComplexType ?? string.Empty);
         base.Serialize(writer);
+    }
+
+    public static new DeclarationNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var immutable = reader.ReadBoolean();
+        var async = reader.ReadBoolean();
+        var type = (DataType)reader.ReadInt32();
+
+        AssignmentNode? assignment = null;
+        if (reader.ReadByte() == (byte)1) // Check if there is an assignment
+            assignment = BinaryDeserializerHelper.Deserialize<AssignmentNode>(reader);
+
+        var complexType = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new DeclarationNode(identifier, immutable, async, type, assignment, complexType, location);
     }
 
     public override string ToString()

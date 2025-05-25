@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Statements;
@@ -40,6 +41,19 @@ public record ScriptNode : StatementNode, IReaxDeclaration
             node.Serialize(writer);
         }
         base.Serialize(writer);
+    }
+
+    public static new ScriptNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var nodesCount = reader.ReadInt32();
+        var nodes = new ReaxNode[nodesCount];
+        for (var i = 0; i < nodesCount; i++)
+        {
+            nodes[i] = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        }
+        var location = ReaxNode.Deserialize(reader);
+        return new ScriptNode(identifier, nodes, location);
     }
 
     public override string ToString()

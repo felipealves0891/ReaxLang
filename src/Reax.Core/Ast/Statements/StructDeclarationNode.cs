@@ -1,4 +1,5 @@
 using System;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Statements;
@@ -27,6 +28,21 @@ public record StructDeclarationNode(
             property.Serialize(writer);
         }
         base.Serialize(writer);
+    }
+
+    public static new StructDeclarationNode Deserialize(BinaryReader reader)
+    {
+        var name = reader.ReadString();
+        var propertyCount = reader.ReadInt32();
+        var properties = new List<StructFieldNode>(propertyCount);
+        
+        for (int i = 0; i < propertyCount; i++)
+        {
+            properties.Add(BinaryDeserializerHelper.Deserialize<StructFieldNode>(reader));
+        }
+
+        var location = ReaxNode.Deserialize(reader);
+        return new StructDeclarationNode(name, properties, location);
     }
 
     public override string ToString()

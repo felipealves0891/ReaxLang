@@ -1,4 +1,5 @@
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 
@@ -37,6 +38,14 @@ public record WhileNode(
         Condition.Serialize(writer);
         Block.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    public static new WhileNode Deserialize(BinaryReader reader)
+    {
+        var condition = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var block = BinaryDeserializerHelper.Deserialize<ContextNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new WhileNode(condition, block, location);
     }
 
     public override string ToString()

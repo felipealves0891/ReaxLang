@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Functions;
 using Reax.Core.Locations;
+using Reax.Core.Registries;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -11,6 +12,8 @@ public record ModuleNode(
     Dictionary<string, Function> functions, 
     SourceLocation Location) : StatementNode(Location), IReaxDeclaration
 {
+    private static BuiltInRegistry _builtInRegistry = new ();
+
     public override IReaxNode[] Children => [];
 
     public override void Execute(IReaxExecutionContext context)
@@ -28,6 +31,14 @@ public record ModuleNode(
 
         writer.Write(identifier);
         base.Serialize(writer);
+    }
+
+    public static new ModuleNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var functions = _builtInRegistry.Get(identifier);
+        var location = ReaxNode.Deserialize(reader);
+        return new ModuleNode(identifier, functions, location);
     }
 
     public override string ToString()

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Expressions;
@@ -32,17 +33,25 @@ public record BinaryNode(
     {
         return $"{Left} {Operator} {Right}";
     }
-    
+
     public override void Serialize(BinaryWriter writer)
     {
         var typename = GetType().AssemblyQualifiedName
             ?? throw new InvalidOperationException("Tipo nulo ao serializar");
 
         writer.Write(typename);
-
         Left.Serialize(writer);
         Operator.Serialize(writer);
         Right.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    public static new BinaryNode Deserialize(BinaryReader reader)
+    {
+        var left = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var op = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var right = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new BinaryNode(left, op, right, location);
     }
 }

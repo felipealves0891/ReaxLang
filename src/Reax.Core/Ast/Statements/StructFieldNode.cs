@@ -23,6 +23,14 @@ public record StructFieldNode(
         base.Serialize(writer);
     }
 
+    public static new StructFieldNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var type = (DataType)reader.ReadInt32();
+        var location = ReaxNode.Deserialize(reader);
+        return new StructFieldNode(identifier, type, location);
+    }
+
     public override string ToString()
     {
         return $"{Identifier}: {Type}";

@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Objects;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 using Reax.Parser.Node;
@@ -60,6 +61,22 @@ public record UseInstanceNode(
         }
         Target.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    
+    public static new UseInstanceNode Deserialize(BinaryReader reader)
+    {
+        var member = reader.ReadString();
+        var argumentCount = reader.ReadInt32();
+        var arguments = new ReaxNode[argumentCount];
+        for (int i = 0; i < argumentCount; i++)
+        {
+            arguments[i] = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        }
+
+        var target = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new UseInstanceNode(member, arguments, target, location);
     }
 
     public override string ToString()

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Expressions;
@@ -50,6 +51,15 @@ public record CalculateNode(
         Operator.Serialize(writer);
         Right.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    public static new CalculateNode Deserialize(BinaryReader reader)
+    {
+        var left = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var op = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var right = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new CalculateNode(left, op, right, location);
     }
 
     public override string ToString()

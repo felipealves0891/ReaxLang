@@ -31,6 +31,13 @@ public record ScriptDeclarationNode(
         base.Serialize(writer);
     }
 
+    public static new ScriptDeclarationNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new ScriptDeclarationNode(identifier, location);
+    }
+
     public override string ToString()
     {
         return $"script {Identifier};";

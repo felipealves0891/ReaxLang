@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Immutable;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 
@@ -29,6 +30,18 @@ public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Locati
             literal.Serialize(writer);
         }
         base.Serialize(writer);
+    }
+
+    public static new ArrayNode Deserialize(BinaryReader reader)
+    {
+        var length = reader.ReadInt32();
+        var literals = new ReaxNode[length];
+        for (var i = 0; i < length; i++)
+        {
+            literals[i] = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        }
+        var location = ReaxNode.Deserialize(reader);
+        return new ArrayNode(literals.ToImmutableArray(), location);
     }
 
     public IEnumerator<ReaxNode> GetEnumerator()

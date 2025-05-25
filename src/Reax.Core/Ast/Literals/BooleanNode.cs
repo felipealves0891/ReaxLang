@@ -26,6 +26,13 @@ public record BooleanNode(
         base.Serialize(writer);
     }
 
+    public static new BooleanNode Deserialize(BinaryReader reader)
+    {
+        var source = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new BooleanNode(source, location);
+    }
+
     public override string ToString()
     {
         return $"{Source.ToLower()}";

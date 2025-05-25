@@ -3,6 +3,7 @@ using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Parser.Node;
+using Reax.Core.Helpers;
 
 namespace Reax.Core.Ast.Expressions;
 
@@ -54,6 +55,15 @@ public record ExternalFunctionCallNode(
         writer.Write(scriptName);
         functionCall.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    public static new ExternalFunctionCallNode Deserialize(BinaryReader reader)
+    {
+        var scriptName = reader.ReadString();
+        var functionCall = BinaryDeserializerHelper.Deserialize<FunctionCallNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+
+        return new ExternalFunctionCallNode(scriptName, functionCall, location);
     }
 
     public override string ToString()

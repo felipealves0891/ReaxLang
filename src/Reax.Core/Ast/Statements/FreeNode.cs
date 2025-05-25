@@ -26,6 +26,13 @@ public record FreeNode(string Identifier, SourceLocation Location)
         base.Serialize(writer);
     }
 
+    public static new FreeNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new FreeNode(identifier, location);
+    }
+
     public override string ToString()
     {
         return $"free {Identifier};";

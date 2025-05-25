@@ -34,6 +34,13 @@ public record FactorNode(
         base.Serialize(writer);
     }
     
+    public static new FactorNode Deserialize(BinaryReader reader)
+    {
+        var op = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new FactorNode(op, location);
+    }
+
     public override string ToString()
     {
         return Operator.ToString();

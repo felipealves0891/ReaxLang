@@ -2,7 +2,9 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Reax.Core;
 using Reax.Core.Ast;
+using Reax.Core.Debugger;
 
 namespace Reax.Interpreter.Cache;
 
@@ -53,14 +55,29 @@ public static class ReaxBinSerializer
         var sourceCode = File.ReadAllText(filename);
         if (CalculateHash(sourceCode) != sourceHash)
             return null;
-            
-        var cachedAst = new CachedAst(br);        
-        return cachedAst.Data;
+
+        return TryingAstParseFromBinary(br, outputFile);
+    }
+
+    public static ReaxNode[]? TryingAstParseFromBinary(BinaryReader br, string outputFile)
+    { 
+        try
+        {
+            var cachedAst = new CachedAst(br);
+            return cachedAst.Data;
+        }
+        catch (System.Exception ex)
+        {
+            if(File.Exists(outputFile))
+                File.Delete(outputFile); // Remove corrupted file                
+            Logger.LogError(ex, "Failed to load CachedAst from binary reader.");
+            return null;
+        }
     }
 
     private static string GetOutputFilePath(string filename)
     {
-        var currentDirectory = Directory.GetCurrentDirectory();
+        var currentDirectory = ReaxEnvironment.DirectoryRoot;
         var cacheDirectory = Path.Combine(currentDirectory, FOLDER_BIN);
         if (!Directory.Exists(cacheDirectory))
         {

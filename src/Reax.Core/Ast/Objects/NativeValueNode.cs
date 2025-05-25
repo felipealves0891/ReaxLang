@@ -32,6 +32,13 @@ public record NativeValueNode : ReaxNode, IReaxValue
         base.Serialize(writer);
     }
 
+    public static new NativeValueNode Deserialize(BinaryReader reader)
+    {
+        var value = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new NativeValueNode(value) { Location = location };
+    }
+
     public override string ToString()
     {
         return JsonSerializer.Serialize(Value);

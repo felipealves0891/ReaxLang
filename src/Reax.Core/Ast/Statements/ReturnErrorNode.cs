@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 
 namespace Reax.Core.Ast.Statements;
 
@@ -37,6 +38,13 @@ public record ReturnErrorNode(
 
         Expression.Serialize(writer);
         base.Serialize(writer);
+    }
+
+    public static new ReturnErrorNode Deserialize(BinaryReader reader)
+    {
+        var expression = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new ReturnErrorNode(expression, location);
     }
 
     public override string ToString()

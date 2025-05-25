@@ -13,6 +13,7 @@ public record NullNode(SourceLocation Location) : LiteralNode("NULL", Location)
     public override object Value => new object{};
     public override DataType Type => DataType.NULL;
     public override IReaxNode[] Children => [];
+
     public override void Serialize(BinaryWriter writer)
     {
         var typename = GetType().AssemblyQualifiedName
@@ -23,6 +24,14 @@ public record NullNode(SourceLocation Location) : LiteralNode("NULL", Location)
         writer.Write(Source);
         base.Serialize(writer);
     }
+
+    public static new NullNode Deserialize(BinaryReader reader)
+    {
+        var source = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new NullNode(location);
+    }
+
     public override string ToString()
     {
         return "NULL";
