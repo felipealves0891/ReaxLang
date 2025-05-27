@@ -20,6 +20,25 @@ public record NativeValueNode : ReaxNode, IReaxValue
 
     public DataType Type => DataType.NONE;
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        var str = Value?.ToString() ?? string.Empty;
+        writer.Write(str);
+        base.Serialize(writer);
+    }
+
+    public static new NativeValueNode Deserialize(BinaryReader reader)
+    {
+        var value = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new NativeValueNode(value) { Location = location };
+    }
+
     public override string ToString()
     {
         return JsonSerializer.Serialize(Value);

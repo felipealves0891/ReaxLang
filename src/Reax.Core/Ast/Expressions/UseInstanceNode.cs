@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Objects;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 using Reax.Parser.Node;
@@ -43,6 +44,39 @@ public record UseInstanceNode(
             return expression.Evaluation(context).Value;
         else
             throw new InvalidOperationException("Target é invalido para chamada nativa");
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Member);
+        writer.Write(Arguments.Length);
+        foreach (var arg in Arguments)
+        {
+            arg.Serialize(writer);
+        }
+        Target.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    
+    public static new UseInstanceNode Deserialize(BinaryReader reader)
+    {
+        var member = reader.ReadString();
+        var argumentCount = reader.ReadInt32();
+        var arguments = new ReaxNode[argumentCount];
+        for (int i = 0; i < argumentCount; i++)
+        {
+            arguments[i] = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        }
+
+        var target = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new UseInstanceNode(member, arguments, target, location);
     }
 
     public override string ToString()

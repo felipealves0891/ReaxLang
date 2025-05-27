@@ -9,9 +9,30 @@ namespace Reax.Core.Ast;
 
 public abstract record ReaxNode(SourceLocation Location) : IReaxNode
 {
+    protected const byte ACK = 0x06;
+
     public abstract IReaxNode[] Children { get; }
 
-    public IReaxValue GetValue(IReaxExecutionContext context) 
+    public virtual void Serialize(BinaryWriter writer)
+    {
+        writer.Write(Location.File);
+        writer.Write(Location.Start.Line);
+        writer.Write(Location.Start.Column);
+        writer.Write(Location.End.Line);
+        writer.Write(Location.End.Column);
+    }
+    
+    public static SourceLocation Deserialize(BinaryReader reader)
+    {
+        var file = reader.ReadString();
+        var startLine = reader.ReadInt32();
+        var startColumn = reader.ReadInt32();
+        var endLine = reader.ReadInt32();
+        var endColumn = reader.ReadInt32();
+        return new SourceLocation(file, new Position(startLine, startColumn), new Position(endLine, endColumn));
+    }
+
+    public IReaxValue GetValue(IReaxExecutionContext context)
     {
         if (this is ExpressionNode expression)
             return expression.Evaluation(context);

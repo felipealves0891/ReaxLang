@@ -8,4 +8,5 @@ public interface IReaxNode
 {
     SourceLocation Location { get; }
     IReaxNode[] Children { get; }
+    void Serialize(BinaryWriter writer);
 }

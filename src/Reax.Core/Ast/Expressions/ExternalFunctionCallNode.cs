@@ -3,6 +3,7 @@ using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Parser.Node;
+using Reax.Core.Helpers;
 
 namespace Reax.Core.Ast.Expressions;
 
@@ -42,6 +43,27 @@ public record ExternalFunctionCallNode(
         {
             throw new InvalidOperationException($"Função externa não localizada: {scriptName}.{functionCall.Identifier}"); 
         }
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(scriptName);
+        functionCall.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    public static new ExternalFunctionCallNode Deserialize(BinaryReader reader)
+    {
+        var scriptName = reader.ReadString();
+        var functionCall = BinaryDeserializerHelper.Deserialize<FunctionCallNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+
+        return new ExternalFunctionCallNode(scriptName, functionCall, location);
     }
 
     public override string ToString()

@@ -29,6 +29,26 @@ public record VarNode : ExpressionNode
         return context.GetVariable(Identifier);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        writer.Write((int)Type);
+        base.Serialize(writer);
+    }
+
+    public static new VarNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var type = (DataType)reader.ReadInt32();
+        var location = ReaxNode.Deserialize(reader);
+        return new VarNode(identifier, type, location);
+    }
+
     public override string ToString()
     {
         return Identifier;

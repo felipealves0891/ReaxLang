@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Ast.Expressions;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 
@@ -44,13 +45,50 @@ public record DeclarationNode(
         }
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        writer.Write(Immutable);
+        writer.Write(Async);
+        var type = (int)Type;
+        writer.Write(type);
+
+        writer.Write(Assignment is not null ? (byte)1 : (byte)0);
+        if (Assignment is not null)
+            Assignment.Serialize(writer);
+        
+        writer.Write(ComplexType ?? string.Empty);
+        base.Serialize(writer);
+    }
+
+    public static new DeclarationNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var immutable = reader.ReadBoolean();
+        var async = reader.ReadBoolean();
+        var type = (DataType)reader.ReadInt32();
+
+        AssignmentNode? assignment = null;
+        if (reader.ReadByte() == (byte)1) // Check if there is an assignment
+            assignment = BinaryDeserializerHelper.Deserialize<AssignmentNode>(reader);
+
+        var complexType = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new DeclarationNode(identifier, immutable, async, type, assignment, complexType, location);
+    }
+
     public override string ToString()
     {
         var asc = Async ? "async " : "";
         var mut = Immutable ? "const" : "let";
-        if(Assignment is not null)
+        if (Assignment is not null)
             return $"{asc}{mut} {Identifier}: {Type} = {Assignment};";
-        else 
+        else
             return $"{asc}{mut} {Identifier}: {Type};";
     }
 }

@@ -47,8 +47,10 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         TimeSpan runTime = TimeSpan.Zero;
         var fileInfo = new FileInfo(settings.ComputedScript);
 
-        ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
         Logger.Level = (LoggerLevel)settings.LogLevel;
+        ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
+        Logger.LogAnalize("Reax Environment Directory: {0}", ReaxEnvironment.DirectoryRoot);
+        
 
         IReaxInterpreter interpreter = null!;
         Stopwatch stopwatch = new Stopwatch();
@@ -73,7 +75,6 @@ public sealed class RunCommand : Command<RunCommand.Settings>
 
             Logger.LogError(ex, "Error: ");
             Console.WriteLine("Reax Error: {0}", ex.Message);
-
             if (interpreter is not null)
                 Console.WriteLine(interpreter.PrintStackTrace());
         }
@@ -81,14 +82,11 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         Console.WriteLine("\nBuild Time: {0}", buildTime);
         Console.WriteLine("Run Time: {0}", runTime);
         Console.WriteLine("Total Time: {0}", stopwatch.Elapsed);
-
-        
         Console.WriteLine($"Memory Usage: {memoryUsageInMB:F2} MB");
-
         return 0;
 
     }
-    
+
     private double GetMemoryUsage()
     {
         Process currentProcess = Process.GetCurrentProcess();

@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Immutable;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Objects;
 using Reax.Core.Ast.Objects.Structs;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Expressions;
@@ -13,7 +15,7 @@ public record ArrayAccessNode(ReaxNode Array, ReaxNode Expression, SourceLocatio
     public override IReaxNode[] Children => [Array, Expression];
 
     public override IReaxValue Evaluation(IReaxExecutionContext context)
-    {        
+    {
         var array = GetArray(context);
         var index = GetIndex(context);
         return array[index].GetValue(context);
@@ -42,5 +44,24 @@ public record ArrayAccessNode(ReaxNode Array, ReaxNode Expression, SourceLocatio
     public override string ToString()
     {
         return $"{Array}[{Expression}]";
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+        Array.Serialize(writer);
+        Expression.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    public static new ArrayAccessNode Deserialize(BinaryReader reader)
+    {
+        var array = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var expression = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new ArrayAccessNode(array, expression, location);
     }
 }

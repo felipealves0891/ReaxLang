@@ -13,7 +13,7 @@ public class ReaxParser : ITokenSource
     private readonly Token[] _tokens;
     private int _position;
 
-    public ReaxParser(IEnumerable<Token> tokens)
+    public ReaxParser(IEnumerable<Token> tokens, Func<string, ReaxNode[]> getNodes)
     {
         _tokens = tokens.ToArray();
         _position = 0;
@@ -21,7 +21,9 @@ public class ReaxParser : ITokenSource
                        .Assembly
                        .GetTypes()
                        .Where(x => x.GetInterface(nameof(INodeParser)) != null)
-                       .Select(x => Activator.CreateInstance(x))
+                       .Select(x => x.GetConstructor([getNodes.GetType()]) is not null
+                                  ? Activator.CreateInstance(x, getNodes)
+                                  : Activator.CreateInstance(x))
                        .Cast<INodeParser>()
                        .ToList();
     }

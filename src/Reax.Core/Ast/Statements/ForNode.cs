@@ -1,5 +1,6 @@
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 
@@ -40,6 +41,28 @@ public record ForNode(
     public bool HasGuaranteedReturn()
     {
         return Block.HasGuaranteedReturn();
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Declaration.Serialize(writer);
+        Condition.Serialize(writer);
+        Block.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    public static new ForNode Deserialize(BinaryReader reader)
+    {
+        var declaration = BinaryDeserializerHelper.Deserialize<DeclarationNode>(reader);
+        var condition = BinaryDeserializerHelper.Deserialize<BinaryNode>(reader);
+        var block = BinaryDeserializerHelper.Deserialize<ContextNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new ForNode(declaration, condition, block, location);
     }
 
     public override string ToString()

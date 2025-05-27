@@ -22,6 +22,24 @@ public record LogicNode(string Operator,
         };
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Operator);
+        base.Serialize(writer);
+    }
+
+    public static new LogicNode Deserialize(BinaryReader reader)
+    {
+        var op = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new LogicNode(op, location);
+    }
+
     public override string ToString()
     {
         return Operator.ToString();

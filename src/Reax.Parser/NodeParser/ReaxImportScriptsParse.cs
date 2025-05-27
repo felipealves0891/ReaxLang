@@ -11,6 +11,13 @@ namespace Reax.Parser.NodeParser;
 
 public class ReaxImportScriptsParse : INodeParser
 {
+    private readonly Func<string, ReaxNode[]> _getNodes;
+
+    public ReaxImportScriptsParse(Func<string, ReaxNode[]> getNodes)
+    {
+        _getNodes = getNodes;
+    }
+
     public bool IsParse(Token before, Token current, Token next)
     {
         return current.Type == TokenType.IMPORT && next.Type == TokenType.SCRIPT;
@@ -28,7 +35,7 @@ public class ReaxImportScriptsParse : INodeParser
 
         if(!ReaxEnvironment.ImportedFiles.ContainsKey(file))
         {
-            var nodes = GetNodes(info.FullName);
+            var nodes = _getNodes(info.FullName);
             script = new ScriptNode(info.Name, nodes.ToArray(), source.CurrentToken.Location);
             ReaxEnvironment.ImportedFiles.Add(file, script);      
         }
@@ -48,15 +55,4 @@ public class ReaxImportScriptsParse : INodeParser
         return script;
     }
     
-    private static IEnumerable<ReaxNode> GetNodes(string filename)
-    {
-        var reader = new ReaxStreamReader(filename);
-        var lexer = new ReaxLexer(reader);
-        var tokens = lexer.Tokenize().ToArray();
-
-        var parser = new ReaxParser(tokens);
-        var ast = parser.Parse().ToArray();
-
-        return ast;
-    }
 }

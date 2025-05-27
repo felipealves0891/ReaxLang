@@ -4,6 +4,7 @@ using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Objects;
+using Reax.Core.Helpers;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -26,6 +27,25 @@ public record AssignmentNode(
             context.SetVariable(Identifier.Identifier, value);
         else
             throw new Exception($"Tipo invalido para direita de uma atribuição {Assigned.GetType().Name}, era esperado uma expressão ou um literal!");
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+        Identifier.Serialize(writer);
+        Assigned.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    public static new AssignmentNode Deserialize(BinaryReader reader)
+    {
+        var identifier = BinaryDeserializerHelper.Deserialize<VarNode>(reader);
+        var assigned = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new AssignmentNode(identifier, assigned, location);
     }
 
     public override string ToString()

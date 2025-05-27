@@ -5,6 +5,7 @@ using Reax.Core.Types;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Statements;
 using Reax.Core.Debugger;
+using Reax.Core.Helpers;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -24,6 +25,28 @@ public record BindNode(
         context.SetBind(Identifier, interpreter);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Identifier);
+        Node.Serialize(writer);
+        writer.Write((int)Type);
+        base.Serialize(writer);
+    }
+
+    public static new BindNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var node = BinaryDeserializerHelper.Deserialize<AssignmentNode>(reader);
+        var type = (DataType)reader.ReadInt32();
+        var location = ReaxNode.Deserialize(reader);
+        return new BindNode(identifier, node, type, location);
+    }
+    
     public void Initialize(IReaxExecutionContext context)
     {
         context.Declare(Identifier);
