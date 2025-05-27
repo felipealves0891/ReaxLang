@@ -72,7 +72,7 @@ public class ReaxInterpreter : IReaxInterpreter
             {
                 Logger.LogInterpreter($"Adicionando {node} a stack!");
                 StackTrace.Push(node);
-                declaration.Execute(_context);
+                declaration.Initialize(_context);
                 Logger.LogInterpreter($"Removendo {node} a stack!");
                 StackTrace.TryPop(out var _);
             }
@@ -134,14 +134,12 @@ public class ReaxInterpreter : IReaxInterpreter
         Logger.LogInterpreter($"Adicionando {node} a stack!");
         StackTrace.Push(node);
 
-        if (node is StatementNode statement and not IReaxDeclaration)
+        if (node is StatementNode statement)
             statement.Execute(_context);
-        else if (node is ExpressionNode expression and not IReaxDeclaration)
+        else if (node is ExpressionNode expression)
             Output = expression.Evaluation(_context);
-        else if (node is LiteralNode literal and not IReaxDeclaration)
+        else if (node is LiteralNode literal)
             Output = literal;
-
-        if(ReaxEnvironment.Debug){}
 
         Logger.LogInterpreter($"Removendo {node} a stack!");
         StackTrace.TryPop(out var nodeOut);

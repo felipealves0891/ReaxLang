@@ -17,8 +17,10 @@ public record ScriptDeclarationNode(
     public override IReaxNode[] Children => [];
 
     public override void Execute(IReaxExecutionContext context)
-    {
-    }
+    {}
+
+    public void Initialize(IReaxExecutionContext context)
+    {}
 
     public override void Serialize(BinaryWriter writer)
     {

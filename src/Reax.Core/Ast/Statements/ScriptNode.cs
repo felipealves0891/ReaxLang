@@ -37,8 +37,6 @@ public record ScriptNode : StatementNode, IReaxDeclaration
     {
         var interpreter = context.CreateInterpreter(Identifier, Nodes);
         interpreter.Interpret();
-        
-        context.Declare(Identifier);
         context.SetScript(Identifier, interpreter);
     }
 
@@ -71,6 +69,11 @@ public record ScriptNode : StatementNode, IReaxDeclaration
         
         var location = ReaxNode.Deserialize(reader);
         return new ScriptNode(filename, identifier, nodes, location);
+    }
+    
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.Declare(Identifier);
     }
 
     public override string ToString()

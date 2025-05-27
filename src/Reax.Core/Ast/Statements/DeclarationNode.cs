@@ -19,22 +19,26 @@ public record DeclarationNode(
 {
     public override IReaxNode[] Children => Assignment is not null ? [Assignment] : [];
 
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.DeclareVariable(Identifier, Async);
+    }
+
     public override void Execute(IReaxExecutionContext context)
     {
-        if(!Immutable)
+        if (!Immutable)
         {
-            context.DeclareVariable(Identifier, Async);
-            if(Assignment is not null && Assignment is not AssignmentNode)
-                new AssignmentNode(new VarNode(Identifier, Type, Location), Assignment, Location).Execute(context);    
-            else if(Assignment is not null && Assignment is AssignmentNode assignment)
-                assignment.Execute(context);    
+            if (Assignment is not null && Assignment is not AssignmentNode)
+                new AssignmentNode(new VarNode(Identifier, Type, Location), Assignment, Location).Execute(context);
+            else if (Assignment is not null && Assignment is AssignmentNode assignment)
+                assignment.Execute(context);
         }
-        else 
-        {
-            if(Assignment is null)
+        else
+        { 
+            if (Assignment is null)
                 throw new InvalidOperationException("A constante deve ser definida na declaração!");
 
-            if(Assignment is AssignmentNode assignment)
+            if (Assignment is AssignmentNode assignment)
                 context.DeclareImmutable(Identifier, assignment.Assigned.GetValue(context));
             else
                 context.DeclareImmutable(Identifier, Assignment.GetValue(context));

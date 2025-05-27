@@ -10,22 +10,26 @@ public record ForNode(
     DeclarationNode Declaration, 
     ReaxNode Condition, 
     ContextNode Block, 
-    SourceLocation Location) : StatementNode(Location), IBranchFlowNode
+    SourceLocation Location) : StatementNode(Location), IBranchFlowNode, IReaxDeclaration
 {
     public override IReaxNode[] Children => [Declaration, Condition, Block];
+
+    public void Initialize(IReaxExecutionContext context)
+    {
+        Declaration.Initialize(context);
+    }
 
     public override void Execute(IReaxExecutionContext context)
     {
         var condition = (BinaryNode)Condition;
-
         Declaration.Execute(context);
-        while((bool)condition.Evaluation(context).Value)
+        while ((bool)condition.Evaluation(context).Value)
         {
             var interpreter = context.CreateInterpreter(ToString(), Block.Block);
             interpreter.Interpret();
 
             var value = context.GetVariable(Declaration.Identifier) as NumberNode;
-            if(value is null)
+            if (value is null)
                 throw new InvalidOperationException("Não foi possivel obter o controlador do loop");
 
             var intValue = Convert.ToInt32(value.Value) + 1;

@@ -11,13 +11,17 @@ public record ForInNode(
     DeclarationNode Declaration,
     ReaxNode Array,
     ContextNode Context,
-    SourceLocation Location) : StatementNode(Location)
+    SourceLocation Location) : StatementNode(Location), IReaxDeclaration
 {
     public override IReaxNode[] Children => [Declaration, Array, Context];
 
+    public void Initialize(IReaxExecutionContext context)
+    {
+        Declaration.Initialize(context);
+    }
+    
     public override void Execute(IReaxExecutionContext context)
     {
-        Declaration.Execute(context);
         var array = GetArray(context);
 
         foreach (var item in array)
@@ -64,4 +68,5 @@ public record ForInNode(
     {
         return $"for {Declaration.Identifier}:{Declaration.Type} in {Array} {{}}";
     }
+
 }

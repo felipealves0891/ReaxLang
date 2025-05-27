@@ -18,7 +18,6 @@ public record ModuleNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        context.Declare(identifier);
         context.SetModule(identifier, functions);  
     }
 
@@ -39,6 +38,11 @@ public record ModuleNode(
         var functions = _builtInRegistry.Get(identifier);
         var location = ReaxNode.Deserialize(reader);
         return new ModuleNode(identifier, functions, location);
+    }
+    
+    public void Initialize(IReaxExecutionContext context)
+    {
+        context.Declare(identifier);
     }
 
     public override string ToString()
