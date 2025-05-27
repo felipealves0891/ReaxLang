@@ -59,6 +59,7 @@ public enum TokenType
     USE,
     OF,
     AS,
-    FREE
+    FREE,
+    CALL
 
 } 

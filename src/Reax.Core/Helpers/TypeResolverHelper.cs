@@ -54,11 +54,14 @@ public static class TypeResolverHelper
         // Se tipos de parâmetros forem fornecidos, buscamos por método correspondente (sobrecarga)
         if (parameterTypes != null && parameterTypes.Any())
         {
-            return type
+            var member = type
                 .GetMethods(bindingFlags)
                 .FirstOrDefault(m =>
                     string.Equals(m.Name, memberName, StringComparison.OrdinalIgnoreCase) &&
                     m.GetParameters().Select(p => p.ParameterType).SequenceEqual(parameterTypes));
+
+            if (member != null)
+                return member;
         }
 
         return GetMemberInfo(type, memberName);
@@ -126,20 +129,64 @@ public static class TypeResolverHelper
         {
             PropertyInfo prop => prop.GetValue(target),
             FieldInfo field => field.GetValue(target),
-            MethodInfo method => method.Invoke(target, parameters),
+            MethodInfo method => InvokeWithParsedParameters(method, target, parameters),
             _ => null
         };
     }
-    
+
+    public static object? InvokeWithParsedParameters(MethodInfo method, object? instance, object[] parameters)
+    {
+        if (method == null)
+            throw new ArgumentNullException(nameof(method));
+
+        var paramInfos = method.GetParameters();
+        if (paramInfos.Length != parameters.Length)
+            throw new ArgumentException("Parameter count mismatch.");
+
+        object?[] parsedParams = new object?[parameters.Length];
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            var targetType = paramInfos[i].ParameterType;
+            var value = parameters[i];
+
+            if (value == null || targetType.IsInstanceOfType(value))
+            {
+                parsedParams[i] = value;
+            }
+            else
+            {
+                // Se o valor for um array e o tipo de destino também for array, converta cada item individualmente
+                if (value is Array valueArray && targetType.IsArray)
+                {
+                    var elementType = targetType.GetElementType();
+                    var convertedArray = Array.CreateInstance(elementType!, valueArray.Length);
+                    for (int j = 0; j < valueArray.Length; j++)
+                    {
+                        convertedArray.SetValue(Convert.ChangeType(valueArray.GetValue(j), elementType!), j);
+                    }
+                    parsedParams[i] = convertedArray;
+                }
+                else
+                {
+                    parsedParams[i] = Convert.ChangeType(value, targetType);
+                }
+                
+
+            }
+        }
+
+        return method.Invoke(instance, parsedParams);
+    }
+
     public static IReaxValue CastToReax(object result, string resultText, DataType reaxType, SourceLocation location)
-    { 
+    {
         return reaxType switch
         {
             DataType.STRING => new StringNode(resultText, location),
             DataType.NUMBER => new NumberNode(resultText, location),
             DataType.BOOLEAN => new BooleanNode(resultText, location),
             _ => reaxType.HasFlag(DataType.ARRAY)
-               ? new ArrayNode(GetLiterals(result, location), location) 
+               ? new ArrayNode(GetLiterals(result, location), location)
                : new NullNode(location),
         };
     }

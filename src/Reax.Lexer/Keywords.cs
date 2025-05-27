@@ -72,6 +72,8 @@ public static class Keywords
 
     public static byte[] FREE = [(byte)'f', (byte)'r', (byte)'e', (byte)'e'];
 
+    public static byte[] CALL = [(byte)'c', (byte)'a', (byte)'l', (byte)'l'];
+
     public static TokenType IsKeyword(byte[] chars)
     {
         if (LET.SequenceEqual(chars)) return TokenType.LET;
@@ -108,6 +110,7 @@ public static class Keywords
         if (OF.SequenceEqual(chars)) return TokenType.OF;
         if (AS.SequenceEqual(chars)) return TokenType.AS;
         if (FREE.SequenceEqual(chars)) return TokenType.FREE;
+        if (CALL.SequenceEqual(chars)) return TokenType.CALL;
         if (char.IsUpper((char)chars[0])) return TokenType.NATIVE_IDENTIFIER;
         return TokenType.IDENTIFIER;
     }

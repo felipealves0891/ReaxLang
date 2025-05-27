@@ -10,7 +10,7 @@ public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Locati
     : ObjectNode(Location), IEnumerable<ReaxNode>
 {
     public override IReaxNode[] Children => Literals.ToArray();
-    public override object Value => Literals.ToArray();
+    public override object Value => Literals.Select(x => ((IReaxValue)x).Value).ToArray();
     public override DataType Type => DataType.ARRAY;
 
     public ReaxNode this[int i] => Literals[i];
