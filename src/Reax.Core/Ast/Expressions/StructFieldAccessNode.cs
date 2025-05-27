@@ -20,6 +20,25 @@ public record StructFieldAccessNode(
         return obj.FieldValues[Property].GetValue(context);
     }
 
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+        writer.Write(Identifier);
+        writer.Write(Property);
+        base.Serialize(writer);
+    }
+
+    public static new StructFieldAccessNode Deserialize(BinaryReader reader)
+    {
+        var identifier = reader.ReadString();
+        var property = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new StructFieldAccessNode(identifier, property, location);
+    }
+
     public override string ToString()
     {
         return $"{Identifier}->{Property}";

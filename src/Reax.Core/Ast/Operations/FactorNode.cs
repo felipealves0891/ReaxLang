@@ -22,7 +22,25 @@ public record FactorNode(
             _ => throw new InvalidOperationException("Operador invalido!")
         };
     }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Operator);
+        base.Serialize(writer);
+    }
     
+    public static new FactorNode Deserialize(BinaryReader reader)
+    {
+        var op = reader.ReadString();
+        var location = ReaxNode.Deserialize(reader);
+        return new FactorNode(op, location);
+    }
+
     public override string ToString()
     {
         return Operator.ToString();

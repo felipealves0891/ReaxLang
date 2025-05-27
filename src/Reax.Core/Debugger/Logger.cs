@@ -24,12 +24,14 @@ public sealed class Logger : IDisposable
         try
         {
             var path = ReaxEnvironment.DirectoryRoot;
-            var filename = new FileInfo(Path.Combine(path, "logs", $"{DateTime.Now.ToString("yyyy-MM-dd-HHmmss")}.log"));
-            if (filename.Directory is not null && !filename.Directory.Exists)
-                filename.Directory.Create();
+            var executionTime = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+            var fileName = Path.Combine(path, "logs", $"{executionTime}.log");
+            var fileInfo = new FileInfo(fileName);
+            if (fileInfo.Directory is not null && !fileInfo.Directory.Exists)
+                fileInfo.Directory.Create();
             
-            _writer = new StreamWriter(filename.FullName, true);
-            Console.WriteLine("Execution Log: {0}", filename);
+            _writer = new StreamWriter(fileInfo.FullName, true);
+            Console.WriteLine("Execution Log: {0}", fileInfo);
         }
         catch (Exception ex)
         {

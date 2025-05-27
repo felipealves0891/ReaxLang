@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 
 namespace Reax.Core.Ast.Expressions;
@@ -37,6 +38,28 @@ public record CalculateNode(
             return literal;
         else
             throw new InvalidOperationException("Não é possivel tratar o nó da operação!");
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Left.Serialize(writer);
+        Operator.Serialize(writer);
+        Right.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    public static new CalculateNode Deserialize(BinaryReader reader)
+    {
+        var left = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var op = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var right = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new CalculateNode(left, op, right, location);
     }
 
     public override string ToString()

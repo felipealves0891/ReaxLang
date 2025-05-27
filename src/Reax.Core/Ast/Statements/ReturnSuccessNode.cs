@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
+using Reax.Core.Helpers;
 
 
 namespace Reax.Core.Ast.Statements;
@@ -28,6 +29,24 @@ public record ReturnSuccessNode(
     public bool HasGuaranteedReturn()
     {
         return true;
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        Expression.Serialize(writer);
+        base.Serialize(writer);
+    }
+
+    public static new ReturnSuccessNode Deserialize(BinaryReader reader)
+    {
+        var expression = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        var location = ReaxNode.Deserialize(reader);
+        return new ReturnSuccessNode(expression, location);
     }
 
     public override string ToString()

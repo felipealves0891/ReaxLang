@@ -1,6 +1,7 @@
 using System;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Objects;
+using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
 using Reax.Parser.Node;
@@ -31,6 +32,37 @@ public record UseStaticNode(
             return new NullNode(Location);
 
         return new NativeValueNode(result);
+    }
+
+    public override void Serialize(BinaryWriter writer)
+    {
+        var typename = GetType().AssemblyQualifiedName
+            ?? throw new InvalidOperationException("Tipo nulo ao serializar");
+
+        writer.Write(typename);
+
+        writer.Write(Member);
+        writer.Write(TypeName);
+        writer.Write(Arguments.Length);
+        foreach (var arg in Arguments)
+        {
+            arg.Serialize(writer);
+        }
+        base.Serialize(writer);
+    }
+    
+    public static new UseStaticNode Deserialize(BinaryReader reader)
+    {
+        var member = reader.ReadString();
+        var typeName = reader.ReadString();
+        var argumentCount = reader.ReadInt32();
+        var arguments = new ReaxNode[argumentCount];
+        for (int i = 0; i < argumentCount; i++)
+        {
+            arguments[i] = BinaryDeserializerHelper.Deserialize<ReaxNode>(reader);
+        }
+        var location = ReaxNode.Deserialize(reader);
+        return new UseStaticNode(member, typeName, arguments, location);
     }
 
     public override string ToString()
