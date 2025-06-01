@@ -97,7 +97,7 @@ public class ReaxInterpreter : IReaxInterpreter
         Interpret(rethrow);
     }
 
-    public void Interpret(bool rethrow = false)
+    public void Interpret(bool rethrow = true)
     {
         Initialize();
         foreach (var node in _nodes)
@@ -107,7 +107,7 @@ public class ReaxInterpreter : IReaxInterpreter
         }
     }
 
-    private void ProcessNode(ReaxNode node, bool rethrow = false)
+    private void ProcessNode(ReaxNode node, bool rethrow)
     {
         try
         {

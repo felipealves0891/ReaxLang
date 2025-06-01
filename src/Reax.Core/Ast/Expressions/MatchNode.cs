@@ -20,21 +20,21 @@ public record MatchNode(
 
     public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
-        var result = Expression.Evaluation(context);
-        if (result.Type == Success.Parameter.Type)
+        try
         {
-            var successInterpreter = context.CreateInterpreter(Success.ToString(), [Success.Context], [Success.Parameter]);
+            var result = Expression.Evaluation(context);
+            var nodes = Success.Context is ContextNode contextNode ? contextNode.Block : [Success.Context];
+            var successInterpreter = context.CreateInterpreter(Success.ToString(), nodes, [Success.Parameter]);
             successInterpreter.Interpret("Success", false, result);
             return successInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
-        else if (result.Type == Error.Parameter.Type)
+        catch (ReturnErrorException ex)
         {
-            var errorInterpreter = context.CreateInterpreter(Error.ToString(), [Error.Context], [Error.Parameter]);
-            errorInterpreter.Interpret("Error", false, result);
+            var nodes = Error.Context is ContextNode contextNode ? contextNode.Block : [Error.Context];
+            var errorInterpreter = context.CreateInterpreter(Error.ToString(), nodes, [Error.Parameter]);
+            errorInterpreter.Interpret("Error", false, ex.Value);
             return errorInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
-        else
-            throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
     }
     
     public override void Serialize(BinaryWriter writer)
