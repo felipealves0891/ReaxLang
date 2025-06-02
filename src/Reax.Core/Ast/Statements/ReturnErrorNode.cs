@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Locations;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Helpers;
+using Reax.Core.Ast.Interfaces;
 
 namespace Reax.Core.Ast.Statements;
 
@@ -14,8 +15,8 @@ public record ReturnErrorNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        if (Expression is LiteralNode literal)
-            throw new ReturnErrorException(literal);
+        if (Expression is IReaxValue value)
+            throw new ReturnErrorException(value);
 
         var interpreter = context.CreateInterpreter(ToString(), [Expression]);
         interpreter.Interpret();

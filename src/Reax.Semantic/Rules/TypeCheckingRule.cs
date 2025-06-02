@@ -284,7 +284,7 @@ public class TypeCheckingRule : BaseRule
             var type = (DataType)GetDataType(item);
             if (type != DataType.NONE)
             {
-                if (returnType == DataType.NONE)
+                if (returnType is DataType.NONE or DataType.VOID)
                     returnType = type;
                 else
                     returnType = returnType | type;
@@ -302,6 +302,8 @@ public class TypeCheckingRule : BaseRule
             return GetDataType(var);
         else if (successNode.Expression is LiteralNode literal)
             return literal.Type;
+        else if (successNode.Expression is ObjectNode obj)
+            return GetDataType(obj);
         else
             return DataType.NONE;
     }

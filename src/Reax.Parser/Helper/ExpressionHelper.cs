@@ -100,6 +100,14 @@ public class ExpressionHelper
             Consume();
             return node;
         }
+        else if (token.Type == TokenType.USE)
+        {
+            return NativeCallHelper.Parser(_tokens[_pos..]);
+        }
+        else if (token.Type == TokenType.OPEN_BRACKET)
+        {
+            return ArrayHelper.Parse(_tokens[_pos..]);
+        }
         else
         {
             throw new Exception($"Token inesperado: {token}");
@@ -164,7 +172,7 @@ public class ExpressionHelper
                     instance.File,
                     instance.Location.Start,
                     property.Location.End));
-        
+
         if (Peek().Type == TokenType.OPEN_BRACKET)
         {
             Consume();

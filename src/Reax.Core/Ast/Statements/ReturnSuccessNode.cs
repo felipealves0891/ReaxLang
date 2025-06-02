@@ -16,8 +16,8 @@ public record ReturnSuccessNode(
 
     public override void Execute(IReaxExecutionContext context)
     {
-        if (Expression is LiteralNode literal)
-            throw new ReturnSuccessException(literal);
+        if (Expression is IReaxValue value)
+            throw new ReturnSuccessException(value);
         
         var interpreter = context.CreateInterpreter(ToString(), [Expression]);
         interpreter.Interpret();

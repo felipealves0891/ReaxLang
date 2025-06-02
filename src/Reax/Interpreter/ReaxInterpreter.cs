@@ -90,7 +90,7 @@ public class ReaxInterpreter : IReaxInterpreter
         for (int i = 0; i < values.Length; i++)
         {
             var variable = _parameters[i].ToString();
-            var value = (LiteralNode)values[i];
+            var value = values[i];
             _context.DeclareImmutable(variable, value);
         }
 

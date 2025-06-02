@@ -13,8 +13,8 @@ public class ReaxArrayParse : INodeParser
 {
     public bool IsParse(Token before, Token current, Token next)
     {
-        return before.Type == TokenType.ASSIGNMENT
-            && current.Type == TokenType.OPEN_BRACKET;
+        return (before.Type == TokenType.ASSIGNMENT && current.Type == TokenType.OPEN_BRACKET)
+            || (current.Type == TokenType.OPEN_BRACKET && next.Type == TokenType.CLOSE_BRACKET);
     }
 
     public ReaxNode? Parse(ITokenSource source)

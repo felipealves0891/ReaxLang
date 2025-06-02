@@ -7,7 +7,9 @@ using Reax.Core.Types;
 
 namespace Reax.Core.Ast.Objects;
 
-public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Location)
+public record ArrayNode(
+    ImmutableArray<ReaxNode> Literals,
+    SourceLocation Location)
     : ObjectNode(Location), IEnumerable<ReaxNode>
 {
     public ReaxNode this[int i] => Literals[i];
@@ -16,7 +18,7 @@ public record ArrayNode(ImmutableArray<ReaxNode> Literals, SourceLocation Locati
     public override object Value => Literals.Select(x => ((IReaxValue)x).Value).ToArray();
     public override DataType Type => DataType.ARRAY;
     public int Length = Literals.Length;
-
+    
     public override void Serialize(BinaryWriter writer)
     {
         var typename = GetType().AssemblyQualifiedName

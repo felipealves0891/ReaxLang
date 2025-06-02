@@ -2,6 +2,7 @@ using System;
 using Reax.Core.Ast.Interfaces;
 using Reax.Core.Ast.Literals;
 using Reax.Core.Ast.Objects;
+using Reax.Core.Debugger;
 using Reax.Core.Helpers;
 using Reax.Core.Locations;
 using Reax.Core.Types;
@@ -17,6 +18,19 @@ public record NativeCallNode(
 
     public override IReaxValue Evaluation(IReaxExecutionContext context)
     {
+        try
+        {
+            return TryingEvaluation(context);
+        }
+        catch (System.Exception ex)
+        {
+            Logger.LogError(ex, "Erro ao tentar fazer uma chamada nativa!");
+            throw new ReturnErrorException(new StringNode("Erro ao tentar fazer uma chamada nativa!", Location));
+        }
+    }
+
+    private IReaxValue TryingEvaluation(IReaxExecutionContext context)
+    { 
         if (Node is LiteralNode literal)
             return literal;
 

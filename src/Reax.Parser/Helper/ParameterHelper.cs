@@ -2,6 +2,7 @@ using System;
 using Reax.Core.Ast;
 using Reax.Core.Ast.Expressions;
 using Reax.Core.Ast.Interfaces;
+using Reax.Core.Types;
 using Reax.Lexer;
 using Reax.Parser.Extensions;
 using Reax.Parser.Node;
@@ -25,8 +26,8 @@ public class ParameterHelper
                 var value = source.CurrentToken;
                 source.Advance();
                 source.Advance();
-                var type = source.CurrentToken;
-                parameters.Add((VarNode)value.ToReaxValue(type));
+                var type = GetDataType(source);
+                parameters.Add(new VarNode(value.Source, type, value.Location));
             }
 
             source.Advance();
@@ -55,7 +56,7 @@ public class ParameterHelper
                     tokens.Add(source.CurrentToken);
                     source.Advance();
                 }
-                
+
                 parameters.Add(ExpressionHelper.Parser(tokens));
             }
 
@@ -65,9 +66,20 @@ public class ParameterHelper
 
         if (validateEndExpression)
             source.Advance(TokenType.SEMICOLON);
-        else 
+        else
             source.Advance();
-            
+
         return parameters;
+    }
+
+    public static DataType GetDataType(ITokenSource source)
+    {
+        var type = source.CurrentToken.Type;
+        if (source.NextToken.Type != TokenType.OPEN_BRACKET)
+            return type.ToDataType();
+
+        source.Advance(TokenType.OPEN_BRACKET);
+        source.Advance(TokenType.CLOSE_BRACKET);
+        return type.ToDataType() | DataType.ARRAY;
     }
 }
