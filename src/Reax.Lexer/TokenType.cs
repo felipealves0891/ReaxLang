@@ -60,6 +60,7 @@ public enum TokenType
     OF,
     AS,
     FREE,
-    CALL
-
+    CALL,
+    INVOKABLE,
+    INVOKE
 } 

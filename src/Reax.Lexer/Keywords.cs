@@ -74,6 +74,10 @@ public static class Keywords
 
     public static byte[] CALL = [(byte)'c', (byte)'a', (byte)'l', (byte)'l'];
 
+    public static byte[] INVOKABLE = [(byte)'i',(byte)'n',(byte)'v',(byte)'o',(byte)'k',(byte)'a',(byte)'b',(byte)'l',(byte)'e'];
+
+    public static byte[] INVOKE = [(byte)'i',(byte)'n',(byte)'v',(byte)'o',(byte)'k',(byte)'e'];
+
     public static TokenType IsKeyword(byte[] chars)
     {
         if (LET.SequenceEqual(chars)) return TokenType.LET;
@@ -111,6 +115,8 @@ public static class Keywords
         if (AS.SequenceEqual(chars)) return TokenType.AS;
         if (FREE.SequenceEqual(chars)) return TokenType.FREE;
         if (CALL.SequenceEqual(chars)) return TokenType.CALL;
+        if (INVOKABLE.SequenceEqual(chars)) return TokenType.INVOKABLE;
+        if (INVOKE.SequenceEqual(chars)) return TokenType.INVOKE;
         if (char.IsUpper((char)chars[0])) return TokenType.NATIVE_IDENTIFIER;
         return TokenType.IDENTIFIER;
     }

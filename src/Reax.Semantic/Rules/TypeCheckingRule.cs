@@ -241,6 +241,10 @@ public class TypeCheckingRule : BaseRule
             return GetDataTypeByProperty(fieldAccessNode);
         else if (node is NativeCallNode native)
             return native.Type;
+        else if (node is InvokableNode invokable)
+            return GetDataType((ReaxNode)invokable.Value);
+        else if (node is StatementNode)
+            return DataType.VOID;
         else
             return DataType.NONE;
     }
