@@ -25,7 +25,7 @@ public record InvokableNode : ObjectNode
             ?? throw new InvalidOperationException("Tipo nulo ao serializar");
 
         writer.Write(typename);
-        ((ReaxNode)Value).Serialize(writer);
+        ((IReaxNode)Value).Serialize(writer);
         base.Serialize(writer);
     }
 

@@ -243,6 +243,8 @@ public class TypeCheckingRule : BaseRule
             return native.Type;
         else if (node is InvokableNode invokable)
             return GetDataType((ReaxNode)invokable.Value);
+        else if (node is InvokeNode invoke)
+            return GetDataTypeByIdentifier(invoke.Identifier);
         else if (node is StatementNode)
             return DataType.VOID;
         else
@@ -309,7 +311,7 @@ public class TypeCheckingRule : BaseRule
         else if (successNode.Expression is ObjectNode obj)
             return GetDataType(obj);
         else
-            return DataType.NONE;
+            return GetDataType(successNode.Expression);
     }
 
     private DataType GetDataTypeByReturn(ReturnErrorNode successNode)

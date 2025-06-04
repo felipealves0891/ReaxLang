@@ -108,6 +108,16 @@ public class ExpressionHelper
         {
             return ArrayHelper.Parse(_tokens[_pos..]);
         }
+        else if (token.Type == TokenType.INVOKE)
+        {
+            var keyword = Consume();
+            var identifier = Consume();
+            return new InvokeNode(identifier.Source, 
+                new SourceLocation(
+                    keyword.File,
+                    keyword.Location.Start,
+                    identifier.Location.End));
+        }
         else
         {
             throw new Exception($"Token inesperado: {token}");
