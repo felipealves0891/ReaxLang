@@ -19,8 +19,9 @@ public class ReaxCompiler
 {
     private static bool _reprocessing = false;
 
-    public static IReaxInterpreter Compile(string filename)
+    public static IReaxInterpreter Compile(string filename, bool rebuild)
     {
+        _reprocessing = rebuild;
         var ast = GetNodes(filename);
         
         if (ReaxEnvironment.MainInterpreter != null)

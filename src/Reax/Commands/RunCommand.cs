@@ -23,6 +23,11 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         [CommandOption("-l|--loglevel")]
         [DefaultValue(1)]
         public int LogLevel { get; set; }
+
+        [Description("Define se a aplicação sera recontruida do zero, ou tentara usar o cache.")]
+        [CommandOption("-r|--rebuild")]
+        [DefaultValue(false)]
+        public bool Rebuild { get; set; }
     }
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
@@ -50,7 +55,6 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         Logger.Level = (LoggerLevel)settings.LogLevel;
         ReaxEnvironment.DirectoryRoot = fileInfo.DirectoryName ?? throw new Exception();
         Logger.LogAnalize("Reax Environment Directory: {0}", ReaxEnvironment.DirectoryRoot);
-        
 
         IReaxInterpreter interpreter = null!;
         Stopwatch stopwatch = new Stopwatch();
@@ -60,7 +64,7 @@ public sealed class RunCommand : Command<RunCommand.Settings>
         try
         {
             stopwatch.Start();
-            interpreter = ReaxCompiler.Compile(settings.ComputedScript);
+            interpreter = ReaxCompiler.Compile(settings.ComputedScript, settings.Rebuild);
             var memoryUsageBefore = GetMemoryUsage();
             buildTime = stopwatch.Elapsed;
             interpreter.Interpret();
