@@ -1,24 +1,21 @@
 using System.Diagnostics.CodeAnalysis;
 using Reax.Core.Functions;
 using Reax.Core.Locations;
-using Reax.Core.Registries;
-
+using Reax.Core.Modules;
 
 namespace Reax.Core.Ast.Statements;
 
 [ExcludeFromCodeCoverage]
 public record ModuleNode(
-    string identifier, 
-    Dictionary<string, Function> functions, 
+    string Identifier, 
+    Dictionary<string, Function> Functions, 
     SourceLocation Location) : StatementNode(Location), IReaxDeclaration
 {
-    private static BuiltInRegistry _builtInRegistry = new ();
-
     public override IReaxNode[] Children => [];
 
     public override void Execute(IReaxExecutionContext context)
     {
-        context.SetModule(identifier, functions);  
+        context.SetModule(Identifier, Functions);  
     }
 
     public override void Serialize(BinaryWriter writer)
@@ -28,25 +25,25 @@ public record ModuleNode(
 
         writer.Write(typename);
 
-        writer.Write(identifier);
+        writer.Write(Identifier);
         base.Serialize(writer);
     }
 
     public static new ModuleNode Deserialize(BinaryReader reader)
     {
         var identifier = reader.ReadString();
-        var functions = _builtInRegistry.Get(identifier);
         var location = ReaxNode.Deserialize(reader);
-        return new ModuleNode(identifier, functions, location);
+        return (ModuleNode)ModuleResolver.GetInstance()
+            .Resolve(identifier, location);
     }
     
     public void Initialize(IReaxExecutionContext context)
     {
-        context.Declare(identifier);
+        context.Declare(Identifier);
     }
 
     public override string ToString()
     {
-        return $"import module {identifier};";
+        return $"import module {Identifier};";
     }
 }

@@ -125,7 +125,7 @@ public class SymbolRule : BaseRule
     {
         var module = (ModuleNode)node;
         var results = ValidationResult.Success();
-        foreach (var item in module.functions)
+        foreach (var item in module.Functions)
         {
             var name = item.Key;
             var function = item.Value;

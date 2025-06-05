@@ -4,7 +4,7 @@ using Reax.Core.Functions.Attributes;
 
 namespace Reax.Core.Registries;
 
-public class BuiltInRegistry : BaseRegistry<string, Dictionary<string, Function>>
+internal class FunctionBuiltInRegistry : BaseRegistry<string, Dictionary<string, Function>>
 {
     protected override Dictionary<string, Function>? Load(string key)
     {
@@ -25,6 +25,6 @@ public class BuiltInRegistry : BaseRegistry<string, Dictionary<string, Function>
         foreach (var item in functions)
             dictionary[item.Name] = item.Item2;
 
-        return dictionary.Count > 0 ? dictionary : null;
+        return dictionary;
     }
 }

@@ -45,7 +45,7 @@ public class DefaultSemanticAnalyzer : ISemanticAnalyzer
     private IDisposable? EnterScript(IReaxNode node, ISemanticContext context)
     {
         if(node is ModuleNode module)
-            return context.EnterScript(module.identifier);
+            return context.EnterScript(module.Identifier);
 
         if(node is ScriptNode script)
         {

@@ -5,13 +5,12 @@ using Reax.Parser.Node;
 using Reax.Core.Ast.Statements;
 using Reax.Core.Ast;
 using Reax.Core.Registries;
+using Reax.Core.Modules;
 
 namespace Reax.Parser.NodeParser;
 
 public class ReaxImportModuleParse : INodeParser
 {
-    private static BuiltInRegistry _builtInRegistry = new ();
-
     public bool IsParse(Token before, Token current, Token next)
     {
         return current.Type == TokenType.IMPORT && next.Type == TokenType.MODULE; 
@@ -22,17 +21,10 @@ public class ReaxImportModuleParse : INodeParser
         source.Advance();
         source.Advance();
         var identifier = source.CurrentToken;
-        source.Advance();
+        source.Advance(TokenType.SEMICOLON);
         
-        if(source.CurrentToken.Type != TokenType.SEMICOLON)
-            throw new InvalidOperationException("Era esperado o encerramento da expressão!");
-
         source.Advance();
-        if (_builtInRegistry.Exists(identifier.Source))
-            return new NullNode(identifier.Location);
-
-        var functions = _builtInRegistry.Get(identifier.Source);        
-        var node = new ModuleNode(identifier.Source, functions, identifier.Location);
-        return node;
+        return ModuleResolver.GetInstance()
+            .Resolve(identifier.Source, identifier.Location);
     }
 }
