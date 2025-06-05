@@ -22,8 +22,12 @@ public class ReaxCompiler
     public static IReaxInterpreter Compile(string filename)
     {
         var ast = GetNodes(filename);
-        return new ReaxInterpreterBuilder()
-                .BuildMain(ast);
+        
+        if (ReaxEnvironment.MainInterpreter != null)
+            return ReaxEnvironment.MainInterpreter;
+
+        ReaxEnvironment.MainInterpreter = new ReaxInterpreter(ast);
+        return ReaxEnvironment.MainInterpreter;
     }
 
     public static ReaxNode[] GetNodes(string filename)
