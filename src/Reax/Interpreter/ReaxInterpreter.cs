@@ -138,7 +138,7 @@ public class ReaxInterpreter : IReaxInterpreter
             statement.Execute(_context);
         else if (node is ExpressionNode expression)
             Output = expression.Evaluation(_context);
-        else if (node is LiteralNode literal)
+        else if (node is IReaxValue literal)
             Output = literal;
 
         Logger.LogInterpreter($"Removendo {node} a stack!");
