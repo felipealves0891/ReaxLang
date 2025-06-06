@@ -1,0 +1,33 @@
+import module 'console';
+import module 'array';
+
+let myArray: string[] = ['31', '10', '105'];
+
+console.writer('O array tem o comprimento de {0}', array.len(myArray));
+console.writer('A posição zero é {0}', myArray[0]);
+
+for str: string in myArray {
+	console.writer(str);
+}
+
+struct pessoa {
+	nome: string,
+	idade: number,
+	langs: string[]
+}
+
+let _pessoa: @pessoa = {
+	nome: 'Felipe',
+	idade: 33,
+	langs: ['C#', 'Js', 'Rx']
+}
+
+console.writer(_pessoa->nome);
+
+let lang: string = _pessoa->langs[0];
+console.writer(lang);
+
+for lang: string in _pessoa->langs {
+	console.writer(lang);
+}
+

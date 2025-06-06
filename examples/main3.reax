@@ -1,0 +1,44 @@
+import module 'console';
+
+let myArray: string[] = ['C#', 'Js', 'Rx'];
+
+const count: number = use Length in myArray as number;
+console.writer('O comprimento do array é {0}', count);
+
+let datetime: string;
+on datetime {
+	console.writer('A variavel datetime foi alterada para {0}', datetime);
+}
+
+datetime = use ToString('yyyy-MM-dd') in Now of DateTime as string;
+datetime = use Substring(0, 4) in datetime as string;
+
+let day: number = use Day in Now of Datetime as number; 
+console.writer('Hoje é dia {0}', day);
+
+struct carro {
+	modelo: string,
+	marca: string,
+	ano: number
+}
+
+let meuCarro: @carro = {
+	modelo: 'Fox',
+	marca: 'Wv',
+	ano: 2014
+}
+
+console.writer('Antes: {0}', meuCarro->ano);
+
+meuCarro = carro{
+	modelo: 'Fox',
+	marca: 'Wv',
+	ano: 2015
+}
+
+console.writer('Depois: {0}', meuCarro->ano);
+
+console.writer('Digite um texto:');
+const texto: string = console.reader();
+
+console.writer('echo {0}', texto);

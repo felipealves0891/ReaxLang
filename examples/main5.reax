@@ -1,0 +1,15 @@
+import module 'console';
+
+let lines: string[] = match use ReadAllLines('D:\Source\Scripts\main9.reax') of File as string[] {
+	success(lines: string[]): string[] -> lines;
+	error(message: string): string[] {
+		console.writer(message);
+		return success [''];
+	}
+}
+
+for line: string in lines {
+	console.writer(line);
+}
+
+

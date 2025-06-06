@@ -1,0 +1,23 @@
+script calculate;
+
+const meuValornumbererno: number = 2;
+
+fun sum(num: number, den: number): number {
+	return success (num + den) - meuValornumbererno;
+}
+
+fun subtract(num: number, den: number): number {
+	return success (num - den) + meuValornumbererno;
+}
+
+fun divider(num: number, den: number): number | string {
+	if(den == 0) {
+		return error 'Tentativa de divisão por 0';
+	} else {
+		return success num / den + meuValornumbererno;
+	}
+}
+
+fun multiple(num: number, den: number): number {
+	return success (num * den) + meuValornumbererno;
+}

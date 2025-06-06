@@ -1,0 +1,17 @@
+import module 'console';
+
+let reader: string[] = invokable use ReadAllLines('D:\Source\Scripts\main2.reax') of File as string[];
+let lines: string[] = invoke reader;
+let attempt: void = invokable call WriteAllLines('Y:\Source\Scripts\teste.txt', lines) of File;
+
+match invoke attempt {
+	success(_: void): void -> console.writer('Deu certo!');
+	error(msg: string): void -> console.writer('Deu errado, pelo motivo de {0}', msg);
+}
+
+let fileExists: bool = use Exists('D:\Source\Scripts\main5.reax') of File as bool;
+if(fileExists == true) {
+	console.writer('O Arquivo existe!');
+} else {
+	console.writer('O Arquivo não existe!');
+}

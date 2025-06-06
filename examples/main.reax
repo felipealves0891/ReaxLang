@@ -1,0 +1,113 @@
+import script 'calculate.reax';
+import module 'console';
+
+let minhaDivisao: number = match calculate.divider(50, 0) {
+	success (val: number): number -> val;
+	error (message: string): number {
+		console.writer(message);
+		return -1;
+	}
+}
+
+console.writer('Isso deveria ser um numero {0}', minhaDivisao);
+free minhaDivisao;
+
+# Meu comentario de uma linha
+# Mais um comentario
+# Outro comentario
+
+const meuValorImutavel: string = 'Sempre assim'; # uma constante e um comentário
+console.writer(meuValorImutavel);
+free meuValorImutavel;
+
+async let minha_variavel: string = 'Meu Texto';
+
+on minha_variavel {
+    console.writer('Minha variavel foi alterada!');
+}
+
+on minha_variavel {
+	const meu_novo_valor: string = minha_variavel;
+    console.writer('Minha variavel foi alterada2: {0}!', meu_novo_valor);
+}
+
+on minha_variavel -> console.writer('Minha variavel foi alterada3!');
+
+let meuNumero: number;
+meuNumero = calculate.sum(5, 1);
+
+bind meuNumeroVezes2: number -> meuNumero * 2;
+
+on meuNumero when meuNumero > 0 {
+
+	fun vezes2(num: number): number | number
+	{
+		return num*2;
+	}
+	
+	console.writer('Meu numero é {0}', meuNumero);
+	console.writer('Meu numero vezes 2 com vinculo é {0}', meuNumeroVezes2);
+	console.writer('Meu numero vezes 2 com função é {0}', vezes2(meuNumero));
+}
+
+if meuNumero > 5 {
+    console.writer('Meu numero é igual a 5');    
+} else {
+    console.writer('Meu numero é menor que 10');    
+}
+
+console.writer(minha_variavel);
+minha_variavel = 'Meu texto alterado ';
+
+meuNumero = meuNumero * 5 + 2;
+meuNumero = meuNumero / 6 - 3;
+meuNumero = meuNumero + 3 * 4;
+meuNumero = meuNumero + 8 / 2;
+meuNumero = match calculate.divider(meuNumero, 0) {
+	error (message: string): number {
+		console.writer(message);
+		return 0;
+	}
+	success (val: number): number -> val;
+}
+
+console.writer(meuNumero);
+meuNumero = calculate.sum(meuNumero,1);
+
+for controle: number = 0 to 100 {
+	console.writer('Valor de controle é {0}!', controle);
+	meuNumero = calculate.sum(meuNumero,1);
+}
+
+let controle: number = 1;
+while controle < 100 and (controle > 0 or minha_variavel == 'Meu texto alterado ') {
+	meuNumero = calculate.sum(meuNumero,1);
+	controle = controle + 1;
+}
+
+free minha_variavel;
+
+meuNumero = calculate.subtract(meuNumero, 100);
+console.writer(meuNumero);
+free meuNumero;
+
+fun eMenorQueZero(num: number):bool {
+	return success num < 0;
+}
+
+if eMenorQueZero(-1) {
+	console.writer('-1 é menor que zero!');
+}
+
+free eMenorQueZero;
+
+bind vinculo1: number -> 10 + 1;
+bind vinculo2: number -> vinculo1 + 2;
+bind vinculo3: number -> vinculo1 * vinculo2;
+
+fun log(texto: string): void {
+	console.writer('Logado {0}', texto);
+}
+
+let myArray: number[] = [31, 10, 105];
+log(myArray[2]);
