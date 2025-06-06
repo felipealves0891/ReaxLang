@@ -35,6 +35,13 @@ public record MatchNode(
             errorInterpreter.Interpret("Error", false, ex.Value);
             return errorInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
         }
+        catch (Exception ex)
+        { 
+            var nodes = Error.Context is ContextNode contextNode ? contextNode.Block : [Error.Context];
+            var errorInterpreter = context.CreateInterpreter(Error.ToString(), nodes, [Error.Parameter]);
+            errorInterpreter.Interpret("Error", false, new StringNode(ex.InnerException?.Message ?? ex.Message, Location));
+            return errorInterpreter.Output ?? throw new InvalidOperationException($"{Location} - Era esperado um retorno de sucesso ou erro, mas não teve nenhum retorno!");
+        }
     }
     
     public override void Serialize(BinaryWriter writer)

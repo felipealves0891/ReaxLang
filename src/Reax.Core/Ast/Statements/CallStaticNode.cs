@@ -22,7 +22,7 @@ public record CallStaticNode(
         }
         catch (Exception ex)
         {
-            throw new ReturnErrorException(new StringNode(ex.Message, Location));
+            throw new ReturnErrorException(new StringNode(ex.InnerException?.Message ?? ex.Message, Location));
         }
     }
 
